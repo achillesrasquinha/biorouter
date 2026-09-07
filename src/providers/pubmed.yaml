@@ -72,6 +72,34 @@ tools:
         - result.*.volume
         - result.*.issue
         - result.*.pages
+  getArticle:
+    description: Get full article details by PubMed ID using efetch
+    tags:
+      - article-detail
+      - full-record
+    method: GET
+    path: /efetch.fcgi
+    params:
+      pmid:
+        type: string
+        required: true
+        mapsTo: id
+        description: PubMed ID (e.g. "33086985")
+      db:
+        type: string
+        default: pubmed
+      retmode:
+        type: string
+        default: xml
+      rettype:
+        type: string
+        default: abstract
+    response:
+      format: xml
+      fields:
+        - PubmedArticleSet.PubmedArticle.MedlineCitation.Article.ArticleTitle
+        - PubmedArticleSet.PubmedArticle.MedlineCitation.Article.Abstract.AbstractText
+        - PubmedArticleSet.PubmedArticle.MedlineCitation.Article.AuthorList.Author
 tests:
   search:
     - name: searches for CRISPR papers
@@ -86,3 +114,9 @@ tests:
         ids: "33086985"
       assert:
         - path: result.33086985.title
+  getArticle:
+    - name: gets full article details for PMID 33086985
+      params:
+        pmid: "33086985"
+      assert:
+        - {}

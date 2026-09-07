@@ -54,6 +54,29 @@ tools:
         - instruments[].name
         - submitters[].name
         - countries
+  getProjectFiles:
+    description: Get files associated with a PRIDE project
+    tags:
+      - project-files
+      - dataset-files
+    method: GET
+    path: /projects/{accession}/files
+    params:
+      accession:
+        type: string
+        required: true
+        description: PRIDE project accession (e.g. PXD000001)
+      pageSize:
+        type: integer
+        default: 10
+        description: Number of files to return per page
+    response:
+      format: json
+      fields:
+        - "[].fileName"
+        - "[].fileSizeBytes"
+        - "[].fileCategory.value"
+        - "[].projectAccessions"
 tests:
   searchProjects:
     - name: searches projects for cancer
@@ -69,3 +92,10 @@ tests:
         - path: accession
           equals: PXD000001
         - path: title
+  getProjectFiles:
+    - name: gets files for project PXD000001
+      params:
+        accession: PXD000001
+      assert:
+        - {}
+      allowError: true

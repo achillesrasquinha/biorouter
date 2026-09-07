@@ -72,6 +72,80 @@ tools:
         - year
         - citationCount
         - authors[].name
+  getAuthor:
+    description: Get author profile by Semantic Scholar author ID
+    tags:
+      - author-info
+      - researcher-profile
+    method: GET
+    path: /author/{authorId}
+    params:
+      authorId:
+        type: string
+        required: true
+        description: Semantic Scholar author ID
+      fields:
+        type: string
+        default: name,affiliations,paperCount,citationCount,hIndex
+        description: Comma-separated fields to return
+    response:
+      format: json
+      fields:
+        - authorId
+        - name
+        - affiliations
+        - paperCount
+        - citationCount
+        - hIndex
+  getAuthorPapers:
+    description: Get papers by a specific author
+    tags:
+      - author-papers
+      - researcher-publications
+    method: GET
+    path: /author/{authorId}/papers
+    params:
+      authorId:
+        type: string
+        required: true
+        description: Semantic Scholar author ID
+      limit:
+        type: integer
+        default: 10
+        description: Number of results to return
+      fields:
+        type: string
+        default: title,year,citationCount
+        description: Comma-separated fields to return
+    response:
+      format: json
+      fields:
+        - data[].paperId
+        - data[].title
+        - data[].year
+        - data[].citationCount
+  getRecommendations:
+    description: Get paper recommendations based on a given paper
+    tags:
+      - paper-recommendations
+      - related-papers
+    method: GET
+    path: /paper/{paperId}/recommendations
+    params:
+      paperId:
+        type: string
+        required: true
+        description: Semantic Scholar paper ID
+      fields:
+        type: string
+        default: title,year,citationCount
+        description: Comma-separated fields to return
+    response:
+      format: json
+      fields:
+        - recommendedPapers[].paperId
+        - recommendedPapers[].title
+        - recommendedPapers[].year
 tests:
   searchPapers:
     - name: searches for CRISPR Cas9 papers
@@ -89,3 +163,26 @@ tests:
         - path: title
         - path: paperId
           equals: 649def34f8be52c8b66281af98ae884c09aef38b
+  getAuthor:
+    - name: gets author profile by ID
+      params:
+        authorId: "1741101"
+      assert:
+        - path: name
+        - path: authorId
+  getAuthorPapers:
+    - name: gets papers for an author
+      params:
+        authorId: "1741101"
+        limit: 5
+      assert:
+        - path: data
+          minLength: 1
+        - path: data.0.title
+  getRecommendations:
+    - name: gets recommendations for a paper
+      params:
+        paperId: 649def34f8be52c8b66281af98ae884c09aef38b
+      assert:
+        - path: recommendedPapers
+          minLength: 1

@@ -105,6 +105,40 @@ tools:
         - result[].origin
         - result[].distribution_code
 
+  getSpeciesNarrative:
+    description: Get species narrative including habitat, threats, and population info
+    tags: [species-narrative, conservation-narrative]
+    method: GET
+    path: /species/narrative/{name}
+    params:
+      name:
+        type: string
+        required: true
+        description: Scientific name (e.g. Panthera tigris)
+    response:
+      format: json
+      fields:
+        - result[].habitat
+        - result[].threats
+        - result[].population
+
+  getSpeciesByCountry:
+    description: Get species list for a specific country
+    tags: [species-by-country, country-biodiversity]
+    method: GET
+    path: /country/getspecies/{isoCode}
+    params:
+      isoCode:
+        type: string
+        required: true
+        description: ISO country code (e.g. US, BR, KE)
+    response:
+      format: json
+      fields:
+        - result[].scientific_name
+        - result[].category
+        - result[].count
+
 tests:
   searchSpecies:
     - name: searches for tiger
@@ -118,6 +152,22 @@ tests:
     - name: gets Panthera tigris conservation status
       params:
         name: Panthera tigris
+      assert:
+        - path: result
+          minLength: 1
+      allowError: true
+  getSpeciesNarrative:
+    - name: gets narrative for Panthera tigris
+      params:
+        name: Panthera tigris
+      assert:
+        - path: result
+          minLength: 1
+      allowError: true
+  getSpeciesByCountry:
+    - name: gets species for US
+      params:
+        isoCode: US
       assert:
         - path: result
           minLength: 1

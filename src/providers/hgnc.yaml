@@ -52,6 +52,27 @@ tools:
         - response.docs[].location
         - response.docs[].alias_symbol
         - response.docs[].entrez_id
+  getGeneById:
+    description: Get gene record by HGNC ID
+    tags:
+      - gene-info
+      - hgnc-id-lookup
+    method: GET
+    path: /fetch/hgnc_id/{hgncId}
+    params:
+      hgncId:
+        type: string
+        required: true
+        description: HGNC identifier (e.g. "HGNC:11998" for TP53)
+    response:
+      format: json
+      fields:
+        - response.docs[].hgnc_id
+        - response.docs[].symbol
+        - response.docs[].name
+        - response.docs[].alias_symbol
+        - response.docs[].locus_type
+        - response.docs[].gene_group
 tests:
   search:
     - name: searches for BRCA1 gene
@@ -69,3 +90,12 @@ tests:
           minLength: 1
         - path: response.docs.0.symbol
           equals: BRCA1
+  getGeneById:
+    - name: gets gene record by HGNC ID for TP53
+      params:
+        hgncId: "HGNC:11998"
+      assert:
+        - path: response.docs
+          minLength: 1
+        - path: response.docs.0.symbol
+          equals: TP53

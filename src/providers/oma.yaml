@@ -78,6 +78,24 @@ tools:
         - '[].levels_url'
         - '[].members_url'
         - '[].alternative_levels'
+  getGenome:
+    description: Get genome information by genome identifier
+    tags:
+      - genome-info
+      - species-genome
+    method: GET
+    path: /genome/{genomeId}/
+    params:
+      genomeId:
+        type: string
+        required: true
+        description: Genome identifier (e.g. HUMAN, MOUSE, DROME)
+    response:
+      format: json
+      fields:
+        - species.species
+        - species.genome
+        - nr_entries
 tests:
   getProtein:
     - name: gets protein info for P04637
@@ -88,3 +106,10 @@ tests:
         - anyOf:
             - entry_nr
             - sequence
+  getGenome:
+    - name: gets genome info for HUMAN
+      params:
+        genomeId: HUMAN
+      assert:
+        - path: species.species
+        - path: nr_entries

@@ -88,6 +88,49 @@ tools:
         - results[].iconic_taxon_name
         - results[].conservation_status.status
         - results[].wikipedia_url
+  getObservation:
+    description: Get a specific observation by ID
+    tags:
+      - observation-detail
+      - sighting-info
+    method: GET
+    path: /observations/{id}
+    params:
+      id:
+        type: integer
+        required: true
+        description: iNaturalist observation ID
+    response:
+      format: json
+      fields:
+        - results[].id
+        - results[].species_guess
+        - results[].taxon.name
+        - results[].place_guess
+        - results[].observed_on
+        - results[].quality_grade
+  searchPlaces:
+    description: Search places by name using autocomplete
+    tags:
+      - place-search
+      - location-search
+    method: GET
+    path: /places/autocomplete
+    params:
+      q:
+        type: string
+        required: true
+        description: Place name to search (e.g. "Yellowstone", "Costa Rica")
+      per_page:
+        type: integer
+        default: 10
+        description: Number of results per page
+    response:
+      format: json
+      fields:
+        - results[].id
+        - results[].display_name
+        - results[].bounding_box_geojson
 tests:
   searchObservations:
     - name: searches observations for Monarch butterfly
@@ -113,3 +156,17 @@ tests:
           minLength: 1
         - path: results.0.name
           equals: Danaus plexippus
+  getObservation:
+    - name: gets a specific observation by ID
+      params:
+        id: 1
+      assert:
+        - path: results
+      allowError: true
+  searchPlaces:
+    - name: searches for Yellowstone places
+      params:
+        q: Yellowstone
+      assert:
+        - path: results
+          minLength: 1

@@ -1,0 +1,112 @@
+name: metexplore
+displayName: MetExplore
+description: MetExplore — metabolic network analysis platform with 349 organism models
+tags:
+  - metabolism
+  - metabolic-network
+  - pathway
+  - metexplore
+  - systems-biology
+baseUrl: https://metexplore.toulouse.inrae.fr/metexplore-api
+tools:
+  listBiosources:
+    description: List all available organism metabolic networks
+    tags:
+      - organism-list
+      - metabolic-networks
+    method: GET
+    path: /biosources/
+    params: {}
+    response:
+      format: json
+      fields:
+        - "[].id"
+        - "[].NomComplet"
+        - "[].type"
+  getPathways:
+    description: Get metabolic pathways for a specific organism
+    tags:
+      - pathway-list
+      - metabolism
+    method: GET
+    path: /{biosourceId}/pathway/
+    params:
+      biosourceId:
+        type: integer
+        required: true
+        description: Biosource ID from listBiosources (e.g. 3232 for E. coli K-12)
+    response:
+      format: json
+  getMetabolites:
+    description: Get metabolites in a specific organism's metabolic network
+    tags:
+      - metabolite-list
+      - metabolism
+    method: GET
+    path: /{biosourceId}/metabolite/
+    params:
+      biosourceId:
+        type: integer
+        required: true
+        description: Biosource ID from listBiosources
+    response:
+      format: json
+  getReactions:
+    description: Get reactions in a specific organism's metabolic network
+    tags:
+      - reaction-list
+      - metabolism
+    method: GET
+    path: /{biosourceId}/reaction/
+    params:
+      biosourceId:
+        type: integer
+        required: true
+        description: Biosource ID from listBiosources
+    response:
+      format: json
+  getGenes:
+    description: Get genes in a specific organism's metabolic network
+    tags:
+      - gene-list
+      - metabolism
+    method: GET
+    path: /{biosourceId}/gene/
+    params:
+      biosourceId:
+        type: integer
+        required: true
+        description: Biosource ID from listBiosources
+    response:
+      format: json
+  fuzzySearch:
+    description: Fuzzy search for metabolites, genes, reactions, or enzymes
+    tags:
+      - search
+      - fuzzy-search
+    method: GET
+    path: /fuzzysearch/{biosourceId}/{type}/{name}/
+    params:
+      biosourceId:
+        type: integer
+        required: true
+        description: Biosource ID from listBiosources
+      type:
+        type: string
+        required: true
+        description: Type of entity to search (metabolite, gene, reaction, enzyme)
+      name:
+        type: string
+        required: true
+        description: Name to search for (fuzzy matching)
+    response:
+      format: json
+tests:
+  listBiosources:
+    - name: lists available organism metabolic networks
+      params: {}
+      assert:
+        - path: ""
+          minLength: 1
+        - path: "0.id"
+        - path: "0.NomComplet"

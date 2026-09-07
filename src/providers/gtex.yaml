@@ -64,6 +64,80 @@ tools:
         - "data[].tissueSiteDetailId"
         - "data[].median"
         - "data[].unit"
+  getEqtl:
+    description: Get single-tissue eQTL associations for a gene
+    tags:
+      - eqtl
+      - genetic-association
+      - tissue-specific
+    method: GET
+    path: /association/singleTissueEqtl
+    params:
+      gencodeId:
+        type: string
+        required: true
+        description: GENCODE gene ID (e.g. ENSG00000139618.18)
+      tissueSiteDetailId:
+        type: string
+        required: true
+        description: GTEx tissue ID (e.g. Liver, Brain_Cortex)
+      datasetId:
+        type: string
+        default: gtex_v8
+        description: GTEx dataset version
+    response:
+      format: json
+      fields:
+        - "data[].geneSymbol"
+        - "data[].variantId"
+        - "data[].pValue"
+        - "data[].nes"
+        - "data[].tissueSiteDetailId"
+  getTopExpressed:
+    description: Get top expressed genes in a specific tissue
+    tags:
+      - top-expression
+      - tissue-specific
+    method: GET
+    path: /expression/topExpressedGene
+    params:
+      tissueSiteDetailId:
+        type: string
+        required: true
+        description: GTEx tissue ID (e.g. Liver, Brain_Cortex)
+      datasetId:
+        type: string
+        default: gtex_v8
+        description: GTEx dataset version
+      pageSize:
+        type: integer
+        default: 50
+        description: Number of top genes to return
+    response:
+      format: json
+      fields:
+        - "data[].geneSymbol"
+        - "data[].gencodeId"
+        - "data[].median"
+        - "data[].unit"
+  getTissues:
+    description: List all available GTEx tissue types
+    tags:
+      - tissue-list
+      - reference
+    method: GET
+    path: /dataset/tissueSiteDetail
+    params:
+      datasetId:
+        type: string
+        default: gtex_v8
+        description: GTEx dataset version
+    response:
+      format: json
+      fields:
+        - "data[].tissueSiteDetailId"
+        - "data[].tissueSiteDetail"
+        - "data[].tissueSite"
 tests:
   getGene:
     - name: looks up BRCA1 gene reference info
@@ -78,6 +152,28 @@ tests:
     - name: gets median gene expression for BRCA1 across tissues
       params:
         gencodeId: ENSG00000012048.20
+      assert:
+        - path: data
+          minLength: 1
+        - path: data.0.tissueSiteDetailId
+  getEqtl:
+    - name: gets eQTL associations for BRCA2 in Liver
+      params:
+        gencodeId: ENSG00000139618.18
+        tissueSiteDetailId: Liver
+      assert:
+        - path: data
+  getTopExpressed:
+    - name: gets top expressed genes in Liver
+      params:
+        tissueSiteDetailId: Liver
+      assert:
+        - path: data
+          minLength: 1
+        - path: data.0.geneSymbol
+  getTissues:
+    - name: lists all available GTEx tissues
+      params: {}
       assert:
         - path: data
           minLength: 1

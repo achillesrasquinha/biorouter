@@ -1,0 +1,61 @@
+name: bmrb
+displayName: BMRB
+description: Biological Magnetic Resonance Bank — NMR spectroscopy data for proteins, nucleic acids, and metabolites
+tags:
+  - nmr
+  - spectroscopy
+  - protein-structure
+  - metabolomics
+  - bmrb
+baseUrl: https://api.bmrb.io/v2
+tools:
+  getEntry:
+    description: Get an NMR data entry by BMRB ID
+    tags:
+      - entry-info
+      - nmr-data
+    method: GET
+    path: /entry/{entryId}
+    params:
+      entryId:
+        type: string
+        required: true
+        description: BMRB entry ID (e.g. 15000, 6457)
+    response:
+      format: json
+  search:
+    description: Search BMRB entries by keyword or chemical shift
+    tags:
+      - nmr-search
+      - entry-search
+    method: GET
+    path: /search
+    params:
+      q:
+        type: string
+        required: true
+        description: Search query (e.g. ubiquitin, lysozyme)
+    response:
+      format: json
+  getChemicalShifts:
+    description: Get chemical shift data for a BMRB entry
+    tags:
+      - chemical-shifts
+      - nmr-data
+    method: GET
+    path: /entry/{entryId}/simulate_hsqc
+    params:
+      entryId:
+        type: string
+        required: true
+        description: BMRB entry ID
+    response:
+      format: json
+tests:
+  getEntry:
+    - name: gets NMR data entry
+      params:
+        entryId: "15000"
+      assert:
+        - path: "15000.entry_id"
+          equals: "15000"

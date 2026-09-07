@@ -78,6 +78,287 @@ tools:
         - evidenceItems.nodes[].evidenceDirection
         - evidenceItems.nodes[].significance
         - evidenceItems.nodes[].description
+  searchVariants:
+    description: Search variants by gene name or variant name in CIViC
+    tags:
+      - variant-search
+      - cancer-variant
+    query: |
+      query($name: String, $first: Int) {
+        variants(name: $name, first: $first) {
+          totalCount
+          nodes {
+            id
+            name
+            singleVariantMolecularProfile { id name }
+            gene { name id }
+            variantTypes { name }
+          }
+        }
+      }
+    params:
+      name:
+        type: string
+        required: true
+        description: Gene name or variant name to search for (e.g. "BRAF" or "V600E")
+      first:
+        type: integer
+        default: 10
+        description: Number of variants to return
+    response:
+      format: json
+      fields:
+        - variants.totalCount
+        - variants.nodes[].id
+        - variants.nodes[].name
+        - variants.nodes[].singleVariantMolecularProfile.id
+        - variants.nodes[].singleVariantMolecularProfile.name
+        - variants.nodes[].gene.name
+        - variants.nodes[].gene.id
+        - variants.nodes[].variantTypes[].name
+  getVariantDetails:
+    description: Get full details for a specific variant by ID
+    tags:
+      - variant-detail
+      - cancer-variant
+    query: |
+      query($id: Int!) {
+        variant(id: $id) {
+          id
+          name
+          gene { name id }
+          variantAliases
+          variantTypes { name soid }
+          singleVariantMolecularProfile { id name }
+          coordinates {
+            referenceBuild
+            ensemblVersion
+            chromosome
+            start
+            stop
+            representativeTranscript
+          }
+        }
+      }
+    params:
+      id:
+        type: integer
+        required: true
+        description: CIViC variant ID
+    response:
+      format: json
+      fields:
+        - variant.id
+        - variant.name
+        - variant.gene.name
+        - variant.gene.id
+        - variant.variantAliases
+        - variant.variantTypes[].name
+        - variant.variantTypes[].soid
+        - variant.singleVariantMolecularProfile.id
+        - variant.singleVariantMolecularProfile.name
+        - variant.coordinates.referenceBuild
+        - variant.coordinates.chromosome
+        - variant.coordinates.start
+        - variant.coordinates.stop
+        - variant.coordinates.representativeTranscript
+  searchTherapies:
+    description: Search therapies in the CIViC database
+    tags:
+      - therapy-search
+      - cancer-therapy
+    query: |
+      query($name: String, $first: Int) {
+        therapies(name: $name, first: $first) {
+          totalCount
+          nodes { id name ncitId therapyUrl }
+        }
+      }
+    params:
+      name:
+        type: string
+        required: true
+        description: Therapy name to search for (e.g. "Vemurafenib")
+      first:
+        type: integer
+        default: 10
+        description: Number of therapies to return
+    response:
+      format: json
+      fields:
+        - therapies.totalCount
+        - therapies.nodes[].id
+        - therapies.nodes[].name
+        - therapies.nodes[].ncitId
+        - therapies.nodes[].therapyUrl
+  searchAssertions:
+    description: Search clinical assertions in CIViC by disease name
+    tags:
+      - assertion-search
+      - clinical-assertion
+    query: |
+      query($diseaseName: String, $first: Int) {
+        assertions(diseaseName: $diseaseName, first: $first) {
+          totalCount
+          nodes {
+            id
+            status
+            significance
+            assertionType
+            assertionDirection
+            summary
+            molecularProfile { name }
+            disease { name doid }
+          }
+        }
+      }
+    params:
+      diseaseName:
+        type: string
+        required: true
+        description: Disease name to search assertions for (e.g. "Lung Non-small Cell Carcinoma")
+      first:
+        type: integer
+        default: 10
+        description: Number of assertions to return
+    response:
+      format: json
+      fields:
+        - assertions.totalCount
+        - assertions.nodes[].id
+        - assertions.nodes[].status
+        - assertions.nodes[].significance
+        - assertions.nodes[].assertionType
+        - assertions.nodes[].assertionDirection
+        - assertions.nodes[].summary
+        - assertions.nodes[].molecularProfile.name
+        - assertions.nodes[].disease.name
+        - assertions.nodes[].disease.doid
+  getMolecularProfile:
+    description: Get molecular profile details including evidence and assertions
+    tags:
+      - molecular-profile
+      - cancer-variant
+    query: |
+      query($id: Int!) {
+        molecularProfile(id: $id) {
+          id
+          name
+          description
+          evidenceItems(first: 10) {
+            totalCount
+            nodes {
+              id
+              status
+              evidenceType
+              evidenceLevel
+              significance
+              description
+            }
+          }
+          assertions(first: 5) {
+            totalCount
+            nodes { id status assertionType significance }
+          }
+        }
+      }
+    params:
+      id:
+        type: integer
+        required: true
+        description: Molecular profile ID
+    response:
+      format: json
+      fields:
+        - molecularProfile.id
+        - molecularProfile.name
+        - molecularProfile.description
+        - molecularProfile.evidenceItems.totalCount
+        - molecularProfile.evidenceItems.nodes[].id
+        - molecularProfile.evidenceItems.nodes[].status
+        - molecularProfile.evidenceItems.nodes[].evidenceType
+        - molecularProfile.evidenceItems.nodes[].evidenceLevel
+        - molecularProfile.evidenceItems.nodes[].significance
+        - molecularProfile.evidenceItems.nodes[].description
+        - molecularProfile.assertions.totalCount
+        - molecularProfile.assertions.nodes[].id
+        - molecularProfile.assertions.nodes[].status
+        - molecularProfile.assertions.nodes[].assertionType
+        - molecularProfile.assertions.nodes[].significance
+  getGeneDetails:
+    description: Get full gene details including variants from CIViC
+    tags:
+      - gene-detail
+      - cancer-gene
+    query: |
+      query($geneId: Int!) {
+        gene(id: $geneId) {
+          id
+          name
+          description
+          officialName
+          myGeneInfoId
+          variants(first: 20) {
+            totalCount
+            nodes { id name variantTypes { name } }
+          }
+        }
+      }
+    params:
+      geneId:
+        type: integer
+        required: true
+        description: CIViC gene ID
+    response:
+      format: json
+      fields:
+        - gene.id
+        - gene.name
+        - gene.description
+        - gene.officialName
+        - gene.myGeneInfoId
+        - gene.variants.totalCount
+        - gene.variants.nodes[].id
+        - gene.variants.nodes[].name
+        - gene.variants.nodes[].variantTypes[].name
+  searchSources:
+    description: Search literature sources by citation ID in CIViC
+    tags:
+      - source-search
+      - literature
+    query: |
+      query($citationId: Int, $first: Int) {
+        sources(citationId: $citationId, first: $first) {
+          totalCount
+          nodes {
+            id
+            citation
+            citationId
+            sourceType
+            title
+            abstract
+          }
+        }
+      }
+    params:
+      citationId:
+        type: integer
+        required: true
+        description: Citation ID (e.g. PubMed ID) to search for
+      first:
+        type: integer
+        default: 5
+        description: Number of sources to return
+    response:
+      format: json
+      fields:
+        - sources.totalCount
+        - sources.nodes[].id
+        - sources.nodes[].citation
+        - sources.nodes[].citationId
+        - sources.nodes[].sourceType
+        - sources.nodes[].title
+        - sources.nodes[].abstract
 tests:
   searchGenes:
     - name: searches for BRAF gene
@@ -100,3 +381,66 @@ tests:
         - path: evidenceItems.nodes
           minLength: 1
         - path: evidenceItems.nodes.0.evidenceType
+  searchVariants:
+    - name: searches for BRAF V600E variant
+      params:
+        name: V600E
+        first: 5
+      assert:
+        - path: variants.totalCount
+          gte: 1
+        - path: variants.nodes.0.name
+  getVariantDetails:
+    - name: gets details for variant ID 12
+      params:
+        id: 12
+      assert:
+        - path: variant.id
+          equals: 12
+        - path: variant.name
+        - path: variant.gene.name
+  searchTherapies:
+    - name: searches for Vemurafenib therapy
+      params:
+        name: Vemurafenib
+        first: 5
+      assert:
+        - path: therapies.totalCount
+          gte: 1
+        - path: therapies.nodes.0.name
+  searchAssertions:
+    - name: searches assertions for lung cancer
+      params:
+        diseaseName: Lung Non-small Cell Carcinoma
+        first: 5
+      assert:
+        - path: assertions.totalCount
+          gte: 1
+        - path: assertions.nodes.0.status
+  getMolecularProfile:
+    - name: gets molecular profile by ID
+      params:
+        id: 1
+      assert:
+        - path: molecularProfile.id
+          equals: 1
+        - path: molecularProfile.name
+  getGeneDetails:
+    - name: gets full gene details by ID
+      params:
+        geneId: 5
+      assert:
+        - path: gene.id
+          equals: 5
+        - path: gene.name
+        - path: gene.variants.totalCount
+          gte: 1
+  searchSources:
+    - name: searches sources by PubMed citation ID
+      params:
+        citationId: 25589621
+        first: 3
+      assert:
+        - path: sources.totalCount
+          gte: 1
+        - path: sources.nodes.0.citationId

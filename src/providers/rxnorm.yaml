@@ -72,6 +72,80 @@ tools:
         - allRelatedGroup.conceptGroup[].conceptProperties[].rxcui
         - allRelatedGroup.conceptGroup[].conceptProperties[].name
         - allRelatedGroup.conceptGroup[].conceptProperties[].tty
+  getDrugInteractions:
+    description: Get drug interactions by RxCUI
+    tags:
+      - drug-interaction
+      - rxcui
+    method: GET
+    path: /interaction/interaction.json
+    params:
+      rxcui:
+        type: string
+        required: true
+        description: RxNorm concept unique identifier (e.g. "161" for acetaminophen)
+    response:
+      format: json
+      fields:
+        - interactionTypeGroup[].interactionType[].interactionPair[].interactionConcept[].minConceptItem.name
+        - interactionTypeGroup[].interactionType[].interactionPair[].description
+  getSpellingSuggestions:
+    description: Get spelling suggestions for a drug name
+    tags:
+      - drug-spelling
+      - suggestions
+    method: GET
+    path: /spellingsuggestions.json
+    params:
+      name:
+        type: string
+        required: true
+        description: Drug name to get spelling suggestions for (e.g. "ambienn")
+    response:
+      format: json
+      fields:
+        - suggestionGroup.suggestionList.suggestion
+        - suggestionGroup.name
+  getRxcuiByString:
+    description: Get RxCUI for a drug by name string
+    tags:
+      - rxcui-lookup
+      - drug-id
+    method: GET
+    path: /rxcui.json
+    params:
+      name:
+        type: string
+        required: true
+        description: Drug name to look up (e.g. "metformin")
+    response:
+      format: json
+      fields:
+        - idGroup.rxnormId
+        - idGroup.name
+  getRelated:
+    description: Get related drug concepts by RxCUI and term type
+    tags:
+      - drug-related
+      - rxcui
+      - term-type
+    method: GET
+    path: /rxcui/{rxcui}/related.json
+    params:
+      rxcui:
+        type: string
+        required: true
+        description: RxNorm concept unique identifier
+      tty:
+        type: string
+        default: SBD+SCD
+        description: Term types to filter by (e.g. "SBD+SCD" for branded and clinical drugs)
+    response:
+      format: json
+      fields:
+        - relatedGroup.conceptGroup[].conceptProperties[].rxcui
+        - relatedGroup.conceptGroup[].conceptProperties[].name
+        - relatedGroup.conceptGroup[].conceptProperties[].tty
 tests:
   search:
     - name: searches for metformin
@@ -96,3 +170,31 @@ tests:
       assert:
         - {}
         - path: allRelatedGroup
+  getDrugInteractions:
+    - name: gets drug interactions for acetaminophen (161)
+      params:
+        rxcui: "161"
+      assert:
+        - {}
+      allowError: true
+  getSpellingSuggestions:
+    - name: gets spelling suggestions for ambienn
+      params:
+        name: ambienn
+      assert:
+        - {}
+        - path: suggestionGroup
+  getRxcuiByString:
+    - name: gets RxCUI for metformin
+      params:
+        name: metformin
+      assert:
+        - {}
+        - path: idGroup
+  getRelated:
+    - name: gets related concepts for metformin (6809)
+      params:
+        rxcui: "6809"
+      assert:
+        - {}
+        - path: relatedGroup

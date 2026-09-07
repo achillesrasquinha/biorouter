@@ -79,6 +79,20 @@ tools:
         - "[].rank"
         - "[].name"
         - "[].score"
+  getLibraries:
+    description: List available gene set libraries with statistics
+    tags:
+      - library-list
+      - gene-set-libraries
+    method: GET
+    path: /datasetStatistics
+    params: {}
+    response:
+      format: json
+      fields:
+        - statistics[].libraryName
+        - statistics[].numTerms
+        - statistics[].geneCoverage
 tests:
   viewList:
     - name: views a previously submitted gene list
@@ -103,3 +117,9 @@ tests:
         - path: "[].rank"
         - path: "[].name"
         - path: "[].score"
+  getLibraries:
+    - name: lists available gene set libraries
+      params: {}
+      assert:
+        - path: statistics
+          minLength: 1

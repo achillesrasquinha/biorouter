@@ -1,6 +1,6 @@
 # life-science-mcp
 
-A unified MCP server for 223 life science APIs and databases (209 free, 14 API key). Two tools — `findTools` and `callTools` — provide progressive discovery across 475 endpoints with field projection and batch execution.
+A unified MCP server for 238 life science APIs and databases (221 free, 17 API key). Two tools — `findTools` and `callTools` — provide progressive discovery across 682 endpoints with field projection and batch execution.
 
 ## Installation
 
@@ -15,7 +15,7 @@ A unified MCP server for 223 life science APIs and databases (209 free, 14 API k
 }
 ```
 
-## Providers (223)
+## Providers (238)
 
 | Provider | Description | Auth |
 |----------|-------------|------|
@@ -32,13 +32,16 @@ A unified MCP server for 223 life science APIs and databases (209 free, 14 API k
 | [BiGG Models](https://bigg.ucsd.edu/api/v2) | BiGG Models — genome-scale metabolic network reconstructions | Free |
 | [BindingDB](https://bindingdb.org/axis2/services/BDBService) | Public database of measured binding affinities between proteins and drug-like molecules | Free |
 | [BioCyc](https://websvc.biocyc.org) | BioCyc / MetaCyc — metabolic pathway and genome database collection | Free |
+| [bio.tools](https://bio.tools/api) | ELIXIR bio.tools registry — bioinformatics tools and databases catalog | Free |
 | [BioGRID](https://webservice.thebiogrid.org) | BioGRID database of protein and genetic interactions | API Key |
 | [BioModels](https://biomodels.org) | BioModels repository — mathematical models of biological systems in SBML and other formats | Free |
 | [BioPortal](https://data.bioontology.org) | NCBO BioPortal — search 900+ biomedical ontologies and annotate text with ontology concepts | API Key |
 | [bioRxiv](https://api.biorxiv.org) | bioRxiv preprint server — access preprints in biology and related sciences | Free |
+| [BMRB](https://api.bmrb.io/v2) | Biological Magnetic Resonance Bank — NMR spectroscopy data for proteins, nucleic acids, and metabolites | Free |
 | [BioSamples](https://www.ebi.ac.uk/biosamples) | EBI BioSamples database — biological sample metadata and attributes | Free |
 | [BOLD](https://www.boldsystems.org/index.php/API_Public) | Barcode of Life Data Systems — DNA barcode specimens and sequences for species identification | Free |
 | [BrainSpan](https://api.brain-map.org/api/v2/data) | BrainSpan developmental transcriptome — human brain gene expression across developmental stages | Free |
+| [BV-BRC](https://www.bv-brc.org/api) | Bacterial and Viral Bioinformatics Resource Center — pathogen genomics, AMR, and surveillance data | Free |
 | [CADD](https://cadd.gs.washington.edu/api/v1.0) | Combined Annotation Dependent Depletion — variant deleteriousness scoring | Free |
 | [CATH](https://www.cathdb.info/version/v4_3_0/api/rest) | Protein structure classification — hierarchical domain classification of protein structures | Free |
 | [Catalogue of Life](https://api.catalogueoflife.org) | Catalogue of Life — global checklist of all known species with authoritative taxonomy | Free |
@@ -50,9 +53,11 @@ A unified MCP server for 223 life science APIs and databases (209 free, 14 API k
 | [CELLxGENE](https://api.cellxgene.cziscience.com) | CZ CELLxGENE Discover — single-cell datasets and gene expression | Free |
 | [ChEBI (via OLS4)](https://www.ebi.ac.uk/ols4/api) | Chemical Entities of Biological Interest — ontology lookup via EBI OLS4 | Free |
 | [ChEMBL](https://www.ebi.ac.uk/chembl/api/data) | Database of bioactive drug-like small molecules | Free |
+| [ChemSpider](https://api.rsc.org/compounds/v1) | RSC chemical compound search, structures, and properties database | API Key |
 | [CIViC](https://civicdb.org/api/graphql) | Clinical Interpretations of Variants in Cancer — curated clinical evidence for variants | Free |
 | [ClassyFire](http://classyfire.wishartlab.com) | Automated chemical classification using the ChemOnt ontology | Free |
 | [ClinGen](https://search.clinicalgenome.org/kb/rest) | Clinical Genome Resource — gene-disease validity and dosage sensitivity curation | Free |
+| [ClinGen Allele Registry](https://reg.clinicalgenome.org) | ClinGen Allele Registry — canonical allele identifiers linking variants across nomenclatures | Free |
 | [ClinicalTrials.gov](https://clinicaltrials.gov/api/v2) | Registry of clinical studies conducted around the world | Free |
 | [ClinVar](https://eutils.ncbi.nlm.nih.gov/entrez/eutils) | Variant-disease relationship database linking genetic variants to clinical significance | Free |
 | [Clustal Omega](https://www.ebi.ac.uk/Tools/services/rest/clustalo) | EBI Clustal Omega multiple sequence alignment service | Free |
@@ -63,6 +68,7 @@ A unified MCP server for 223 life science APIs and databases (209 free, 14 API k
 | [CompTox](https://comptox.epa.gov/dashboard-api) | EPA CompTox Chemicals Dashboard for toxicology and chemical safety | Free |
 | [DailyMed](https://dailymed.nlm.nih.gov/dailymed/services) | DailyMed drug label information from the National Library of Medicine — SPL documents and prescribing information | Free |
 | [DALI](http://ekhidna2.biocenter.helsinki.fi/dali) | DALI server — protein structure comparison by 3D alignment | Free |
+| [DANDI Archive](https://api.dandiarchive.org/api) | DANDI — neurophysiology data integration, brain imaging and electrophysiology datasets | Free |
 | [dbGaP](https://www.ncbi.nlm.nih.gov/gap/phegeni) | dbGaP (database of Genotypes and Phenotypes) — genotype-phenotype association studies | Free |
 | [dbSNP](https://eutils.ncbi.nlm.nih.gov/entrez/eutils) | Database of single nucleotide polymorphisms and other genetic variation | Free |
 | [dbVar](https://eutils.ncbi.nlm.nih.gov/entrez/eutils) | NCBI dbVar — database of genomic structural variants (CNVs, insertions, deletions, inversions) | Free |
@@ -144,6 +150,7 @@ A unified MCP server for 223 life science APIs and databases (209 free, 14 API k
 | [MassBank](https://massbank.eu/MassBank/api) | Public repository of mass spectra for metabolite identification | Free |
 | [MeSH](https://eutils.ncbi.nlm.nih.gov/entrez/eutils) | Medical Subject Headings vocabulary for indexing biomedical literature | Free |
 | [MetaboLights](https://www.ebi.ac.uk/metabolights/ws) | EMBL-EBI database for metabolomics experiments and derived information | Free |
+| [MetExplore](https://metexplore.toulouse.inrae.fr/metexplore-api) | MetExplore — metabolic network analysis platform with 349 organism models | Free |
 | [Metabolomics Workbench](https://www.metabolomicsworkbench.org/rest) | Metabolomics Workbench — metabolomics data repository and metadata | Free |
 | [METLIN](https://metlin.scripps.edu/rest/api) | METLIN metabolite mass spectrometry database for metabolomics research | API Key |
 | [MGnify](https://www.ebi.ac.uk/metagenomics/api/v1) | MGnify — EBI metagenomics analysis and archiving platform | Free |
@@ -170,6 +177,7 @@ A unified MCP server for 223 life science APIs and databases (209 free, 14 API k
 | [NCBO Annotator](https://data.bioontology.org) | NCBO Annotator — annotate biomedical text with ontology concepts and get ontology recommendations | API Key |
 | [NCI Chemical Identifier Resolver](https://cactus.nci.nih.gov/chemical/structure) | NCI CADD Chemical Identifier Resolver — convert between chemical names, SMILES, InChI, and other formats | Free |
 | [NDEx](https://www.ndexbio.org/v2) | NDEx Network Data Exchange for biological network models | Free |
+| [Nextstrain](https://nextstrain.org) | Real-time tracking of pathogen evolution for influenza, SARS-CoV-2, and other viruses | Free |
 | [NMDC](https://api.microbiomedata.org) | National Microbiome Data Collaborative — integrated microbiome multi-omics data | Free |
 | [NetMHCIIpan](https://services.healthtech.dtu.dk/api) | NetMHCIIpan 4.3 — MHC class II binding prediction for peptides across HLA-DR/DP/DQ alleles | Free |
 | [NetMHCpan](https://services.healthtech.dtu.dk/api) | NetMHCpan 4.1 — MHC class I binding prediction for peptides across HLA alleles | Free |
@@ -190,14 +198,17 @@ A unified MCP server for 223 life science APIs and databases (209 free, 14 API k
 | [PANTHER](https://pantherdb.org/services/oai/pantherdb) | PANTHER — protein classification, gene ontology, and phylogenetic analysis | Free |
 | [Pathway Commons](https://www.pathwaycommons.org/pc2) | Integrated biological pathway and interaction data from multiple sources | Free |
 | [PDBe](https://www.ebi.ac.uk/pdbe/api) | Protein Data Bank in Europe — macromolecular structure data | Free |
+| [PDBj](https://pdbj.org/rest/newweb) | Protein Data Bank Japan — PDB search, SQL queries, and chemical component lookup | Free |
 | [Proteomic Data Commons](https://proteomic.datacommons.cancer.gov/graphql) | NCI Proteomic Data Commons — proteomics data from cancer research studies | Free |
 | [PeptideAtlas](https://db.systemsbiology.net/sbeams/cgi/PeptideAtlas) | PeptideAtlas — proteomics data repository for peptide and protein identifications | Free |
 | [Pfam](https://www.ebi.ac.uk/interpro/api) | Pfam protein families database — protein domain classification via InterPro | Free |
 | [Pharos](https://pharos-api.ncats.io/graphql) | Illuminating the Druggable Genome — comprehensive target, disease, and ligand knowledge base | Free |
+| [PharmVar](https://www.pharmvar.org/api-service) | Pharmacogene Variation Consortium — pharmacogenomic variant alleles for CYP enzymes | API Key |
 | [PharmGKB (CPIC)](https://api.cpicpgx.org/v1) | CPIC pharmacogenomics knowledge base — drug-gene pairs, clinical guidelines, and pharmacogenomic recommendations | Free |
 | [PhyloT](https://phylot.biobyte.de/api) | PhyloT — taxonomy-based phylogenetic tree generation from NCBI taxon IDs | Free |
 | [pkCSM](https://biosig.lab.uq.edu.au/pkcsm) | pkCSM pharmacokinetics and toxicity prediction using graph-based signatures | Free |
 | [Planteome](https://planteome.org/api) | Planteome — plant trait ontologies and gene annotations for plant biology | Free |
+| [PomBase](https://www.pombase.org/api/v1/dataset/latest) | S. pombe genome database — fission yeast genetics and genomics | Free |
 | [PRIDE](https://www.ebi.ac.uk/pride/ws/archive/v2) | PRIDE proteomics archive — mass spectrometry proteomics data repository | Free |
 | [PubChem](https://pubchem.ncbi.nlm.nih.gov/rest/pug) | Open chemistry database with compound, substance, and bioassay data | Free |
 | [PubMed](https://eutils.ncbi.nlm.nih.gov/entrez/eutils) | Biomedical literature search engine (NCBI) | Free |
@@ -221,6 +232,7 @@ A unified MCP server for 223 life science APIs and databases (209 free, 14 API k
 | [STRING](https://string-db.org/api) | Protein-protein interaction network database | Free |
 | [SureChEMBL](https://www.surechembl.org/api) | Patent chemistry database linking chemical structures to patent documents | Free |
 | [SwissADME](http://www.swissadme.ch) | SwissADME drug-likeness and pharmacokinetics prediction tool | Free |
+| [SWISS-MODEL](https://swissmodel.expasy.org) | SWISS-MODEL Repository — homology models and 3D protein structure predictions | Free |
 | [SwissLipids](https://www.swisslipids.org/api) | SwissLipids — curated knowledge resource for lipid biology and lipidomics | Free |
 | [TCIA](https://services.cancerimagingarchive.net/nbia-api/services/v1) | The Cancer Imaging Archive — public access to cancer medical imaging data and collections | Free |
 | [TimeTree](https://timetree.org/api) | TimeTree — divergence time estimates between species pairs | Free |
@@ -234,12 +246,15 @@ A unified MCP server for 223 life science APIs and databases (209 free, 14 API k
 | [UniRef](https://rest.uniprot.org/uniref) | UniProt Reference Clusters — clustered sets of related protein sequences | Free |
 | [USDA NASS](https://quickstats.nass.usda.gov/api) | USDA National Agricultural Statistics Service — US crop, livestock, and agricultural census data | API Key |
 | [VDJdb](https://vdjdb.cdr3.net/api) | VDJdb — curated database of T-cell receptor sequences and specificities | Free |
+| [VEuPathDB](https://veupathdb.org/veupathdb/service) | Eukaryotic pathogen genomics — Plasmodium, Toxoplasma, Cryptosporidium, and more | API Key |
 | [VertNet](http://api.vertnet-portal.appspot.com/api) | VertNet — vertebrate specimen records from natural history collections worldwide | Free |
 | [WHO Global Health Observatory](https://ghoapi.azureedge.net/api) | WHO Global Health Observatory — global health indicators, statistics, and country-level health data | Free |
 | [WHO ICD-11](https://id.who.int/icd) | WHO ICD-11 International Classification of Diseases — search and retrieve disease classifications | API Key |
+| [Wikidata](https://query.wikidata.org) | Wikidata SPARQL endpoint — structured knowledge base for genes, proteins, diseases, drugs, and species | Free |
 | [WikiPathways](https://cdn.jsdelivr.net/gh/wikipathways/wikipathways-assets@main) | Open biological pathway database — community-curated pathway data | Free |
 | [WormBase](https://www.alliancegenome.org/api) | WormBase C. elegans and nematode genomics via the Alliance of Genome Resources API | Free |
 | [WoRMS](https://www.marinespecies.org/rest) | World Register of Marine Species — authoritative classification and nomenclature of marine organisms | Free |
+| [Zenodo](https://zenodo.org/api) | Open research data repository hosted by CERN — datasets, software, and publications | Free |
 | [ZFIN](https://zfin.org/action/api) | ZFIN Zebrafish Information Network — zebrafish genomics, genetics, and phenotype data | Free |
 | [ZINC](https://zinc15.docking.org) | Free database of commercially available compounds for virtual screening | Free |
 

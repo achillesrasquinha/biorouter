@@ -64,7 +64,119 @@ tools:
         - proteinDescription.recommendedName.fullName.value
         - genes[].geneName.value
         - sequence.length
+        - sequence.value
         - annotationScore
+        - features[].type
+        - features[].location.start.value
+        - features[].location.end.value
+        - features[].description
+        - comments[].subcellularLocations[].location.value
+  getFeatures:
+    description: Get protein features and domains for a UniProt entry
+    tags:
+      - protein-features
+      - domains
+    method: GET
+    path: /uniprotkb/{accession}
+    params:
+      accession:
+        type: string
+        required: true
+        description: UniProt accession (e.g. P04637)
+    response:
+      format: json
+      fields:
+        - features[].type
+        - features[].location.start.value
+        - features[].location.end.value
+        - features[].description
+  getSubcellularLocation:
+    description: Get subcellular location information for a UniProt entry
+    tags:
+      - subcellular-location
+      - localization
+    method: GET
+    path: /uniprotkb/{accession}
+    params:
+      accession:
+        type: string
+        required: true
+        description: UniProt accession (e.g. P04637)
+      fields:
+        type: string
+        default: accession,protein_name,cc_subcellular_location
+        description: Fields to retrieve
+      format:
+        type: string
+        default: json
+    response:
+      format: json
+      fields:
+        - primaryAccession
+        - comments[].subcellularLocations[].location.value
+  getProteome:
+    description: Get proteome information by proteome ID
+    tags:
+      - proteome
+      - organism
+    method: GET
+    path: /proteomes/{proteomeId}
+    params:
+      proteomeId:
+        type: string
+        required: true
+        description: Proteome ID (e.g. UP000005640 for human)
+    response:
+      format: json
+      fields:
+        - id
+        - description
+        - taxonomy.taxonId
+        - taxonomy.scientificName
+        - proteinCount
+  searchUniRef:
+    description: Search UniRef clusters for sequence similarity groupings
+    tags:
+      - uniref
+      - cluster
+      - sequence-similarity
+    method: GET
+    path: /uniref/search
+    params:
+      query:
+        type: string
+        required: true
+        description: Search query (e.g. "P53", "insulin")
+      size:
+        type: integer
+        default: 10
+        description: Number of results to return
+    response:
+      format: json
+      fields:
+        - results[].id
+        - results[].name
+        - results[].memberCount
+        - results[].representativeMember.memberIdType
+  getUniParcEntry:
+    description: Get UniParc cross-reference archive entry by UPI identifier
+    tags:
+      - uniparc
+      - cross-reference
+      - archive
+    method: GET
+    path: /uniparc/{upi}
+    params:
+      upi:
+        type: string
+        required: true
+        description: UniParc identifier (e.g. UPI000000000A)
+    response:
+      format: json
+      fields:
+        - uniParcId
+        - uniParcCrossReferences[].database
+        - uniParcCrossReferences[].id
 tests:
   search:
     - name: searches for BRCA1 human
@@ -82,3 +194,41 @@ tests:
         - path: primaryAccession
           equals: P00533
         - path: proteinDescription
+  getFeatures:
+    - name: gets protein features for P04637
+      params:
+        accession: P04637
+      assert:
+        - path: features
+          minLength: 1
+        - path: features.0.type
+  getSubcellularLocation:
+    - name: gets subcellular location for P04637
+      params:
+        accession: P04637
+      assert:
+        - path: primaryAccession
+          equals: P04637
+  getProteome:
+    - name: gets human proteome info
+      params:
+        proteomeId: UP000005640
+      assert:
+        - path: id
+          equals: UP000005640
+        - path: taxonomy.scientificName
+  searchUniRef:
+    - name: searches UniRef clusters for P53
+      params:
+        query: P53
+      assert:
+        - path: results
+          minLength: 1
+        - path: results.0.id
+  getUniParcEntry:
+    - name: gets UniParc entry by UPI
+      params:
+        upi: UPI000000000A
+      assert:
+        - path: uniParcId
+          equals: UPI000000000A

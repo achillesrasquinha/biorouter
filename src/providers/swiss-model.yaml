@@ -1,0 +1,42 @@
+name: swiss-model
+displayName: SWISS-MODEL
+description: SWISS-MODEL Repository — homology models and 3D protein structure predictions
+tags:
+  - protein-structure
+  - homology-modeling
+  - 3d-structure
+  - swiss-model
+baseUrl: https://swissmodel.expasy.org
+tools:
+  getModels:
+    description: Get pre-computed homology models for a protein by UniProt accession
+    tags:
+      - protein-models
+      - structure-prediction
+    method: GET
+    path: /repository/uniprot/{accession}.json
+    params:
+      accession:
+        type: string
+        required: true
+        description: UniProt accession (e.g. P04637, Q9Y6K9)
+    response:
+      format: json
+      fields:
+        - query
+        - result.sequence_length
+        - result.structures[].template
+        - result.structures[].identity
+        - result.structures[].coverage
+        - result.structures[].qmean
+        - result.structures[].method
+        - result.structures[].from
+        - result.structures[].to
+tests:
+  getModels:
+    - name: gets homology models for TP53
+      params:
+        accession: P04637
+      assert:
+        - path: result
+        - path: query

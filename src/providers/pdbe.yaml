@@ -53,6 +53,58 @@ tools:
         - '*.0.weight'
         - '*.0.source[].organism_scientific_name'
         - '*.0.source[].tax_id'
+  getLigands:
+    description: Get ligand monomers for a PDB entry
+    tags:
+      - ligand-info
+      - small-molecule
+    method: GET
+    path: /pdb/entry/ligand_monomers/{pdbId}
+    params:
+      pdbId:
+        type: string
+        required: true
+        description: PDB entry ID in lowercase (e.g. 1cbs, 4hhb)
+    response:
+      format: json
+      fields:
+        - '*.0.chem_comp_id'
+        - '*.0.chem_comp_name'
+  getSecondaryStructure:
+    description: Get secondary structure information for a PDB entry
+    tags:
+      - secondary-structure
+      - helix-strand
+    method: GET
+    path: /pdb/entry/secondary_structure/{pdbId}
+    params:
+      pdbId:
+        type: string
+        required: true
+        description: PDB entry ID in lowercase (e.g. 1cbs, 4hhb)
+    response:
+      format: json
+      fields:
+        - '*.molecules[].chains[].secondary_structure.helices'
+        - '*.molecules[].chains[].secondary_structure.strands'
+  getPublications:
+    description: Get publications associated with a PDB entry
+    tags:
+      - publication-info
+      - literature
+    method: GET
+    path: /pdb/entry/publications/{pdbId}
+    params:
+      pdbId:
+        type: string
+        required: true
+        description: PDB entry ID in lowercase (e.g. 1cbs, 4hhb)
+    response:
+      format: json
+      fields:
+        - '*.0.title'
+        - '*.0.journal_info.pdb_abbreviation'
+        - '*.0.pubmed_id'
 tests:
   getSummary:
     - name: gets summary for PDB entry 1cbs
@@ -68,3 +120,22 @@ tests:
       assert:
         - path: 1cbs
         - path: 1cbs.0.molecule_name
+  getLigands:
+    - name: gets ligands for PDB entry 1cbs
+      params:
+        pdbId: 1cbs
+      assert:
+        - path: 1cbs
+  getSecondaryStructure:
+    - name: gets secondary structure for PDB entry 1cbs
+      params:
+        pdbId: 1cbs
+      assert:
+        - path: 1cbs
+  getPublications:
+    - name: gets publications for PDB entry 1cbs
+      params:
+        pdbId: 1cbs
+      assert:
+        - path: 1cbs
+        - path: 1cbs.0.title

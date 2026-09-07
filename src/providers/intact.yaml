@@ -69,6 +69,71 @@ tools:
         - content[].interactorSpecies
         - content[].interactorTaxId
         - content[].interactionCount
+  getInteraction:
+    description: Get interaction details by IntAct accession
+    tags:
+      - interaction-details
+      - accession
+    method: GET
+    path: /interaction/{ac}
+    params:
+      ac:
+        type: string
+        required: true
+        description: IntAct interaction accession (e.g. EBI-12345678)
+    response:
+      format: json
+      fields:
+        - interaction.ac
+        - interaction.detectionMethods[].name
+        - interaction.type.name
+        - interaction.participants[].interactor.accession
+  getComplex:
+    description: Search protein complexes in IntAct Complex Portal
+    tags:
+      - complex
+      - protein-complex
+    method: GET
+    path: /complex/search
+    params:
+      query:
+        type: string
+        required: true
+        description: Search query for complexes (e.g. "p53", "proteasome")
+      first:
+        type: integer
+        default: 0
+        description: Offset for pagination
+      number:
+        type: integer
+        default: 10
+        description: Number of results to return
+    response:
+      format: json
+      fields:
+        - elements[].complexAC
+        - elements[].complexName
+        - elements[].description
+        - elements[].organismName
+  getInteractorDetails:
+    description: Get detailed information about a specific interactor
+    tags:
+      - interactor-details
+      - protein-info
+    method: GET
+    path: /interactor/{ac}
+    params:
+      ac:
+        type: string
+        required: true
+        description: IntAct interactor accession (e.g. EBI-12345678)
+    response:
+      format: json
+      fields:
+        - interactor.accession
+        - interactor.organism.taxId
+        - interactor.type.name
+        - interactor.xrefs[].id
 tests:
   search:
     - name: searches for TP53 interactions
@@ -88,3 +153,23 @@ tests:
         - path: content
           minLength: 1
         - path: content.0.interactorName
+  getInteraction:
+    - name: gets interaction details by accession
+      params:
+        ac: EBI-12345678
+      assert:
+        - path: interaction.ac
+  getComplex:
+    - name: searches for p53 protein complexes
+      params:
+        query: p53
+      assert:
+        - path: elements
+          minLength: 1
+        - path: elements.0.complexAC
+  getInteractorDetails:
+    - name: gets interactor details by accession
+      params:
+        ac: EBI-12345678
+      assert:
+        - path: interactor.accession

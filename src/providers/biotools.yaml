@@ -1,0 +1,85 @@
+name: biotools
+displayName: bio.tools
+description: ELIXIR bio.tools registry — bioinformatics tools and databases catalog
+tags:
+  - bioinformatics
+  - tools
+  - software
+  - registry
+  - elixir
+baseUrl: https://bio.tools/api
+tools:
+  searchTools:
+    description: Search the bio.tools registry for bioinformatics tools
+    tags:
+      - tool-search
+      - software-search
+    method: GET
+    path: /tool/
+    params:
+      q:
+        type: string
+        required: true
+        description: Search query (e.g. blast, alignment, variant calling)
+      topic:
+        type: string
+        description: EDAM topic filter (e.g. Genomics, Proteomics)
+      page:
+        type: integer
+        default: 1
+        description: Page number
+      size:
+        type: integer
+        default: 10
+        description: Results per page
+      format:
+        type: string
+        default: json
+        description: Response format
+    response:
+      format: json
+      fields:
+        - count
+        - list[].name
+        - list[].description
+        - list[].homepage
+        - list[].topic[].term
+        - list[].function[].operation[].term
+  getTool:
+    description: Get detailed information about a specific tool by ID
+    tags:
+      - tool-info
+      - software-info
+    method: GET
+    path: /tool/{toolId}/
+    params:
+      toolId:
+        type: string
+        required: true
+        description: Tool ID (e.g. blast, samtools, bowtie2)
+      format:
+        type: string
+        default: json
+        description: Response format
+    response:
+      format: json
+      fields:
+        - name
+        - description
+        - homepage
+        - topic[].term
+        - function[].operation[].term
+        - function[].input[].data.term
+        - function[].output[].data.term
+        - credit[].name
+tests:
+  searchTools:
+    - name: searches for alignment tools
+      params:
+        q: sequence alignment
+        size: 3
+        format: json
+      assert:
+        - path: count
+        - path: list
+          minLength: 1

@@ -1,0 +1,82 @@
+name: chemspider
+displayName: ChemSpider
+description: ChemSpider — RSC chemical compound search, structures, and properties database
+tags:
+  - chemistry
+  - compounds
+  - chemical-search
+  - chemspider
+  - rsc
+baseUrl: https://api.rsc.org/compounds/v1
+auth:
+  type: apiKey
+  envVar: CHEMSPIDER_API_KEY
+  header: apikey
+tools:
+  searchByName:
+    description: Search compounds by chemical name
+    tags:
+      - name-search
+      - compound-search
+    method: POST
+    path: /filter/name
+    params:
+      name:
+        type: string
+        required: true
+        description: Chemical name to search (e.g. aspirin, caffeine, glucose)
+      orderBy:
+        type: string
+        default: recordId
+        description: Sort order (recordId, massDefect, molecularWeight, referenceCount)
+    response:
+      format: json
+  searchBySMILES:
+    description: Search compounds by SMILES structure
+    tags:
+      - smiles-search
+      - structure-search
+    method: POST
+    path: /filter/smiles
+    params:
+      smiles:
+        type: string
+        required: true
+        description: SMILES string (e.g. CC(=O)Oc1ccccc1C(=O)O for aspirin)
+    response:
+      format: json
+  searchByFormula:
+    description: Search compounds by molecular formula
+    tags:
+      - formula-search
+      - compound-search
+    method: POST
+    path: /filter/formula
+    params:
+      formula:
+        type: string
+        required: true
+        description: Molecular formula (e.g. C9H8O4, C8H10N4O2)
+    response:
+      format: json
+  getRecord:
+    description: Get detailed compound information by record ID
+    tags:
+      - compound-info
+      - record-details
+    method: GET
+    path: /records/{recordId}/details
+    params:
+      recordId:
+        type: integer
+        required: true
+        description: ChemSpider record ID
+    response:
+      format: json
+tests:
+  searchByName:
+    - name: searches for aspirin
+      params:
+        name: aspirin
+      assert: []
+      allowError: true

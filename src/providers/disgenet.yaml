@@ -50,6 +50,45 @@ tools:
         - payload[].disease_type
         - payload[].disease_class_name
 
+  getVariantDisease:
+    description: Search variant-disease associations
+    tags: [variant-disease, variant-associations]
+    method: GET
+    path: /vda/variant/{variant}
+    params:
+      variant:
+        type: string
+        required: true
+        description: Variant identifier (e.g. rs7412)
+      source:
+        type: string
+        default: ALL
+        description: Source filter (ALL, CURATED, PREDICTED)
+      format:
+        type: string
+        default: json
+    response:
+      format: json
+  getDiseaseGenes:
+    description: Search disease-gene associations by disease
+    tags: [disease-gene, disease-associations]
+    method: GET
+    path: /gda/disease/{disease}
+    params:
+      disease:
+        type: string
+        required: true
+        description: Disease UMLS CUI (e.g. C0002395 for Alzheimer)
+      source:
+        type: string
+        default: ALL
+        description: Source filter (ALL, CURATED, PREDICTED)
+      format:
+        type: string
+        default: json
+    response:
+      format: json
+
 tests:
   getGeneAssociations:
     - name: gets disease associations for CDK2
@@ -62,6 +101,20 @@ tests:
     - name: searches for asthma
       params:
         query: asthma
+      assert:
+        - minLength: 1
+      allowError: true
+  getVariantDisease:
+    - name: gets disease associations for rs7412
+      params:
+        variant: rs7412
+      assert:
+        - minLength: 1
+      allowError: true
+  getDiseaseGenes:
+    - name: gets gene associations for Alzheimer disease
+      params:
+        disease: C0002395
       assert:
         - minLength: 1
       allowError: true

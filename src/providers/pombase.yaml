@@ -1,0 +1,55 @@
+name: pombase
+displayName: PomBase
+description: PomBase — Schizosaccharomyces pombe genome database for fission yeast genetics and genomics
+tags:
+  - model-organism
+  - yeast
+  - fission-yeast
+  - pombase
+  - s-pombe
+baseUrl: https://www.pombase.org/api/v1/dataset/latest
+tools:
+  getGene:
+    description: Get detailed gene information by systematic ID
+    tags:
+      - gene-info
+      - fission-yeast
+    method: GET
+    path: /data/gene/{id}
+    params:
+      id:
+        type: string
+        required: true
+        description: Systematic gene ID (e.g. SPBC11B10.09 for cdc2, SPAC1F7.01c for rpl3001)
+    response:
+      format: json
+      fields:
+        - uniquename
+        - name
+        - product
+        - taxonid
+        - deletion_viability
+        - uniprot_identifier
+        - interpro_matches[].id
+        - interpro_matches[].name
+  getGeneSummaries:
+    description: Get summary list of all S. pombe genes
+    tags:
+      - gene-list
+      - fission-yeast
+    method: GET
+    path: /data/gene_summaries
+    params: {}
+    response:
+      format: json
+tests:
+  getGene:
+    - name: gets cdc2 gene details
+      params:
+        id: SPBC11B10.09
+      assert:
+        - path: uniquename
+          equals: SPBC11B10.09
+        - path: name
+          equals: cdc2
+        - path: product

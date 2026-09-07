@@ -50,6 +50,60 @@ tools:
         - "data[].title"
         - "data[].spl_version"
         - "data[].published_date"
+  getNdc:
+    description: Get NDC (National Drug Code) details
+    tags:
+      - ndc-info
+      - drug-code
+    method: GET
+    path: /v2/ndcs/{ndc}.json
+    params:
+      ndc:
+        type: string
+        required: true
+        description: National Drug Code (e.g. 0002-1433-80)
+    response:
+      format: json
+      fields:
+        - data.ndc
+        - data.rxcui
+        - data.product_name
+        - data.labeler_name
+  getPackaging:
+    description: Get drug packaging information by SPL set ID
+    tags:
+      - packaging-info
+      - drug-packaging
+    method: GET
+    path: /v2/spls/{setid}/packaging.json
+    params:
+      setid:
+        type: string
+        required: true
+        description: SPL set ID (UUID)
+    response:
+      format: json
+      fields:
+        - data[].ndc
+        - data[].packageDescription
+  getMedia:
+    description: Get drug images and media by SPL set ID
+    tags:
+      - drug-media
+      - drug-images
+    method: GET
+    path: /v2/spls/{setid}/media.json
+    params:
+      setid:
+        type: string
+        required: true
+        description: SPL set ID (UUID)
+    response:
+      format: json
+      fields:
+        - data[].name
+        - data[].mime_type
+        - data[].url
 tests:
   searchDrugs:
     - name: searches for aspirin drug labels
@@ -69,3 +123,21 @@ tests:
           minLength: 1
         - path: data.0.setid
           equals: 2777beea-06d7-4ff5-ae4a-ad7a117dfb62
+  getNdc:
+    - name: gets NDC details
+      params:
+        ndc: 0002-1433-80
+      assert:
+        - path: data
+  getPackaging:
+    - name: gets packaging for a drug label
+      params:
+        setid: 2777beea-06d7-4ff5-ae4a-ad7a117dfb62
+      assert:
+        - path: data
+  getMedia:
+    - name: gets media for a drug label
+      params:
+        setid: 2777beea-06d7-4ff5-ae4a-ad7a117dfb62
+      assert:
+        - path: data

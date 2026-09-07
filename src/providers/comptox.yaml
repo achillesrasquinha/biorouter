@@ -52,11 +52,64 @@ tools:
         - "[].searchMatch"
         - "[].rank"
         - "[].hasStructureImage"
+  getChemicalDetails:
+    description: Get detailed chemical information by DTXSID
+    tags:
+      - chemical-detail
+      - comptox-detail
+    method: GET
+    path: /ccdapp1/search/chemical/equal/{dtxsid}
+    params:
+      dtxsid:
+        type: string
+        required: true
+        description: DSSTox substance identifier (e.g. DTXSID7020182 for bisphenol A)
+    response:
+      format: json
+      fields:
+        - "[].dtxsid"
+        - "[].preferredName"
+        - "[].casrn"
+        - "[].molecularFormula"
+  searchByName:
+    description: Search chemicals by exact name in CompTox
+    tags:
+      - chemical-search
+      - comptox-name-search
+    method: GET
+    path: /ccdapp1/search/chemical/equal/{name}
+    params:
+      name:
+        type: string
+        required: true
+        description: Chemical name to search (e.g. "Bisphenol A", "Atrazine")
+    response:
+      format: json
+      fields:
+        - "[].dtxsid"
+        - "[].dtxcid"
+        - "[].searchWord"
+        - "[].searchMatch"
+        - "[].rank"
 tests:
   searchChemical:
     - name: searches for bisphenol chemicals
       params:
         query: bisphenol
+      assert:
+        - {}
+        - isArray: true
+  getChemicalDetails:
+    - name: gets chemical details for DTXSID7020182
+      params:
+        dtxsid: DTXSID7020182
+      assert:
+        - {}
+        - isArray: true
+  searchByName:
+    - name: searches for Bisphenol A by name
+      params:
+        name: Bisphenol A
       assert:
         - {}
         - isArray: true

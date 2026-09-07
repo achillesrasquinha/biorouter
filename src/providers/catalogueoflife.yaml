@@ -61,6 +61,32 @@ tools:
         - parentId
         - extinct
         - label
+  getNameUsage:
+    description: Search name usages in the Catalogue of Life
+    tags:
+      - name-usage-search
+      - nomenclature-search
+    method: GET
+    path: /dataset/3LR/nameusage/search
+    params:
+      query:
+        type: string
+        required: true
+        mapsTo: q
+        description: Name to search (e.g. "Panthera leo")
+      rank:
+        type: string
+        description: Filter by taxonomic rank (e.g. species, genus)
+      limit:
+        type: integer
+        default: 10
+        description: Maximum number of results
+    response:
+      format: json
+      fields:
+        - result[].usage.id
+        - result[].usage.name.scientificName
+        - result[].usage.status
 tests:
   searchTaxa:
     - name: searches taxa for Felis catus
@@ -77,3 +103,10 @@ tests:
       assert:
         - path: id
         - path: name
+  getNameUsage:
+    - name: searches name usages for Panthera leo
+      params:
+        query: Panthera leo
+      assert:
+        - path: result
+          minLength: 1

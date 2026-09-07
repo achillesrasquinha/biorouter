@@ -1,0 +1,46 @@
+name: veupathdb
+displayName: VEuPathDB
+description: VEuPathDB — eukaryotic pathogen genomics covering Plasmodium, Toxoplasma, Cryptosporidium, and more
+tags:
+  - pathogen
+  - parasite
+  - eukaryotic-pathogen
+  - genomics
+  - veupathdb
+baseUrl: https://veupathdb.org/veupathdb/service
+auth:
+  type: apiKey
+  envVar: VEUPATHDB_API_KEY
+  header: Authorization
+tools:
+  listRecordTypes:
+    description: List available data types (gene, organism, pathway, compound, etc.)
+    tags:
+      - record-types
+      - data-types
+    method: GET
+    path: /record-types
+    params: {}
+    response:
+      format: json
+  listSearches:
+    description: List available gene search methods for a record type
+    tags:
+      - search-methods
+      - gene-search
+    method: GET
+    path: /record-types/{recordType}/searches
+    params:
+      recordType:
+        type: string
+        required: true
+        description: Record type (e.g. gene, transcript, organism, pathway, compound)
+    response:
+      format: json
+tests:
+  listRecordTypes:
+    - name: lists available record types
+      params: {}
+      assert:
+        - path: ""
+          minLength: 1

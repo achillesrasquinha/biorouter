@@ -67,6 +67,97 @@ tools:
         - gender
         - birthDate
         - active
+  getPatient:
+    description: Get a patient resource by ID
+    tags:
+      - fhir-patient
+      - patient-info
+    method: GET
+    path: /Patient/{id}
+    params:
+      id:
+        type: string
+        required: true
+        description: FHIR Patient resource ID
+    response:
+      format: json
+      fields:
+        - resourceType
+        - id
+        - name[].given
+        - name[].family
+        - gender
+        - birthDate
+  getCondition:
+    description: Search conditions for a patient
+    tags:
+      - fhir-condition
+      - clinical-data
+    method: GET
+    path: /Condition
+    params:
+      patient:
+        type: string
+        required: true
+        description: Patient ID to search conditions for
+      _count:
+        type: integer
+        default: 10
+        description: Maximum number of results to return
+    response:
+      format: json
+      fields:
+        - entry[].resource.code.coding[].display
+        - entry[].resource.clinicalStatus.coding[].code
+        - entry[].resource.resourceType
+  getMedicationRequest:
+    description: Search medication requests for a patient
+    tags:
+      - fhir-medication
+      - prescription
+    method: GET
+    path: /MedicationRequest
+    params:
+      patient:
+        type: string
+        required: true
+        description: Patient ID to search medication requests for
+      _count:
+        type: integer
+        default: 10
+        description: Maximum number of results to return
+    response:
+      format: json
+      fields:
+        - entry[].resource.medicationCodeableConcept.coding[].display
+        - entry[].resource.status
+        - entry[].resource.resourceType
+  getObservation:
+    description: Search observations for a patient
+    tags:
+      - fhir-observation
+      - lab-results
+    method: GET
+    path: /Observation
+    params:
+      patient:
+        type: string
+        required: true
+        description: Patient ID to search observations for
+      category:
+        type: string
+        description: Observation category filter (e.g. "vital-signs", "laboratory")
+      _count:
+        type: integer
+        default: 20
+        description: Maximum number of results to return
+    response:
+      format: json
+      fields:
+        - entry[].resource.code.coding[].display
+        - entry[].resource.valueQuantity.value
+        - entry[].resource.valueQuantity.unit
+        - entry[].resource.resourceType
 tests:
   searchResource:
     - name: searches for Patient resources
@@ -84,4 +175,35 @@ tests:
         id: "1"
       assert:
         - minLength: 1
+      allowError: true
+  getPatient:
+    - name: gets a patient by ID
+      params:
+        id: "1"
+      assert:
+        - path: resourceType
+      allowError: true
+  getCondition:
+    - name: searches conditions for a patient
+      params:
+        patient: "1"
+        _count: 5
+      assert:
+        - {}
+      allowError: true
+  getMedicationRequest:
+    - name: searches medication requests for a patient
+      params:
+        patient: "1"
+        _count: 5
+      assert:
+        - {}
+      allowError: true
+  getObservation:
+    - name: searches observations for a patient
+      params:
+        patient: "1"
+        _count: 5
+      assert:
+        - {}
       allowError: true

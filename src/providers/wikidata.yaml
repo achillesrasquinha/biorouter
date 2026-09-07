@@ -1,0 +1,37 @@
+name: wikidata
+displayName: Wikidata
+description: Wikidata SPARQL endpoint — structured knowledge base for genes, proteins, diseases, drugs, and species
+tags:
+  - knowledge-graph
+  - sparql
+  - linked-data
+  - wikidata
+baseUrl: https://query.wikidata.org
+tools:
+  sparqlQuery:
+    description: Execute a SPARQL query against Wikidata for biological entities
+    tags:
+      - sparql-query
+      - knowledge-base
+    method: GET
+    path: /sparql
+    params:
+      query:
+        type: string
+        required: true
+        description: "SPARQL query (e.g. SELECT ?gene ?geneLabel WHERE { ?gene wdt:P351 \"7157\". SERVICE wikibase:label { bd:serviceParam wikibase:language \"en\" } })"
+      format:
+        type: string
+        default: json
+        description: Response format (json, xml, csv)
+    response:
+      format: json
+tests:
+  sparqlQuery:
+    - name: queries TP53 gene
+      params:
+        query: "SELECT ?gene ?geneLabel WHERE { ?gene wdt:P351 \"7157\". SERVICE wikibase:label { bd:serviceParam wikibase:language \"en\" } }"
+        format: json
+      assert:
+        - path: results.bindings
+          minLength: 1

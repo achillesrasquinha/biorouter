@@ -1,0 +1,76 @@
+name: pdbj
+displayName: PDBj
+description: Protein Data Bank Japan — PDB search, SQL queries, and chemical component lookup
+tags:
+  - protein-structure
+  - pdb
+  - structural-biology
+  - pdbj
+baseUrl: https://pdbj.org/rest/newweb
+tools:
+  searchPDB:
+    description: Search PDB entries by ID, title, or keywords
+    tags:
+      - pdb-search
+      - structure-search
+    method: GET
+    path: /search/pdb
+    params:
+      pdbid:
+        type: string
+        description: PDB ID to search (e.g. 1ubq, 4hhb)
+      title:
+        type: string
+        description: Title keywords to search
+      limit:
+        type: integer
+        default: 10
+        description: Maximum results to return
+    response:
+      format: json
+      fields:
+        - total
+        - results
+  searchChemicalComponent:
+    description: Search chemical components (ligands) in PDB by name or formula
+    tags:
+      - chemical-component
+      - ligand-search
+    method: GET
+    path: /search/cc
+    params:
+      query:
+        type: string
+        required: true
+        description: Chemical name, formula, or SMILES to search (e.g. ATP, aspirin)
+    response:
+      format: json
+  sqlQuery:
+    description: Run SQL queries against PDBj Mine 2 relational database
+    tags:
+      - sql-query
+      - advanced-search
+    method: GET
+    path: /search/sql
+    params:
+      q:
+        type: string
+        required: true
+        description: SQL query against Mine 2 RDB (e.g. select pdbid,resolution from brief_summary where resolution < 1.5 limit 10)
+    response:
+      format: json
+tests:
+  searchPDB:
+    - name: searches for ubiquitin structure
+      params:
+        pdbid: 1ubq
+        limit: 2
+      assert:
+        - path: total
+        - path: results
+  searchChemicalComponent:
+    - name: searches for ATP
+      params:
+        query: ATP
+      assert: []
+      allowError: true

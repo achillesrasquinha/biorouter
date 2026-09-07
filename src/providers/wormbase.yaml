@@ -54,6 +54,24 @@ tools:
         - results[].curie
         - results[].name
         - results[].category
+  getProtein:
+    description: Get protein information for a gene from the Alliance of Genome Resources
+    tags:
+      - protein-info
+      - gene-protein
+    method: GET
+    path: /gene/{geneId}/homologs
+    params:
+      geneId:
+        type: string
+        required: true
+        description: Alliance gene ID with WB prefix (e.g. WB:WBGene00006763)
+    response:
+      format: json
+      fields:
+        - results[].gene.symbol
+        - results[].homologGene.symbol
+        - results[].homologGene.species.name
 tests:
   getGene:
     - name: gets gene detail for unc-26 (WB:WBGene00006763)
@@ -69,3 +87,10 @@ tests:
       assert:
         - path: results
           minLength: 1
+  getProtein:
+    - name: gets protein/homolog info for unc-26 (WB:WBGene00006763)
+      params:
+        geneId: WB:WBGene00006763
+      assert:
+        - {}
+      allowError: true

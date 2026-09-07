@@ -62,6 +62,62 @@ tools:
         - goBiologicalProcess.definition
         - literatureReference[].title
         - literatureReference[].pubMedIdentifier
+  getPathwayDetail:
+    description: Get contained events (sub-pathways and reactions) in a pathway
+    tags:
+      - pathway-events
+      - pathway-contents
+    method: GET
+    path: /ContentService/data/pathway/{id}/containedEvents
+    params:
+      id:
+        type: string
+        required: true
+        description: Reactome stable ID (e.g. R-HSA-1640170)
+    response:
+      format: json
+      fields:
+        - '[].stId'
+        - '[].displayName'
+        - '[].schemaClass'
+  getSpeciesPathways:
+    description: Get top-level pathways for a species
+    tags:
+      - species-pathways
+      - top-level-pathways
+    method: GET
+    path: /ContentService/data/pathways/top/{species}
+    params:
+      species:
+        type: string
+        required: true
+        default: "9606"
+        description: Species taxon ID or name (e.g. 9606, "Homo sapiens")
+    response:
+      format: json
+      fields:
+        - '[].stId'
+        - '[].displayName'
+        - '[].isInferred'
+  analyzeIdentifiers:
+    description: Perform pathway enrichment analysis on a list of identifiers
+    tags:
+      - pathway-enrichment
+      - gene-set-analysis
+    method: POST
+    path: /AnalysisService/identifiers/
+    params:
+      ids:
+        type: string
+        required: true
+        description: Newline-separated list of gene/protein identifiers
+    response:
+      format: json
+      fields:
+        - summary.token
+        - pathways[].stId
+        - pathways[].name
+        - pathways[].entities.pValue
 tests:
   search:
     - name: searches for apoptosis pathways
@@ -75,3 +131,23 @@ tests:
       params:
         pathwayId: R-HSA-109581
       assert: []
+  getPathwayDetail:
+    - name: gets contained events for a pathway
+      params:
+        id: R-HSA-1640170
+      assert:
+        - isArray: true
+          minLength: 1
+  getSpeciesPathways:
+    - name: gets top-level human pathways
+      params:
+        species: "9606"
+      assert:
+        - isArray: true
+          minLength: 1
+  analyzeIdentifiers:
+    - name: analyzes a small gene list
+      params:
+        ids: "TP53\nBRCA1\nEGFR"
+      assert:
+        - path: summary.token

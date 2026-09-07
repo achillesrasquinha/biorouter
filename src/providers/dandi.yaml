@@ -1,0 +1,100 @@
+name: dandi
+displayName: DANDI Archive
+description: DANDI — Distributed Archives for Neurophysiology Data Integration, brain imaging and electrophysiology datasets
+tags:
+  - neuroscience
+  - neurophysiology
+  - electrophysiology
+  - brain
+  - dandi
+baseUrl: https://api.dandiarchive.org/api
+tools:
+  listDandisets:
+    description: List and search neurophysiology datasets (dandisets)
+    tags:
+      - dataset-search
+      - neurophysiology
+    method: GET
+    path: /dandisets/
+    params:
+      search:
+        type: string
+        description: Search query for dandisets
+      page_size:
+        type: integer
+        default: 10
+        description: Number of results per page
+      ordering:
+        type: string
+        default: -modified
+        description: Sort order (e.g. -modified, name, -created)
+    response:
+      format: json
+      fields:
+        - count
+        - results[].identifier
+        - results[].contact_person
+        - results[].embargo_status
+        - results[].most_recent_published_version.name
+        - results[].most_recent_published_version.asset_count
+        - results[].most_recent_published_version.size
+  getDandiset:
+    description: Get detailed metadata for a specific dandiset
+    tags:
+      - dataset-info
+      - neurophysiology
+    method: GET
+    path: /dandisets/{dandisetId}/
+    params:
+      dandisetId:
+        type: string
+        required: true
+        description: Dandiset identifier (e.g. 000003, 000005)
+    response:
+      format: json
+      fields:
+        - identifier
+        - contact_person
+        - embargo_status
+        - most_recent_published_version.name
+        - most_recent_published_version.asset_count
+        - most_recent_published_version.size
+        - most_recent_published_version.status
+  listAssets:
+    description: List assets (files) in a specific version of a dandiset
+    tags:
+      - asset-list
+      - data-files
+    method: GET
+    path: /dandisets/{dandisetId}/versions/{version}/assets/
+    params:
+      dandisetId:
+        type: string
+        required: true
+        description: Dandiset identifier (e.g. 000003)
+      version:
+        type: string
+        required: true
+        description: Version string (e.g. 0.260218.2052, or draft)
+      page_size:
+        type: integer
+        default: 10
+        description: Number of results per page
+    response:
+      format: json
+tests:
+  listDandisets:
+    - name: lists neurophysiology datasets
+      params:
+        page_size: 3
+      assert:
+        - path: count
+        - path: results
+          minLength: 1
+  getDandiset:
+    - name: gets details for dandiset 000003
+      params:
+        dandisetId: "000003"
+      assert:
+        - path: identifier
+          equals: "000003"

@@ -55,6 +55,27 @@ tools:
         - abbrev
         - core
         - main_class
+  searchByName:
+    description: Search lipids by common name
+    tags:
+      - lipid-search
+      - name-search
+    method: GET
+    path: /compound/name/{name}/all/json
+    params:
+      name:
+        type: string
+        required: true
+        description: Lipid common name to search (e.g. "cholesterol", "sphingomyelin")
+    response:
+      format: json
+      fields:
+        - "[].lm_id"
+        - "[].name"
+        - "[].systematic_name"
+        - "[].main_class"
+        - "[].formula"
+        - "[].exactmass"
 tests:
   getCompound:
     - name: gets compound by LIPID MAPS ID
@@ -66,6 +87,12 @@ tests:
             - isArray: true
               minLength: 1
             - path: name
+  searchByName:
+    - name: searches lipids by name cholesterol
+      params:
+        name: cholesterol
+      assert:
+        - {}
   getByName:
     - name: searches lipids by abbreviated chain name
       params:

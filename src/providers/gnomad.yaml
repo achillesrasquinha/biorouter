@@ -98,6 +98,227 @@ tools:
         type: string
         default: gnomad_r2_1
         description: Dataset version (e.g. gnomad_r2_1, gnomad_r4)
+  getGeneVariants:
+    description: Get variants for a gene with allele frequency data
+    tags:
+      - gene-variants
+      - allele-frequency
+    query: |
+      query($geneId: String!, $dataset: DatasetId!, $referenceGenome: ReferenceGenomeId!) {
+        gene(gene_id: $geneId, reference_genome: $referenceGenome) {
+          variants(dataset: $dataset) {
+            variant_id
+            rsids
+            consequence
+            hgvsc
+            hgvsp
+            exome { ac an af }
+            genome { ac an af }
+          }
+        }
+      }
+    params:
+      geneId:
+        type: string
+        required: true
+        description: Ensembl gene ID (e.g. ENSG00000139618)
+      dataset:
+        type: string
+        default: gnomad_r2_1
+        description: Dataset version (e.g. gnomad_r2_1, gnomad_r4)
+      referenceGenome:
+        type: string
+        default: GRCh37
+        description: Reference genome (GRCh37 or GRCh38)
+    response:
+      format: json
+      fields:
+        - gene.variants[].variant_id
+        - gene.variants[].rsids
+        - gene.variants[].consequence
+        - gene.variants[].exome.af
+        - gene.variants[].genome.af
+  getTranscript:
+    description: Get transcript-level constraint and exon information
+    tags:
+      - transcript
+      - constraint
+    query: |
+      query($transcriptId: String!, $referenceGenome: ReferenceGenomeId!) {
+        transcript(transcript_id: $transcriptId, reference_genome: $referenceGenome) {
+          transcript_id
+          gene { gene_id symbol }
+          gnomad_constraint { pLI oe_mis oe_lof }
+          exons { start stop }
+        }
+      }
+    params:
+      transcriptId:
+        type: string
+        required: true
+        description: Ensembl transcript ID (e.g. ENST00000357654)
+      referenceGenome:
+        type: string
+        default: GRCh37
+        description: Reference genome (GRCh37 or GRCh38)
+    response:
+      format: json
+      fields:
+        - transcript.transcript_id
+        - transcript.gene.symbol
+        - transcript.gnomad_constraint.pLI
+        - transcript.exons[].start
+        - transcript.exons[].stop
+  getRegion:
+    description: Get variants in a genomic region
+    tags:
+      - region
+      - variant-search
+    query: |
+      query($chrom: String!, $start: Int!, $stop: Int!, $dataset: DatasetId!, $referenceGenome: ReferenceGenomeId!) {
+        region(chrom: $chrom, start: $start, stop: $stop, reference_genome: $referenceGenome) {
+          variants(dataset: $dataset) {
+            variant_id
+            rsids
+            consequence
+            exome { ac an af }
+            genome { ac an af }
+          }
+        }
+      }
+    params:
+      chrom:
+        type: string
+        required: true
+        description: Chromosome (e.g. 1, X)
+      start:
+        type: integer
+        required: true
+        description: Start position
+      stop:
+        type: integer
+        required: true
+        description: Stop position
+      dataset:
+        type: string
+        default: gnomad_r2_1
+        description: Dataset version (e.g. gnomad_r2_1, gnomad_r4)
+      referenceGenome:
+        type: string
+        default: GRCh37
+        description: Reference genome (GRCh37 or GRCh38)
+    response:
+      format: json
+      fields:
+        - region.variants[].variant_id
+        - region.variants[].rsids
+        - region.variants[].consequence
+        - region.variants[].exome.af
+        - region.variants[].genome.af
+  getStructuralVariants:
+    description: Get structural variants for a gene
+    tags:
+      - structural-variant
+      - sv
+    query: |
+      query($geneSymbol: String!, $referenceGenome: ReferenceGenomeId!) {
+        gene(gene_symbol: $geneSymbol, reference_genome: $referenceGenome) {
+          structural_variants(dataset: gnomad_sv_r2_1) {
+            variant_id
+            type
+            consequence
+            chrom
+            pos
+            end
+            ac
+            an
+            af
+          }
+        }
+      }
+    params:
+      geneSymbol:
+        type: string
+        required: true
+        description: Gene symbol (e.g. BRCA1)
+      referenceGenome:
+        type: string
+        default: GRCh37
+        description: Reference genome (GRCh37 or GRCh38)
+    response:
+      format: json
+      fields:
+        - gene.structural_variants[].variant_id
+        - gene.structural_variants[].type
+        - gene.structural_variants[].consequence
+        - gene.structural_variants[].chrom
+        - gene.structural_variants[].pos
+        - gene.structural_variants[].end
+        - gene.structural_variants[].af
+  getMitochondrialVariants:
+    description: Get mitochondrial variants from gnomAD
+    tags:
+      - mitochondrial
+      - variant
+    query: |
+      query {
+        mitochondrial_variants(dataset: gnomad_r3) {
+          variant_id
+          consequence
+          an
+          ac_hom
+          af_hom
+          max_heteroplasmy
+        }
+      }
+    params:
+      first:
+        type: integer
+        default: 25
+        description: Number of results to return
+    response:
+      format: json
+      fields:
+        - mitochondrial_variants[].variant_id
+        - mitochondrial_variants[].consequence
+        - mitochondrial_variants[].an
+        - mitochondrial_variants[].ac_hom
+        - mitochondrial_variants[].af_hom
+        - mitochondrial_variants[].max_heteroplasmy
+  getCopyNumberVariants:
+    description: Get copy number variants for a gene
+    tags:
+      - copy-number-variant
+      - cnv
+    query: |
+      query($geneSymbol: String!, $referenceGenome: ReferenceGenomeId!) {
+        gene(gene_symbol: $geneSymbol, reference_genome: $referenceGenome) {
+          copy_number_variants(dataset: gnomad_cnv_r4) {
+            variant_id
+            type
+            sc
+            sn
+            sf
+          }
+        }
+      }
+    params:
+      geneSymbol:
+        type: string
+        required: true
+        description: Gene symbol (e.g. BRCA1)
+      referenceGenome:
+        type: string
+        default: GRCh38
+        description: Reference genome (GRCh37 or GRCh38)
+    response:
+      format: json
+      fields:
+        - gene.copy_number_variants[].variant_id
+        - gene.copy_number_variants[].type
+        - gene.copy_number_variants[].sc
+        - gene.copy_number_variants[].sn
+        - gene.copy_number_variants[].sf
 tests:
   searchVariant:
     - name: searches for PCSK9 gene information
@@ -116,3 +337,50 @@ tests:
         - path: variant
         - path: variant.variantId
           equals: 1-55516888-G-A
+  getGeneVariants:
+    - name: gets variants for BRCA2 gene
+      params:
+        geneId: ENSG00000139618
+        dataset: gnomad_r2_1
+        referenceGenome: GRCh37
+      assert:
+        - path: gene.variants
+  getTranscript:
+    - name: gets transcript info for ENST00000357654
+      params:
+        transcriptId: ENST00000357654
+        referenceGenome: GRCh37
+      assert:
+        - path: transcript.transcript_id
+          equals: ENST00000357654
+        - path: transcript.gene.symbol
+  getRegion:
+    - name: gets variants in a region on chromosome 1
+      params:
+        chrom: "1"
+        start: 55516888
+        stop: 55516988
+        dataset: gnomad_r2_1
+        referenceGenome: GRCh37
+      assert:
+        - path: region
+  getStructuralVariants:
+    - name: gets structural variants for BRCA1
+      params:
+        geneSymbol: BRCA1
+        referenceGenome: GRCh37
+      assert:
+        - path: gene
+  getMitochondrialVariants:
+    - name: gets mitochondrial variants
+      params:
+        first: 10
+      assert:
+        - path: mitochondrial_variants
+  getCopyNumberVariants:
+    - name: gets copy number variants for BRCA1
+      params:
+        geneSymbol: BRCA1
+        referenceGenome: GRCh38
+      assert:
+        - path: gene

@@ -50,6 +50,26 @@ tools:
         - "[].dependencyScore"
         - "[].geneId"
         - "[].dataset"
+  getCellLine:
+    description: Get cell line information by DepMap cell line ID
+    tags:
+      - cell-line-info
+      - cancer-cell-line
+    method: GET
+    path: /v1/cell_line/{cellLineId}
+    params:
+      cellLineId:
+        type: string
+        required: true
+        description: DepMap cell line identifier (e.g. ACH-000001)
+    response:
+      format: json
+      fields:
+        - cellLineId
+        - cellLineName
+        - lineage
+        - primaryDisease
+        - subtype
 tests:
   searchGene:
     - name: searches for BRAF gene
@@ -57,3 +77,10 @@ tests:
         query: BRAF
       assert:
         - {}
+  getCellLine:
+    - name: gets cell line ACH-000001
+      params:
+        cellLineId: ACH-000001
+      assert:
+        - {}
+      allowError: true

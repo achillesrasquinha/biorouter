@@ -56,6 +56,30 @@ tools:
         - "[].host_organism_names"
         - "[].mhc_allele_names"
         - "[].qualitative_measures"
+  searchAssays:
+    description: Search assays by epitope structure ID
+    tags:
+      - assay-search
+      - epitope-assays
+    method: GET
+    path: /tcell_search
+    params:
+      e_id:
+        type: integer
+        required: true
+        mapsTo: structure_id
+        description: Epitope structure ID (e.g. eq.35572). Prefix value with eq.
+      select:
+        type: string
+        default: assay_id,assay_type,qualitative_measure,response_frequency_positive
+        description: Columns to return
+    response:
+      format: json
+      fields:
+        - "[].assay_id"
+        - "[].assay_type"
+        - "[].qualitative_measure"
+        - "[].response_frequency_positive"
 tests:
   searchEpitopes:
     - name: searches for SIINFEKL epitope
@@ -72,3 +96,9 @@ tests:
         - isArray: true
         - path: 0.structure_id
           equals: 35572
+  searchAssays:
+    - name: searches assays for epitope 35572
+      params:
+        e_id: eq.35572
+      assert:
+        - isArray: true

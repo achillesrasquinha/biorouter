@@ -32,7 +32,12 @@ tools:
         - molecule_properties.full_mwt
         - molecule_properties.alogp
         - molecule_properties.full_molformula
+        - molecule_properties.psa
+        - molecule_properties.qed_weighted
+        - molecule_properties.num_ro5_violations
         - molecule_structures.canonical_smiles
+        - molecule_structures.standard_inchi
+        - atc_classifications
         - natural_product
   search:
     description: Search molecules by name or keyword
@@ -56,6 +61,139 @@ tools:
         - molecules[].max_phase
         - molecules[].molecule_properties.full_mwt
         - molecules[].molecule_properties.alogp
+  getActivity:
+    description: Get bioactivity data for a molecule
+    tags:
+      - bioactivity
+      - assay-data
+    method: GET
+    path: /activity.json
+    params:
+      molecule_chembl_id:
+        type: string
+        required: true
+        description: ChEMBL molecule ID (e.g. CHEMBL25 for aspirin)
+      limit:
+        type: integer
+        default: 20
+        description: Number of activity records to return
+    response:
+      format: json
+      fields:
+        - activities[].molecule_chembl_id
+        - activities[].target_chembl_id
+        - activities[].standard_type
+        - activities[].standard_value
+        - activities[].standard_units
+        - activities[].pchembl_value
+  getTarget:
+    description: Get target details by ChEMBL ID
+    tags:
+      - target-info
+      - drug-target
+    method: GET
+    path: /target/{chemblId}.json
+    params:
+      chemblId:
+        type: string
+        required: true
+        description: ChEMBL target ID (e.g. CHEMBL2093868)
+    response:
+      format: json
+      fields:
+        - target_chembl_id
+        - pref_name
+        - target_type
+        - organism
+        - target_components[].accession
+  searchTarget:
+    description: Search targets by keyword
+    tags:
+      - target-search
+      - drug-target
+    method: GET
+    path: /target/search.json
+    params:
+      query:
+        type: string
+        required: true
+        mapsTo: q
+        description: Search query for targets (e.g. "cyclooxygenase")
+    response:
+      format: json
+      fields:
+        - targets[].target_chembl_id
+        - targets[].pref_name
+        - targets[].target_type
+        - targets[].organism
+  getAssay:
+    description: Get assay details by ChEMBL ID
+    tags:
+      - assay-info
+      - bioassay
+    method: GET
+    path: /assay/{chemblId}.json
+    params:
+      chemblId:
+        type: string
+        required: true
+        description: ChEMBL assay ID (e.g. CHEMBL615110)
+    response:
+      format: json
+      fields:
+        - assay_chembl_id
+        - description
+        - assay_type
+        - assay_organism
+        - confidence_score
+        - target_chembl_id
+  getMechanism:
+    description: Get drug mechanism of action
+    tags:
+      - mechanism-of-action
+      - drug-mechanism
+    method: GET
+    path: /mechanism.json
+    params:
+      molecule_chembl_id:
+        type: string
+        required: true
+        description: ChEMBL molecule ID (e.g. CHEMBL25 for aspirin)
+      limit:
+        type: integer
+        default: 10
+        description: Number of mechanism records to return
+    response:
+      format: json
+      fields:
+        - mechanisms[].molecule_chembl_id
+        - mechanisms[].target_chembl_id
+        - mechanisms[].mechanism_of_action
+        - mechanisms[].action_type
+        - mechanisms[].max_phase
+  getDrugIndication:
+    description: Get drug indications for a molecule
+    tags:
+      - drug-indication
+      - therapeutic-use
+    method: GET
+    path: /drug_indication.json
+    params:
+      molecule_chembl_id:
+        type: string
+        required: true
+        description: ChEMBL molecule ID (e.g. CHEMBL25 for aspirin)
+      limit:
+        type: integer
+        default: 20
+        description: Number of indication records to return
+    response:
+      format: json
+      fields:
+        - drug_indications[].molecule_chembl_id
+        - drug_indications[].mesh_heading
+        - drug_indications[].efo_term
+        - drug_indications[].max_phase_for_ind
 tests:
   getMolecule:
     - name: gets molecule by ChEMBL ID
@@ -72,3 +210,57 @@ tests:
       assert:
         - path: molecules
           minLength: 1
+  getActivity:
+    - name: gets bioactivity data for aspirin
+      params:
+        molecule_chembl_id: CHEMBL25
+        limit: 5
+      assert:
+        - path: activities
+          minLength: 1
+        - path: activities.0.molecule_chembl_id
+          equals: CHEMBL25
+  getTarget:
+    - name: gets target details by ChEMBL ID
+      params:
+        chemblId: CHEMBL2093868
+      assert:
+        - path: target_chembl_id
+          equals: CHEMBL2093868
+        - path: pref_name
+        - path: target_type
+  searchTarget:
+    - name: searches for cyclooxygenase targets
+      params:
+        query: cyclooxygenase
+      assert:
+        - path: targets
+          minLength: 1
+        - path: targets.0.target_chembl_id
+  getAssay:
+    - name: gets assay details by ChEMBL ID
+      params:
+        chemblId: CHEMBL615110
+      assert:
+        - path: assay_chembl_id
+          equals: CHEMBL615110
+        - path: assay_type
+  getMechanism:
+    - name: gets mechanism of action for aspirin
+      params:
+        molecule_chembl_id: CHEMBL25
+        limit: 5
+      assert:
+        - path: mechanisms
+          minLength: 1
+        - path: mechanisms.0.mechanism_of_action
+  getDrugIndication:
+    - name: gets drug indications for aspirin
+      params:
+        molecule_chembl_id: CHEMBL25
+        limit: 5
+      assert:
+        - path: drug_indications
+          minLength: 1
+        - path: drug_indications.0.molecule_chembl_id
+          equals: CHEMBL25

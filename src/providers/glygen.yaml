@@ -49,6 +49,24 @@ tools:
         - "refseq.ac"
         - "refseq.name"
         - "refseq.summary"
+  getGlycan:
+    description: Get detailed glycan information by GlyTouCan accession
+    tags:
+      - glycan-detail
+      - glycan-info
+    method: POST
+    path: /glycan/detail/{glytoucan_ac}/
+    params:
+      glytoucan_ac:
+        type: string
+        required: true
+        description: GlyTouCan accession number (e.g. G17689DH)
+    response:
+      format: json
+      fields:
+        - "glytoucan_ac"
+        - "mass"
+        - "species[].name"
 tests:
   searchGlycans:
     - name: initializes glycan search and gets available parameters
@@ -64,3 +82,9 @@ tests:
       assert:
         - path: mass
         - path: refseq
+  getGlycan:
+    - name: gets glycan details for G17689DH
+      params:
+        glytoucan_ac: G17689DH
+      assert:
+        - path: glytoucan_ac

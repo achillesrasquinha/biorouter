@@ -72,6 +72,41 @@ tools:
         - "biosample_summary"
         - "target.label"
         - "lab.title"
+  searchFiles:
+    description: Search ENCODE files by dataset or other criteria
+    tags:
+      - file-search
+      - encode-files
+    method: GET
+    path: /search/
+    params:
+      dataset:
+        type: string
+        required: true
+        mapsTo: dataset
+        description: Dataset accession to find files for (e.g. /experiments/ENCSR245QRV/)
+      type:
+        type: string
+        default: File
+        description: Object type (File)
+      format:
+        type: string
+        default: json
+        description: Response format
+      limit:
+        type: integer
+        default: 10
+        description: Number of results to return
+    response:
+      format: json
+      fields:
+        - "total"
+        - "@graph[].accession"
+        - "@graph[].file_format"
+        - "@graph[].file_type"
+        - "@graph[].output_type"
+        - "@graph[].assembly"
+        - "@graph[].status"
 tests:
   search:
     - name: searches for ChIP-seq experiments
@@ -89,3 +124,11 @@ tests:
         - path: accession
           equals: ENCSR245QRV
         - path: assay_term_name
+  searchFiles:
+    - name: searches files for an experiment dataset
+      params:
+        dataset: /experiments/ENCSR245QRV/
+        limit: 3
+      assert:
+        - path: total
+          gt: 0

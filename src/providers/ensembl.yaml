@@ -63,6 +63,244 @@ tools:
         - "query"
         - "seq"
         - "version"
+  getVariantConsequences:
+    description: Get variant consequences for a variant ID
+    tags:
+      - variant
+      - consequence
+      - vep
+    method: GET
+    path: /vep/human/id/{id}/consequences
+    params:
+      id:
+        type: string
+        required: true
+        description: Variant ID (e.g. rs699)
+    response:
+      format: json
+      fields:
+        - "transcript_consequences[].gene_symbol"
+        - "transcript_consequences[].consequence_terms"
+        - "transcript_consequences[].impact"
+        - "transcript_consequences[].biotype"
+  lookupId:
+    description: Lookup any Ensembl ID to get summary information
+    tags:
+      - lookup
+      - ensembl-id
+    method: GET
+    path: /lookup/id/{id}
+    params:
+      id:
+        type: string
+        required: true
+        description: Ensembl stable ID (e.g. ENSG00000139618)
+    response:
+      format: json
+      fields:
+        - "id"
+        - "display_name"
+        - "description"
+        - "biotype"
+        - "species"
+        - "object_type"
+        - "seq_region_name"
+        - "start"
+        - "end"
+        - "strand"
+  getHomologs:
+    description: Get homologs for a gene by symbol
+    tags:
+      - homology
+      - comparative-genomics
+    method: GET
+    path: /homology/symbol/{species}/{symbol}
+    params:
+      symbol:
+        type: string
+        required: true
+        description: Gene symbol (e.g. BRCA2)
+      species:
+        type: string
+        default: human
+        description: Species name
+    response:
+      format: json
+      fields:
+        - "data[].homologies[].source.species"
+        - "data[].homologies[].target.species"
+        - "data[].homologies[].target.id"
+        - "data[].homologies[].type"
+  getVariants:
+    description: Get known variants overlapping an Ensembl region
+    tags:
+      - variant
+      - overlap
+    method: GET
+    path: /overlap/id/{id}?feature=variation
+    params:
+      id:
+        type: string
+        required: true
+        description: Ensembl stable ID (e.g. ENSG00000139618)
+    response:
+      format: json
+      fields:
+        - "[].id"
+        - "[].consequence_type"
+        - "[].start"
+        - "[].end"
+        - "[].alleles"
+  getRegulatory:
+    description: Get regulatory features overlapping an Ensembl region
+    tags:
+      - regulatory
+      - overlap
+    method: GET
+    path: /overlap/id/{id}?feature=regulatory
+    params:
+      id:
+        type: string
+        required: true
+        description: Ensembl stable ID (e.g. ENSG00000139618)
+    response:
+      format: json
+      fields:
+        - "[].id"
+        - "[].feature_type"
+        - "[].description"
+        - "[].start"
+        - "[].end"
+  getXrefs:
+    description: Get cross-references for an Ensembl ID
+    tags:
+      - cross-reference
+      - xref
+    method: GET
+    path: /xrefs/id/{id}
+    params:
+      id:
+        type: string
+        required: true
+        description: Ensembl stable ID (e.g. ENSG00000139618)
+    response:
+      format: json
+      fields:
+        - "[].dbname"
+        - "[].display_id"
+        - "[].primary_id"
+        - "[].description"
+  getAssemblyInfo:
+    description: Get assembly information for a species
+    tags:
+      - assembly
+      - genome-info
+    method: GET
+    path: /info/assembly/{species}
+    params:
+      species:
+        type: string
+        default: homo_sapiens
+        description: Species name (e.g. homo_sapiens)
+    response:
+      format: json
+      fields:
+        - "assembly_name"
+        - "assembly_date"
+        - "karyotype"
+        - "top_level_region[].name"
+        - "top_level_region[].length"
+  mapCoordinates:
+    description: Map coordinates between genome assemblies
+    tags:
+      - coordinate-mapping
+      - assembly
+    method: GET
+    path: /map/{species}/{asm_one}/{region}/{asm_two}
+    params:
+      species:
+        type: string
+        default: human
+        description: Species name
+      asm_one:
+        type: string
+        default: GRCh37
+        description: Source assembly name
+      region:
+        type: string
+        required: true
+        description: Region to map (e.g. X:1000000..1000100:1)
+      asm_two:
+        type: string
+        default: GRCh38
+        description: Target assembly name
+    response:
+      format: json
+      fields:
+        - "mappings[].mapped.seq_region_name"
+        - "mappings[].mapped.start"
+        - "mappings[].mapped.end"
+  searchArchive:
+    description: Get archive info for retired or old Ensembl IDs
+    tags:
+      - archive
+      - id-history
+    method: GET
+    path: /archive/id/{id}
+    params:
+      id:
+        type: string
+        required: true
+        description: Ensembl stable ID (e.g. ENSG00000139618)
+    response:
+      format: json
+      fields:
+        - "id"
+        - "is_current"
+        - "release"
+        - "assembly"
+        - "latest"
+  getComparaTree:
+    description: Get gene tree for a gene symbol
+    tags:
+      - gene-tree
+      - comparative-genomics
+    method: GET
+    path: /genetree/member/symbol/{species}/{symbol}
+    params:
+      symbol:
+        type: string
+        required: true
+        description: Gene symbol (e.g. BRCA2)
+      species:
+        type: string
+        default: homo_sapiens
+        description: Species name
+    response:
+      format: json
+      fields:
+        - "tree[].taxonomy.scientific_name"
+        - "tree[].id"
+  getOntologyById:
+    description: Get ontology term information by ID
+    tags:
+      - ontology
+      - go-term
+    method: GET
+    path: /ontology/id/{id}
+    params:
+      id:
+        type: string
+        required: true
+        description: Ontology term ID (e.g. GO:0005524)
+    response:
+      format: json
+      fields:
+        - "accession"
+        - "name"
+        - "namespace"
+        - "definition"
+        - "subsets"
 tests:
   lookupSymbol:
     - name: looks up BRCA2 gene
@@ -81,3 +319,82 @@ tests:
         - path: seq
         - path: id
           equals: ENSG00000139618
+  getVariantConsequences:
+    - name: gets variant consequences for rs699
+      params:
+        id: rs699
+      assert:
+        - path: transcript_consequences
+  lookupId:
+    - name: looks up ENSG00000139618
+      params:
+        id: ENSG00000139618
+      assert:
+        - path: id
+          equals: ENSG00000139618
+        - path: display_name
+        - path: species
+  getHomologs:
+    - name: gets homologs for BRCA2
+      params:
+        symbol: BRCA2
+        species: human
+      assert:
+        - path: data
+  getVariants:
+    - name: gets variants overlapping ENSG00000139618
+      params:
+        id: ENSG00000139618
+      assert:
+        - path: "[].id"
+  getRegulatory:
+    - name: gets regulatory features for ENSG00000139618
+      params:
+        id: ENSG00000139618
+      assert:
+        - path: "[]"
+  getXrefs:
+    - name: gets cross-references for ENSG00000139618
+      params:
+        id: ENSG00000139618
+      assert:
+        - path: "[].dbname"
+        - path: "[].display_id"
+  getAssemblyInfo:
+    - name: gets assembly info for homo_sapiens
+      params:
+        species: homo_sapiens
+      assert:
+        - path: assembly_name
+        - path: karyotype
+  mapCoordinates:
+    - name: maps coordinates from GRCh37 to GRCh38
+      params:
+        species: human
+        asm_one: GRCh37
+        region: "X:1000000..1000100:1"
+        asm_two: GRCh38
+      assert:
+        - path: mappings
+  searchArchive:
+    - name: gets archive info for ENSG00000139618
+      params:
+        id: ENSG00000139618
+      assert:
+        - path: id
+          equals: ENSG00000139618
+        - path: is_current
+  getComparaTree:
+    - name: gets gene tree for BRCA2
+      params:
+        symbol: BRCA2
+        species: homo_sapiens
+      assert:
+        - path: tree
+  getOntologyById:
+    - name: gets ontology info for GO:0005524
+      params:
+        id: "GO:0005524"
+      assert:
+        - path: accession
+        - path: name

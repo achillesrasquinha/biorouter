@@ -51,6 +51,44 @@ tools:
       fields:
         - newick
         - supporting_studies
+  getTaxonInfo:
+    description: Get taxonomy information for a taxon by OTT ID
+    tags:
+      - taxonomy-info
+      - taxon-detail
+    method: POST
+    path: /taxonomy/taxon_info
+    params:
+      ott_id:
+        type: integer
+        required: true
+        description: Open Tree Taxonomy (OTT) identifier
+    response:
+      format: json
+      fields:
+        - name
+        - rank
+        - ott_id
+        - tax_sources
+  findMrca:
+    description: Find the most recent common ancestor of a set of taxa
+    tags:
+      - mrca
+      - common-ancestor
+      - phylogeny
+    method: POST
+    path: /tree_of_life/mrca
+    params:
+      ott_ids:
+        type: array
+        required: true
+        description: List of OTT IDs to find MRCA for (e.g. [770315, 417950])
+    response:
+      format: json
+      fields:
+        - mrca.name
+        - mrca.ott_id
+        - mrca.rank
 tests:
   searchTaxa:
     - name: matches taxon names for Homo sapiens
@@ -66,3 +104,19 @@ tests:
         ott_id: 770315
       assert:
         - path: newick
+  getTaxonInfo:
+    - name: gets taxon info for Homo sapiens
+      params:
+        ott_id: 770315
+      assert:
+        - path: name
+        - path: ott_id
+  findMrca:
+    - name: finds MRCA for Homo sapiens and Pan troglodytes
+      params:
+        ott_ids:
+          - 770315
+          - 417950
+      assert:
+        - path: mrca.name
+        - path: mrca.ott_id

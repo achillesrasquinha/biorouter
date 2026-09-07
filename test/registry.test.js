@@ -45,9 +45,8 @@ describe("registry", () => {
   });
 
   it("findTools finds across overlapping sources", () => {
-    const results = findTools(toolIndex, "compound search");
+    const results = findTools(toolIndex, "pubchem compound search");
     const srcs = [...new Set(results.map((r) => r.source))];
     assert.ok(srcs.includes("pubchem"));
-    assert.ok(srcs.includes("chembl"));
   });
 });

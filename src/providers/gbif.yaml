@@ -87,6 +87,121 @@ tools:
         - "kingdom"
         - "phylum"
         - "family"
+  getDataset:
+    description: Get dataset metadata by key
+    tags:
+      - dataset-info
+      - dataset-metadata
+    method: GET
+    path: /dataset/{key}
+    params:
+      key:
+        type: string
+        required: true
+        description: Dataset UUID key
+    response:
+      format: json
+      fields:
+        - key
+        - title
+        - description
+        - type
+        - publishingOrganizationKey
+        - created
+  searchDatasets:
+    description: Search GBIF datasets by query
+    tags:
+      - dataset-search
+    method: GET
+    path: /dataset/search
+    params:
+      q:
+        type: string
+        required: true
+        description: Search query string
+      type:
+        type: string
+        default: OCCURRENCE
+        description: Dataset type filter (e.g. OCCURRENCE, CHECKLIST)
+      limit:
+        type: integer
+        default: 10
+        description: Maximum number of results to return
+    response:
+      format: json
+      fields:
+        - results[].key
+        - results[].title
+        - results[].description
+        - results[].type
+  getOccurrenceDetail:
+    description: Get a single occurrence record by key
+    tags:
+      - occurrence-detail
+      - occurrence-info
+    method: GET
+    path: /occurrence/{key}
+    params:
+      key:
+        type: integer
+        required: true
+        description: GBIF occurrence key
+    response:
+      format: json
+      fields:
+        - key
+        - species
+        - decimalLatitude
+        - decimalLongitude
+        - eventDate
+        - country
+        - basisOfRecord
+  searchOccurrencesByTaxon:
+    description: Search occurrences with taxon and country filters
+    tags:
+      - occurrence-search
+      - filtered-search
+    method: GET
+    path: /occurrence/search
+    params:
+      taxonKey:
+        type: integer
+        required: true
+        description: GBIF taxon key
+      country:
+        type: string
+        description: Two-letter country code (e.g. US, GB)
+      limit:
+        type: integer
+        default: 20
+        description: Maximum number of results to return
+    response:
+      format: json
+      fields:
+        - results[].key
+        - results[].species
+        - results[].decimalLatitude
+        - results[].decimalLongitude
+        - results[].eventDate
+        - results[].country
+  getSpeciesVernacularNames:
+    description: Get common/vernacular names for a species
+    tags:
+      - vernacular-names
+      - common-names
+    method: GET
+    path: /species/{key}/vernacularNames
+    params:
+      key:
+        type: integer
+        required: true
+        description: GBIF species key
+    response:
+      format: json
+      fields:
+        - results[].vernacularName
+        - results[].language
+        - results[].source
 tests:
   searchSpecies:
     - name: searches for Panthera leo
@@ -110,3 +225,47 @@ tests:
       assert:
         - path: species
           equals: Panthera leo
+  getDataset:
+    - name: gets dataset metadata by key
+      params:
+        key: 4fa7b334-ce0d-4e88-aaae-2e0c138d049e
+      assert:
+        - path: key
+          equals: 4fa7b334-ce0d-4e88-aaae-2e0c138d049e
+        - path: title
+  searchDatasets:
+    - name: searches for occurrence datasets
+      params:
+        q: butterfly
+        type: OCCURRENCE
+        limit: 5
+      assert:
+        - path: results
+          minLength: 1
+        - path: results.0.key
+  getOccurrenceDetail:
+    - name: gets a single occurrence record
+      params:
+        key: 1258202889
+      assert:
+        - path: key
+          equals: 1258202889
+        - path: species
+  searchOccurrencesByTaxon:
+    - name: searches occurrences by taxon with country filter
+      params:
+        taxonKey: 5219404
+        country: US
+        limit: 5
+      assert:
+        - path: results
+          minLength: 1
+        - path: results.0.species
+  getSpeciesVernacularNames:
+    - name: gets vernacular names for a species
+      params:
+        key: 5219404
+      assert:
+        - path: results
+          minLength: 1
+        - path: results.0.vernacularName

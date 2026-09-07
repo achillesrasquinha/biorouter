@@ -69,6 +69,63 @@ tools:
         - class
         - order
         - family
+  getClassification:
+    description: Get full taxonomic classification by AphiaID
+    tags:
+      - taxonomy
+      - classification
+    method: GET
+    path: /AphiaClassificationByAphiaID/{AphiaID}
+    params:
+      AphiaID:
+        type: integer
+        required: true
+        description: WoRMS AphiaID identifier (e.g. 105742)
+    response:
+      format: json
+      fields:
+        - scientificname
+        - rank
+        - child.scientificname
+        - child.rank
+  getChildren:
+    description: Get child taxa for an AphiaID
+    tags:
+      - taxonomy
+      - child-taxa
+    method: GET
+    path: /AphiaChildrenByAphiaID/{AphiaID}
+    params:
+      AphiaID:
+        type: integer
+        required: true
+        description: WoRMS AphiaID identifier (e.g. 105742)
+    response:
+      format: json
+      fields:
+        - "[].AphiaID"
+        - "[].scientificname"
+        - "[].rank"
+        - "[].status"
+  getSynonyms:
+    description: Get synonyms for an AphiaID
+    tags:
+      - taxonomy
+      - synonyms
+    method: GET
+    path: /AphiaSynonymsByAphiaID/{AphiaID}
+    params:
+      AphiaID:
+        type: integer
+        required: true
+        description: WoRMS AphiaID identifier (e.g. 105742)
+    response:
+      format: json
+      fields:
+        - "[].AphiaID"
+        - "[].scientificname"
+        - "[].status"
+        - "[].authority"
 tests:
   searchByName:
     - name: searches by name for Carcharodon
@@ -86,3 +143,24 @@ tests:
           equals: Carcharodon
         - path: AphiaID
           equals: 105742
+  getClassification:
+    - name: gets classification for Carcharodon (105742)
+      params:
+        AphiaID: 105742
+      assert:
+        - path: scientificname
+        - path: rank
+  getChildren:
+    - name: gets child taxa for Carcharodon (105742)
+      params:
+        AphiaID: 105742
+      assert:
+        - isArray: true
+      allowError: true
+  getSynonyms:
+    - name: gets synonyms for Carcharodon (105742)
+      params:
+        AphiaID: 105742
+      assert:
+        - {}
+      allowError: true

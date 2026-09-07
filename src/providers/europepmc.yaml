@@ -76,6 +76,73 @@ tools:
         - resultList.result[].pubYear
         - resultList.result[].abstractText
         - resultList.result[].citedByCount
+  getCitations:
+    description: Get articles that cite a given article
+    tags:
+      - citations
+      - citing-articles
+    method: GET
+    path: /{source}/{id}/citations
+    params:
+      source:
+        type: string
+        default: MED
+        description: Source database (MED for PubMed, PMC for PubMed Central)
+      id:
+        type: string
+        required: true
+        description: Article identifier (e.g. PMID for MED source)
+      format:
+        type: string
+        default: json
+    response:
+      format: json
+      fields:
+        - citationList.citation[].id
+        - citationList.citation[].title
+        - citationList.citation[].authorString
+  getReferences:
+    description: Get references cited by an article
+    tags:
+      - references
+      - bibliography
+    method: GET
+    path: /{source}/{id}/references
+    params:
+      source:
+        type: string
+        default: MED
+        description: Source database (MED for PubMed, PMC for PubMed Central)
+      id:
+        type: string
+        required: true
+        description: Article identifier (e.g. PMID for MED source)
+      format:
+        type: string
+        default: json
+    response:
+      format: json
+      fields:
+        - referenceList.reference[].id
+        - referenceList.reference[].title
+  getFullTextXml:
+    description: Get full text of an open-access article in XML format
+    tags:
+      - full-text
+      - open-access-text
+    method: GET
+    path: /{source}/{id}/fullTextXML
+    params:
+      source:
+        type: string
+        default: PMC
+        description: Source database (typically PMC for full text)
+      id:
+        type: string
+        required: true
+        description: PMC identifier (e.g. PMC7043279)
+    response:
+      format: xml
 tests:
   search:
     - name: searches for CRISPR literature
@@ -95,3 +162,26 @@ tests:
           gte: 1
         - path: resultList.result.0.pmid
           equals: "33086985"
+  getCitations:
+    - name: gets citations for a PubMed article
+      params:
+        source: MED
+        id: "33086985"
+      assert:
+        - path: citationList.citation
+          minLength: 1
+  getReferences:
+    - name: gets references for a PubMed article
+      params:
+        source: MED
+        id: "33086985"
+      assert:
+        - path: referenceList.reference
+          minLength: 1
+  getFullTextXml:
+    - name: gets full text XML for a PMC article
+      params:
+        source: PMC
+        id: PMC7043279
+      assert:
+        - minLength: 1

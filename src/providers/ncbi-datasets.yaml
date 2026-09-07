@@ -81,6 +81,26 @@ tools:
         - taxonomy_nodes[].taxonomy.rank
         - taxonomy_nodes[].taxonomy.lineage
         - taxonomy_nodes[].taxonomy.genomic_moltype
+  getGeneById:
+    description: Get gene information by NCBI gene ID
+    tags:
+      - gene-info
+      - gene-id
+    method: GET
+    path: /gene/id/{geneId}
+    params:
+      geneId:
+        type: integer
+        required: true
+        description: NCBI gene ID (e.g. 7157 for TP53)
+    response:
+      format: json
+      fields:
+        - genes[].gene.gene_id
+        - genes[].gene.symbol
+        - genes[].gene.description
+        - genes[].gene.type
+        - genes[].gene.chromosomes
 tests:
   getGeneBySymbol:
     - name: gets gene info for TP53 in human
@@ -91,4 +111,13 @@ tests:
         - path: reports
           minLength: 1
         - path: reports.0.gene.symbol
+          equals: TP53
+  getGeneById:
+    - name: gets gene info by NCBI gene ID
+      params:
+        geneId: 7157
+      assert:
+        - path: genes
+          minLength: 1
+        - path: genes.0.gene.symbol
           equals: TP53

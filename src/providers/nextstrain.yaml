@@ -1,0 +1,46 @@
+name: nextstrain
+displayName: Nextstrain
+description: Nextstrain — real-time tracking of pathogen evolution for influenza, SARS-CoV-2, and other viruses
+tags:
+  - virology
+  - evolution
+  - phylogenetics
+  - outbreak
+  - nextstrain
+baseUrl: https://nextstrain.org
+tools:
+  getAvailableDatasets:
+    description: List all available pathogen phylogenetic datasets
+    tags:
+      - dataset-list
+      - pathogen-tracking
+    method: GET
+    path: /charon/getAvailable
+    params: {}
+    response:
+      format: json
+  getDatasetRoot:
+    description: Get root sequence and metadata for a pathogen dataset
+    tags:
+      - dataset-info
+      - phylogenetics
+    method: GET
+    path: /charon/getDataset
+    params:
+      prefix:
+        type: string
+        required: true
+        description: Dataset path (e.g. flu/seasonal/h3n2/ha/2y, ncov/global/6m, mpox/clade-IIb)
+      type:
+        type: string
+        default: json
+        description: Response type
+    response:
+      format: json
+tests:
+  getAvailableDatasets:
+    - name: lists available pathogen datasets
+      params: {}
+      assert:
+        - path: datasets
+          minLength: 1

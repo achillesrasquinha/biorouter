@@ -65,6 +65,118 @@ tools:
         - "[].p_value"
         - "[].fdr"
         - "[].preferredNames"
+  getNetwork:
+    description: Get detailed protein interaction network with individual score channels
+    tags:
+      - interaction-network
+      - score-channels
+    method: GET
+    path: /json/network
+    params:
+      identifiers:
+        type: string
+        required: true
+        description: Protein name(s) (e.g. "TP53")
+      species:
+        type: integer
+        default: 9606
+        description: NCBI taxon ID (9606 for human)
+      limit:
+        type: integer
+        default: 10
+        description: Maximum number of interaction partners
+    response:
+      format: json
+      fields:
+        - "[].preferredName_A"
+        - "[].preferredName_B"
+        - "[].score"
+        - "[].nscore"
+        - "[].fscore"
+        - "[].pscore"
+        - "[].ascore"
+        - "[].escore"
+        - "[].dscore"
+        - "[].tscore"
+  getInteractionPartners:
+    description: Get all interaction partners for given protein(s)
+    tags:
+      - interaction-partners
+      - ppi
+    method: GET
+    path: /json/interaction_partners
+    params:
+      identifiers:
+        type: string
+        required: true
+        description: Protein name(s) (e.g. "TP53")
+      species:
+        type: integer
+        default: 9606
+        description: NCBI taxon ID (9606 for human)
+      limit:
+        type: integer
+        default: 25
+        description: Maximum number of interaction partners
+    response:
+      format: json
+      fields:
+        - "[].preferredName_A"
+        - "[].preferredName_B"
+        - "[].score"
+        - "[].nscore"
+        - "[].fscore"
+        - "[].pscore"
+        - "[].ascore"
+        - "[].escore"
+        - "[].dscore"
+        - "[].tscore"
+  getHomologs:
+    description: Get homologs for given protein(s)
+    tags:
+      - homology
+      - orthologs
+    method: GET
+    path: /json/homology
+    params:
+      identifiers:
+        type: string
+        required: true
+        description: Protein name(s) (e.g. "TP53")
+      species:
+        type: integer
+        default: 9606
+        description: NCBI taxon ID (9606 for human)
+    response:
+      format: json
+      fields:
+        - "[].stringId_A"
+        - "[].stringId_B"
+        - "[].bitscore"
+        - "[].species_B"
+  mapIdentifiers:
+    description: Map protein names to STRING identifiers
+    tags:
+      - id-mapping
+      - string-ids
+    method: GET
+    path: /json/get_string_ids
+    params:
+      identifiers:
+        type: string
+        required: true
+        description: Protein name(s) to map (e.g. "TP53")
+      species:
+        type: integer
+        default: 9606
+        description: NCBI taxon ID (9606 for human)
+    response:
+      format: json
+      fields:
+        - "[].queryItem"
+        - "[].preferredName"
+        - "[].stringId"
+        - "[].annotation"
 tests:
   getInteractions:
     - name: gets protein-protein interactions for TP53
@@ -86,3 +198,43 @@ tests:
         - anyOf:
             - 0.term
             - 0.category
+  getNetwork:
+    - name: gets detailed interaction network for TP53
+      params:
+        identifiers: TP53
+      assert:
+        - isArray: true
+          minLength: 1
+        - anyOf:
+            - 0.preferredName_A
+            - 0.stringId_A
+  getInteractionPartners:
+    - name: gets interaction partners for TP53
+      params:
+        identifiers: TP53
+      assert:
+        - isArray: true
+          minLength: 1
+        - anyOf:
+            - 0.preferredName_A
+            - 0.preferredName_B
+  getHomologs:
+    - name: gets homologs for TP53
+      params:
+        identifiers: TP53
+      assert:
+        - isArray: true
+          minLength: 1
+        - anyOf:
+            - 0.stringId_A
+            - 0.stringId_B
+  mapIdentifiers:
+    - name: maps TP53 to STRING identifier
+      params:
+        identifiers: TP53
+      assert:
+        - isArray: true
+          minLength: 1
+        - anyOf:
+            - 0.preferredName
+            - 0.stringId

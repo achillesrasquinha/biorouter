@@ -72,6 +72,151 @@ tools:
         - results[].name
         - results[].model_bigg_id
         - results[].organism
+  getReaction:
+    description: Get details of a specific reaction in a model
+    tags:
+      - reaction-detail
+      - metabolic-network
+    method: GET
+    path: /models/{model_id}/reactions/{reaction_id}
+    params:
+      model_id:
+        type: string
+        required: true
+        description: BiGG model identifier (e.g. iJO1366)
+      reaction_id:
+        type: string
+        required: true
+        description: BiGG reaction identifier (e.g. PFK)
+    response:
+      format: json
+      fields:
+        - bigg_id
+        - name
+        - reaction_string
+        - metabolites[].bigg_id
+        - metabolites[].stoichiometry
+        - metabolites[].name
+  getMetabolite:
+    description: Get details of a specific metabolite in a model
+    tags:
+      - metabolite-detail
+      - compound-info
+    method: GET
+    path: /models/{model_id}/metabolites/{metabolite_id}
+    params:
+      model_id:
+        type: string
+        required: true
+        description: BiGG model identifier (e.g. iJO1366)
+      metabolite_id:
+        type: string
+        required: true
+        description: BiGG metabolite identifier (e.g. glc__D_c)
+    response:
+      format: json
+      fields:
+        - bigg_id
+        - name
+        - formulae
+        - charges
+        - compartments_in_models[].bigg_id
+  getGene:
+    description: Get details of a specific gene in a model
+    tags:
+      - gene-detail
+      - metabolic-network
+    method: GET
+    path: /models/{model_id}/genes/{gene_id}
+    params:
+      model_id:
+        type: string
+        required: true
+        description: BiGG model identifier (e.g. iJO1366)
+      gene_id:
+        type: string
+        required: true
+        description: Gene identifier
+    response:
+      format: json
+      fields:
+        - bigg_id
+        - name
+        - reactions[].bigg_id
+        - reactions[].name
+  listReactions:
+    description: List all reactions in a metabolic model
+    tags:
+      - reaction-list
+      - metabolic-network
+    method: GET
+    path: /models/{model_id}/reactions
+    params:
+      model_id:
+        type: string
+        required: true
+        description: BiGG model identifier (e.g. iJO1366)
+    response:
+      format: json
+      fields:
+        - results_count
+        - results[].bigg_id
+        - results[].name
+  listMetabolites:
+    description: List all metabolites in a metabolic model
+    tags:
+      - metabolite-list
+      - metabolic-network
+    method: GET
+    path: /models/{model_id}/metabolites
+    params:
+      model_id:
+        type: string
+        required: true
+        description: BiGG model identifier (e.g. iJO1366)
+    response:
+      format: json
+      fields:
+        - results_count
+        - results[].bigg_id
+        - results[].name
+  listGenes:
+    description: List all genes in a metabolic model
+    tags:
+      - gene-list
+      - metabolic-network
+    method: GET
+    path: /models/{model_id}/genes
+    params:
+      model_id:
+        type: string
+        required: true
+        description: BiGG model identifier (e.g. iJO1366)
+    response:
+      format: json
+      fields:
+        - results_count
+        - results[].bigg_id
+        - results[].name
+  getUniversalReaction:
+    description: Get universal reaction details (not model-specific)
+    tags:
+      - reaction-detail
+      - universal
+    method: GET
+    path: /universal/reactions/{reaction_id}
+    params:
+      reaction_id:
+        type: string
+        required: true
+        description: BiGG reaction identifier (e.g. PFK)
+    response:
+      format: json
+      fields:
+        - bigg_id
+        - name
+        - reaction_string
+        - database_links
 tests:
   listModels:
     - name: lists available metabolic models
@@ -98,3 +243,64 @@ tests:
       assert:
         - path: results_count
           gt: 0
+  getReaction:
+    - name: gets PFK reaction in iJO1366
+      params:
+        model_id: iJO1366
+        reaction_id: PFK
+      assert:
+        - path: bigg_id
+          equals: PFK
+        - path: name
+  getMetabolite:
+    - name: gets glucose metabolite in iJO1366
+      params:
+        model_id: iJO1366
+        metabolite_id: glc__D_c
+      assert:
+        - path: bigg_id
+          equals: glc__D_c
+        - path: name
+  getGene:
+    - name: gets gene b0727 in iJO1366
+      params:
+        model_id: iJO1366
+        gene_id: b0727
+      assert:
+        - path: bigg_id
+          equals: b0727
+  listReactions:
+    - name: lists reactions in iJO1366
+      params:
+        model_id: iJO1366
+      assert:
+        - path: results_count
+          gt: 0
+        - path: results
+          minLength: 1
+  listMetabolites:
+    - name: lists metabolites in iJO1366
+      params:
+        model_id: iJO1366
+      assert:
+        - path: results_count
+          gt: 0
+        - path: results
+          minLength: 1
+  listGenes:
+    - name: lists genes in iJO1366
+      params:
+        model_id: iJO1366
+      assert:
+        - path: results_count
+          gt: 0
+        - path: results
+          minLength: 1
+  getUniversalReaction:
+    - name: gets universal PFK reaction
+      params:
+        reaction_id: PFK
+      assert:
+        - path: bigg_id
+          equals: PFK
+        - path: name

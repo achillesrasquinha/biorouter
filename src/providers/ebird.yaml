@@ -134,6 +134,71 @@ tools:
         - "[].obsDt"
         - "[].howMany"
 
+  getRecentObservations:
+    description: Get recent bird observations for a region by region code
+    tags: [region-recent, bird-sightings]
+    method: GET
+    path: /data/obs/{regionCode}/recent
+    params:
+      regionCode:
+        type: string
+        required: true
+        description: Region code (e.g. US-NY, CA-ON, MX)
+      maxResults:
+        type: integer
+        default: 25
+        description: Maximum observations to return
+      back:
+        type: integer
+        default: 14
+        description: Days back from today (1-30)
+    response:
+      format: json
+      fields:
+        - "[].speciesCode"
+        - "[].comName"
+        - "[].sciName"
+        - "[].howMany"
+        - "[].obsDt"
+        - "[].locName"
+
+  getHotspots:
+    description: Get birding hotspots in a region by region code
+    tags: [region-hotspots, birding-locations]
+    method: GET
+    path: /ref/hotspot/{regionCode}
+    params:
+      regionCode:
+        type: string
+        required: true
+        description: Region code (e.g. US-NY, CA-ON)
+      fmt:
+        type: string
+        default: json
+    response:
+      format: json
+      fields:
+        - "[].locId"
+        - "[].locName"
+        - "[].lat"
+        - "[].lng"
+        - "[].numSpeciesAllTime"
+
+  getSpeciesList:
+    description: Get list of species observed in a region
+    tags: [species-list, region-species]
+    method: GET
+    path: /product/spplist/{regionCode}
+    params:
+      regionCode:
+        type: string
+        required: true
+        description: Region code (e.g. US-NY, CA-ON)
+    response:
+      format: json
+      fields:
+        - "[]"
+
 tests:
   recentObservations:
     - name: gets recent bird observations near Central Park NYC
@@ -150,6 +215,28 @@ tests:
       params:
         lat: 37.77
         lng: -122.42
+      assert:
+        - minLength: 1
+      allowError: true
+  getRecentObservations:
+    - name: gets recent observations for US-NY
+      params:
+        regionCode: US-NY
+        maxResults: 5
+      assert:
+        - minLength: 1
+      allowError: true
+  getHotspots:
+    - name: gets hotspots in US-NY
+      params:
+        regionCode: US-NY
+      assert:
+        - minLength: 1
+      allowError: true
+  getSpeciesList:
+    - name: gets species list for US-NY
+      params:
+        regionCode: US-NY
       assert:
         - minLength: 1
       allowError: true

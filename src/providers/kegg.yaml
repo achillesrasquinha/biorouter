@@ -139,6 +139,72 @@ tools:
       fields:
         - "[].source"
         - "[].target"
+  getPathway:
+    description: Get a KEGG pathway entry by pathway ID
+    tags:
+      - pathway-info
+      - kegg-pathway-detail
+    method: GET
+    path: /get/{pathwayId}
+    params:
+      pathwayId:
+        type: string
+        required: true
+        description: KEGG pathway ID (e.g. "hsa00010", "map00010")
+    response:
+      format: keyvalue
+      fields:
+        - ENTRY
+        - NAME
+        - DESCRIPTION
+        - CLASS
+        - PATHWAY_MAP
+        - ORGANISM
+        - GENE
+        - COMPOUND
+  listPathways:
+    description: List all pathways for an organism
+    tags:
+      - pathway-list
+      - kegg-pathway-list
+    method: GET
+    path: /list/pathway/{org}
+    params:
+      org:
+        type: string
+        required: true
+        description: Organism code (e.g. "hsa" for human, "mmu" for mouse)
+    response:
+      format: tsv
+      columns:
+        - id
+        - description
+      fields:
+        - "[].id"
+        - "[].description"
+  getCompound:
+    description: Get a KEGG compound entry by compound ID
+    tags:
+      - compound-info
+      - kegg-compound-detail
+    method: GET
+    path: /get/{compoundId}
+    params:
+      compoundId:
+        type: string
+        required: true
+        description: KEGG compound ID (e.g. "cpd:C00031" for glucose)
+    response:
+      format: keyvalue
+      fields:
+        - ENTRY
+        - NAME
+        - FORMULA
+        - EXACT_MASS
+        - MOL_WEIGHT
+        - PATHWAY
+        - ENZYME
+        - DBLINKS
 tests:
   searchGenes:
     - name: searches for insulin genes
@@ -165,5 +231,24 @@ tests:
     - name: gets KEGG entry for human insulin gene
       params:
         entryId: hsa:3630
+      assert:
+        - path: ENTRY
+  getPathway:
+    - name: gets KEGG pathway for glycolysis
+      params:
+        pathwayId: hsa00010
+      assert:
+        - path: ENTRY
+  listPathways:
+    - name: lists human pathways
+      params:
+        org: hsa
+      assert:
+        - isArray: true
+        - path: 0.id
+  getCompound:
+    - name: gets KEGG compound for glucose
+      params:
+        compoundId: cpd:C00031
       assert:
         - path: ENTRY

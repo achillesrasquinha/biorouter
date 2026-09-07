@@ -57,6 +57,24 @@ tools:
         - metadata.go_terms
         - metadata.member_databases
         - metadata.counters
+  getProteinEntries:
+    description: Get InterPro entries for a UniProt protein
+    tags:
+      - protein-domains
+      - protein-classification
+    method: GET
+    path: /entry/interpro/protein/uniprot/{accession}
+    params:
+      accession:
+        type: string
+        required: true
+        description: UniProt accession (e.g. P04637)
+    response:
+      format: json
+      fields:
+        - results[].metadata.accession
+        - results[].metadata.name
+        - results[].metadata.type
 tests:
   search:
     - name: searches for kinase domains
@@ -74,3 +92,10 @@ tests:
         - path: metadata.accession
           equals: IPR000719
         - path: metadata.name
+  getProteinEntries:
+    - name: gets InterPro entries for P04637
+      params:
+        accession: P04637
+      assert:
+        - path: results
+          minLength: 1

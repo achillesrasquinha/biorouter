@@ -60,6 +60,31 @@ tools:
         - results[].patient.reaction[].reactionmeddrapt
         - results[].serious
         - results[].receivedate
+  searchRecalls:
+    description: Search FDA drug recall and enforcement data
+    tags:
+      - drug-recalls
+      - enforcement
+    method: GET
+    path: /drug/enforcement.json
+    params:
+      query:
+        type: string
+        required: true
+        mapsTo: search
+        description: Search query (e.g. "openfda.brand_name:aspirin")
+      limit:
+        type: integer
+        default: 10
+        mapsTo: limit
+        description: Maximum number of results (1-100)
+    response:
+      format: json
+      fields:
+        - results[].product_description
+        - results[].reason_for_recall
+        - results[].classification
+        - results[].recall_initiation_date
 tests:
   searchDrugs:
     - name: searches drug labels for aspirin
@@ -71,6 +96,14 @@ tests:
           minLength: 1
   searchEvents:
     - name: searches adverse events for aspirin
+      params:
+        query: aspirin
+        limit: 5
+      assert:
+        - path: results
+          minLength: 1
+  searchRecalls:
+    - name: searches drug recalls
       params:
         query: aspirin
         limit: 5

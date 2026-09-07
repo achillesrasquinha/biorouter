@@ -52,6 +52,46 @@ tools:
         - "[].inn"
         - "[].approved"
         - "[].approvalSource"
+  getLigand:
+    description: Get ligand details by ligand ID
+    tags:
+      - ligand-info
+      - drug-detail
+    method: GET
+    path: /ligands/{ligandId}
+    params:
+      ligandId:
+        type: integer
+        required: true
+        description: Ligand ID (e.g. 5085)
+    response:
+      format: json
+      fields:
+        - ligandId
+        - name
+        - type
+        - approved
+        - inn
+  getTarget:
+    description: Get target details by target ID
+    tags:
+      - target-info
+      - receptor-detail
+    method: GET
+    path: /targets/{targetId}
+    params:
+      targetId:
+        type: integer
+        required: true
+        description: Target ID (e.g. 1)
+    response:
+      format: json
+      fields:
+        - targetId
+        - name
+        - nomenclature
+        - type
+        - familyIds
 tests:
   searchTargets:
     - name: searches targets for EGFR
@@ -73,3 +113,17 @@ tests:
             - isArray: true
               minLength: 1
             - path: ligands
+  getLigand:
+    - name: gets ligand details for ligand 5085
+      params:
+        ligandId: 5085
+      assert:
+        - path: ligandId
+        - path: name
+  getTarget:
+    - name: gets target details for target 1
+      params:
+        targetId: 1
+      assert:
+        - path: targetId
+        - path: name

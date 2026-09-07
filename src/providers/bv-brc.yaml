@@ -1,0 +1,165 @@
+name: bv-brc
+displayName: BV-BRC
+description: Bacterial and Viral Bioinformatics Resource Center — pathogen genomics, AMR, and surveillance data
+tags:
+  - pathogen
+  - bacteria
+  - virus
+  - genomics
+  - amr
+  - bv-brc
+baseUrl: https://www.bv-brc.org/api
+headers:
+  Accept: application/json
+tools:
+  searchGenomes:
+    description: Search bacterial and viral genomes by keyword
+    tags:
+      - genome-search
+      - pathogen-genomics
+    method: GET
+    path: /genome/?keyword({term})&select(genome_id,genome_name,taxon_id,genome_length,contigs,genome_status)&limit({limit})
+    params:
+      term:
+        type: string
+        required: true
+        description: Search keyword (e.g. Escherichia coli, SARS-CoV-2, Mycobacterium tuberculosis)
+      limit:
+        type: integer
+        default: 10
+        description: Maximum results to return
+    response:
+      format: json
+      fields:
+        - "[].genome_id"
+        - "[].genome_name"
+        - "[].taxon_id"
+        - "[].genome_length"
+        - "[].genome_status"
+  getGenome:
+    description: Get genome details by genome ID
+    tags:
+      - genome-info
+      - pathogen
+    method: GET
+    path: /genome/{genome_id}
+    params:
+      genome_id:
+        type: string
+        required: true
+        description: BV-BRC genome ID (e.g. 83333.117)
+    response:
+      format: json
+  searchFeatures:
+    description: Search genome features (genes) by product keyword
+    tags:
+      - gene-search
+      - genome-features
+    method: GET
+    path: /genome_feature/?keyword({product})&select(patric_id,product,genome_name,gene,feature_type,aa_length)&limit({limit})
+    params:
+      product:
+        type: string
+        required: true
+        description: Gene product name to search (e.g. spike protein, beta-lactamase, DNA gyrase)
+      limit:
+        type: integer
+        default: 10
+        description: Maximum results to return
+    response:
+      format: json
+      fields:
+        - "[].patric_id"
+        - "[].product"
+        - "[].genome_name"
+        - "[].gene"
+        - "[].feature_type"
+  searchAMR:
+    description: Search antimicrobial resistance data by antibiotic
+    tags:
+      - amr
+      - antibiotic-resistance
+    method: GET
+    path: /genome_amr/?eq(antibiotic,{antibiotic})&select(genome_id,genome_name,antibiotic,resistant_phenotype,measurement_value,laboratory_typing_method)&limit({limit})
+    params:
+      antibiotic:
+        type: string
+        required: true
+        description: Antibiotic name (e.g. meropenem, vancomycin, ciprofloxacin)
+      limit:
+        type: integer
+        default: 10
+        description: Maximum results to return
+    response:
+      format: json
+      fields:
+        - "[].genome_id"
+        - "[].genome_name"
+        - "[].antibiotic"
+        - "[].resistant_phenotype"
+  searchTaxonomy:
+    description: Search bacterial/viral taxonomy by name
+    tags:
+      - taxonomy-search
+      - pathogen-taxonomy
+    method: GET
+    path: /taxonomy/?keyword({name})&select(taxon_id,taxon_name,taxon_rank)&limit({limit})
+    params:
+      name:
+        type: string
+        required: true
+        description: Taxon name to search (e.g. Staphylococcus, Salmonella)
+      limit:
+        type: integer
+        default: 10
+        description: Maximum results to return
+    response:
+      format: json
+      fields:
+        - "[].taxon_id"
+        - "[].taxon_name"
+        - "[].taxon_rank"
+  searchSpecialtyGenes:
+    description: Search specialty genes (virulence factors, antibiotic resistance genes, drug targets)
+    tags:
+      - virulence
+      - resistance-genes
+      - specialty-genes
+    method: GET
+    path: /sp_gene/?keyword({term})&select(property,source,evidence,gene,product,organism,genome_name)&limit({limit})
+    params:
+      term:
+        type: string
+        required: true
+        description: Search term (e.g. KPC, mecA, toxin)
+      limit:
+        type: integer
+        default: 10
+        description: Maximum results to return
+    response:
+      format: json
+      fields:
+        - "[].property"
+        - "[].gene"
+        - "[].product"
+        - "[].organism"
+tests:
+  searchGenomes:
+    - name: searches for E. coli genomes
+      params:
+        term: Escherichia coli
+        limit: 3
+      assert:
+        - path: ""
+          minLength: 1
+        - path: "0.genome_id"
+        - path: "0.genome_name"
+  searchAMR:
+    - name: searches for meropenem resistance data
+      params:
+        antibiotic: meropenem
+        limit: 3
+      assert:
+        - path: ""
+          minLength: 1
+        - path: "0.antibiotic"

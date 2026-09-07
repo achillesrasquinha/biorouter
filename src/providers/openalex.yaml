@@ -92,6 +92,66 @@ tools:
         - results[].cited_by_count
         - results[].summary_stats.h_index
         - results[].last_known_institutions[].display_name
+  getAuthor:
+    description: Get an author profile by OpenAlex author ID
+    tags:
+      - author-info
+      - researcher-detail
+    method: GET
+    path: /authors/{id}
+    params:
+      id:
+        type: string
+        required: true
+        description: OpenAlex author ID e.g. 'A5023888391'
+    response:
+      format: json
+      fields:
+        - id
+        - display_name
+        - works_count
+        - cited_by_count
+        - last_known_institutions[].display_name
+  getInstitution:
+    description: Get institution details by OpenAlex institution ID
+    tags:
+      - institution-info
+      - organization-detail
+    method: GET
+    path: /institutions/{id}
+    params:
+      id:
+        type: string
+        required: true
+        description: OpenAlex institution ID e.g. 'I136199984'
+    response:
+      format: json
+      fields:
+        - id
+        - display_name
+        - country_code
+        - type
+        - works_count
+  getConcept:
+    description: Get concept/topic details by OpenAlex concept ID
+    tags:
+      - concept-info
+      - topic-detail
+    method: GET
+    path: /concepts/{id}
+    params:
+      id:
+        type: string
+        required: true
+        description: OpenAlex concept ID e.g. 'C86803240'
+    response:
+      format: json
+      fields:
+        - id
+        - display_name
+        - description
+        - works_count
+        - level
 tests:
   searchWorks:
     - name: searches works for CRISPR
@@ -102,3 +162,24 @@ tests:
           gt: 0
         - path: results
           minLength: 1
+  getAuthor:
+    - name: gets author by OpenAlex ID
+      params:
+        id: A5023888391
+      assert:
+        - path: display_name
+        - path: id
+  getInstitution:
+    - name: gets institution by OpenAlex ID
+      params:
+        id: I136199984
+      assert:
+        - path: display_name
+        - path: id
+  getConcept:
+    - name: gets concept by OpenAlex ID
+      params:
+        id: C86803240
+      assert:
+        - path: display_name
+        - path: id

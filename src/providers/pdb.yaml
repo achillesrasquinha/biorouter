@@ -63,6 +63,137 @@ tools:
         - entity_poly.rcsb_sample_sequence_length
         - rcsb_entity_source_organism[].scientific_name
         - rcsb_entity_source_organism[].ncbi_taxonomy_id
+  getLigand:
+    description: Get ligand (non-polymer entity) information
+    tags:
+      - structure-info
+      - ligand
+      - small-molecule
+    method: GET
+    path: /rest/v1/core/nonpolymer_entity/{entry_id}/{entity_id}
+    params:
+      entry_id:
+        type: string
+        required: true
+        description: PDB entry ID (e.g. 4HHB)
+      entity_id:
+        type: string
+        default: "1"
+        description: Entity ID (default 1)
+    response:
+      format: json
+      fields:
+        - rcsb_nonpolymer_entity.formula_weight
+        - rcsb_nonpolymer_entity.pdbx_description
+        - rcsb_nonpolymer_entity_container_identifiers.comp_id
+  getAssembly:
+    description: Get biological assembly information
+    tags:
+      - structure-info
+      - assembly
+      - quaternary-structure
+    method: GET
+    path: /rest/v1/core/assembly/{entry_id}/{assembly_id}
+    params:
+      entry_id:
+        type: string
+        required: true
+        description: PDB entry ID (e.g. 4HHB)
+      assembly_id:
+        type: string
+        default: "1"
+        description: Assembly ID (default 1)
+    response:
+      format: json
+      fields:
+        - rcsb_assembly_info.entry_id
+        - rcsb_assembly_info.assembly_id
+        - rcsb_assembly_info.polymer_entity_count
+  getBranchedEntity:
+    description: Get branched entity (carbohydrate) information
+    tags:
+      - structure-info
+      - carbohydrate
+      - branched
+    method: GET
+    path: /rest/v1/core/branched_entity/{entry_id}/{entity_id}
+    params:
+      entry_id:
+        type: string
+        required: true
+        description: PDB entry ID
+      entity_id:
+        type: string
+        required: true
+        description: Entity ID
+    response:
+      format: json
+      fields:
+        - rcsb_branched_entity.pdbx_description
+        - rcsb_branched_entity.formula_weight
+  getUniprotMapping:
+    description: Get UniProt mapping for a polymer entity
+    tags:
+      - structure-info
+      - uniprot
+      - mapping
+    method: GET
+    path: /rest/v1/core/uniprot/{entry_id}/{entity_id}
+    params:
+      entry_id:
+        type: string
+        required: true
+        description: PDB entry ID (e.g. 4HHB)
+      entity_id:
+        type: string
+        default: "1"
+        description: Entity ID (default 1)
+    response:
+      format: json
+      fields:
+        - "[].rcsb_uniprot_container_identifiers.uniprot_id"
+        - "[].rcsb_uniprot_protein.name.value"
+  getExperimentalData:
+    description: Get experimental details (resolution, method) for an entry
+    tags:
+      - structure-info
+      - experimental
+      - resolution
+    method: GET
+    path: /rest/v1/core/entry/{entry_id}
+    params:
+      entry_id:
+        type: string
+        required: true
+        description: PDB entry ID (e.g. 4HHB)
+    response:
+      format: json
+      fields:
+        - rcsb_entry_info.resolution_combined
+        - rcsb_entry_info.experimental_method
+        - rcsb_entry_info.deposited_atom_count
+        - struct.title
+        - rcsb_accession_info.deposit_date
+  getEntryPubmed:
+    description: Get associated PubMed publication for an entry
+    tags:
+      - structure-info
+      - publication
+      - pubmed
+    method: GET
+    path: /rest/v1/core/pubmed/{entry_id}
+    params:
+      entry_id:
+        type: string
+        required: true
+        description: PDB entry ID (e.g. 4HHB)
+    response:
+      format: json
+      fields:
+        - rcsb_pubmed_container_identifiers.pubmed_id
+        - rcsb_pubmed_central_id
+        - rcsb_pubmed_abstract_text
+        - rcsb_pubmed_mesh_descriptors_lineage
 tests:
   getEntry:
     - name: gets entry for hemoglobin (4HHB)
@@ -79,3 +210,39 @@ tests:
         entityId: "1"
       assert:
         - path: entity_poly.pdbx_seq_one_letter_code
+  getLigand:
+    - name: gets ligand info for 3HYD entity 2
+      params:
+        entry_id: 3HYD
+        entity_id: "2"
+      assert: []
+  getAssembly:
+    - name: gets assembly for hemoglobin
+      params:
+        entry_id: 4HHB
+        assembly_id: "1"
+      assert: []
+  getBranchedEntity:
+    - name: gets branched entity for 4R1R entity 3
+      params:
+        entry_id: 4R1R
+        entity_id: "3"
+      assert: []
+  getUniprotMapping:
+    - name: gets UniProt mapping for hemoglobin
+      params:
+        entry_id: 4HHB
+        entity_id: "1"
+      assert: []
+  getExperimentalData:
+    - name: gets experimental data for hemoglobin
+      params:
+        entry_id: 4HHB
+      assert:
+        - path: rcsb_entry_info.experimental_method
+        - path: struct.title
+  getEntryPubmed:
+    - name: gets PubMed info for hemoglobin
+      params:
+        entry_id: 4HHB
+      assert: []

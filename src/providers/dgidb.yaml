@@ -77,6 +77,58 @@ tools:
         - "genes.nodes[].interactions[].drug.name"
         - "genes.nodes[].interactions[].drug.conceptId"
         - "genes.nodes[].interactions[].evidenceScore"
+  getCategories:
+    description: Get gene categories for a gene
+    tags:
+      - gene-categories
+      - druggable-genome
+    query: |
+      query ($names: [String!]!) {
+        genes(names: $names) {
+          nodes {
+            name
+            geneCategories { name }
+          }
+        }
+      }
+    params:
+      names:
+        type: array
+        required: true
+        description: Gene name(s) to look up categories (e.g. ["EGFR"])
+    response:
+      format: json
+      fields:
+        - "genes.nodes[].name"
+        - "genes.nodes[].geneCategories[].name"
+  getDrugApplications:
+    description: Get drug details and application information
+    tags:
+      - drug-info
+      - drug-applications
+    query: |
+      query ($names: [String!]!) {
+        drugs(names: $names) {
+          nodes {
+            name
+            conceptId
+            approved
+            drugApplications { appNo }
+          }
+        }
+      }
+    params:
+      names:
+        type: array
+        required: true
+        description: Drug name(s) to look up (e.g. ["ERLOTINIB"])
+    response:
+      format: json
+      fields:
+        - "drugs.nodes[].name"
+        - "drugs.nodes[].conceptId"
+        - "drugs.nodes[].approved"
+        - "drugs.nodes[].drugApplications[].appNo"
 tests:
   search:
     - name: searches for EGFR drug-gene interactions
@@ -98,3 +150,21 @@ tests:
           minLength: 1
         - path: genes.nodes.0.name
           equals: BRAF
+  getCategories:
+    - name: gets gene categories for EGFR
+      params:
+        names:
+          - EGFR
+      assert:
+        - path: genes.nodes
+          minLength: 1
+        - path: genes.nodes.0.geneCategories
+          minLength: 1
+  getDrugApplications:
+    - name: gets drug info for ERLOTINIB
+      params:
+        names:
+          - ERLOTINIB
+      assert:
+        - path: drugs.nodes
+          minLength: 1

@@ -54,6 +54,146 @@ tools:
         - hugoGeneSymbol
         - entrezGeneId
         - type
+  getMutations:
+    description: Get mutations for a gene in a molecular profile
+    tags:
+      - mutations
+      - cancer-mutations
+    method: GET
+    path: /molecular-profiles/{molecularProfileId}/mutations
+    params:
+      molecularProfileId:
+        type: string
+        required: true
+        description: Molecular profile ID (e.g. "brca_tcga_pan_can_atlas_2018_mutations")
+      sampleListId:
+        type: string
+        required: true
+        description: Sample list ID (e.g. "brca_tcga_pan_can_atlas_2018_all")
+      entrezGeneId:
+        type: integer
+        required: true
+        description: Entrez gene ID (e.g. 672 for BRCA1)
+    response:
+      format: json
+      fields:
+        - "[].gene.hugoGeneSymbol"
+        - "[].proteinChange"
+        - "[].mutationType"
+        - "[].variantType"
+        - "[].keyword"
+  getClinicalData:
+    description: Get clinical data for a study
+    tags:
+      - clinical-data
+      - patient-data
+    method: GET
+    path: /studies/{studyId}/clinical-data
+    params:
+      studyId:
+        type: string
+        required: true
+        description: Study ID (e.g. "brca_tcga")
+      clinicalDataType:
+        type: string
+        default: SAMPLE
+        description: Type of clinical data (SAMPLE or PATIENT)
+      pageSize:
+        type: integer
+        default: 100
+        description: Number of records to return
+    response:
+      format: json
+      fields:
+        - "[].clinicalAttributeId"
+        - "[].value"
+        - "[].sampleId"
+        - "[].patientId"
+  getSampleList:
+    description: Get sample lists for a study
+    tags:
+      - sample-list
+      - study-samples
+    method: GET
+    path: /studies/{studyId}/sample-lists
+    params:
+      studyId:
+        type: string
+        required: true
+        description: Study ID (e.g. "brca_tcga")
+    response:
+      format: json
+      fields:
+        - "[].sampleListId"
+        - "[].name"
+        - "[].description"
+        - "[].sampleCount"
+  getCopyNumberSegments:
+    description: Get copy number segment data for a study
+    tags:
+      - copy-number
+      - cna
+    method: GET
+    path: /studies/{studyId}/copy-number-segments
+    params:
+      studyId:
+        type: string
+        required: true
+        description: Study ID (e.g. "brca_tcga")
+      chromosome:
+        type: string
+        description: Chromosome to filter by (e.g. "17")
+      pageSize:
+        type: integer
+        default: 1000
+        description: Number of segments to return
+    response:
+      format: json
+      fields:
+        - "[].sampleId"
+        - "[].chromosome"
+        - "[].start"
+        - "[].end"
+        - "[].numberOfProbes"
+        - "[].segmentMean"
+  getMolecularProfiles:
+    description: List molecular profiles for a study
+    tags:
+      - molecular-profiles
+      - study-profiles
+    method: GET
+    path: /studies/{studyId}/molecular-profiles
+    params:
+      studyId:
+        type: string
+        required: true
+        description: Study ID (e.g. "brca_tcga")
+    response:
+      format: json
+      fields:
+        - "[].molecularProfileId"
+        - "[].name"
+        - "[].molecularAlterationType"
+        - "[].datatype"
+  getCancerTypes:
+    description: List available cancer types
+    tags:
+      - cancer-types
+      - cancer-classification
+    method: GET
+    path: /cancer-types
+    params:
+      pageSize:
+        type: integer
+        default: 50
+        description: Number of cancer types to return
+    response:
+      format: json
+      fields:
+        - "[].cancerTypeId"
+        - "[].name"
+        - "[].dedicatedColor"
+        - "[].parent"
 tests:
   getStudies:
     - name: lists available cancer studies
@@ -71,3 +211,52 @@ tests:
           equals: BRCA1
         - path: entrezGeneId
           equals: 672
+  getMutations:
+    - name: gets BRCA1 mutations in breast cancer study
+      params:
+        molecularProfileId: brca_tcga_pan_can_atlas_2018_mutations
+        sampleListId: brca_tcga_pan_can_atlas_2018_all
+        entrezGeneId: 672
+      assert:
+        - isArray: true
+        - path: 0.gene.hugoGeneSymbol
+          equals: BRCA1
+  getClinicalData:
+    - name: gets clinical data for breast cancer study
+      params:
+        studyId: brca_tcga
+        clinicalDataType: SAMPLE
+        pageSize: 5
+      assert:
+        - isArray: true
+        - path: 0.clinicalAttributeId
+  getSampleList:
+    - name: gets sample lists for breast cancer study
+      params:
+        studyId: brca_tcga
+      assert:
+        - isArray: true
+        - path: 0.sampleListId
+  getCopyNumberSegments:
+    - name: gets copy number segments for breast cancer study
+      params:
+        studyId: brca_tcga
+        pageSize: 5
+      assert:
+        - isArray: true
+  getMolecularProfiles:
+    - name: gets molecular profiles for breast cancer study
+      params:
+        studyId: brca_tcga
+      assert:
+        - isArray: true
+        - path: 0.molecularProfileId
+        - path: 0.molecularAlterationType
+  getCancerTypes:
+    - name: lists available cancer types
+      params:
+        pageSize: 5
+      assert:
+        - isArray: true
+        - path: 0.cancerTypeId
+        - path: 0.name

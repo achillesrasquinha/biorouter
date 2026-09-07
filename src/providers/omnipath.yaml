@@ -76,6 +76,62 @@ tools:
         - '[].residue_type'
         - '[].residue_offset'
         - '[].modification'
+  getAnnotations:
+    description: Get protein annotations from OmniPath
+    tags:
+      - protein-annotations
+      - functional-data
+    method: GET
+    path: /annotations
+    params:
+      proteins:
+        type: string
+        required: true
+        description: Comma-separated UniProt IDs or gene symbols (e.g. TP53, EGFR)
+      resources:
+        type: string
+        description: Filter by annotation resource
+      genesymbols:
+        type: string
+        default: yes
+        description: Use gene symbols instead of UniProt IDs
+      format:
+        type: string
+        default: json
+        description: Response format (json or tsv)
+    response:
+      format: json
+      fields:
+        - '[].uniprot'
+        - '[].source'
+        - '[].value'
+        - '[].record_id'
+  getComplexes:
+    description: Get protein complexes from OmniPath
+    tags:
+      - protein-complexes
+      - complex-data
+    method: GET
+    path: /complexes
+    params:
+      proteins:
+        type: string
+        required: true
+        description: Comma-separated UniProt IDs or gene symbols (e.g. TP53, EGFR)
+      genesymbols:
+        type: string
+        default: yes
+        description: Use gene symbols instead of UniProt IDs
+      format:
+        type: string
+        default: json
+        description: Response format (json or tsv)
+    response:
+      format: json
+      fields:
+        - '[].name'
+        - '[].components'
+        - '[].sources'
 tests:
   getInteractions:
     - name: gets signaling interactions for TP53
@@ -94,3 +150,17 @@ tests:
         limit: 5
       assert:
         - isArray: true
+  getAnnotations:
+    - name: gets annotations for TP53
+      params:
+        proteins: TP53
+      assert:
+        - isArray: true
+          minLength: 1
+  getComplexes:
+    - name: gets complexes for TP53
+      params:
+        proteins: TP53
+      assert:
+        - isArray: true
+          minLength: 1

@@ -55,6 +55,42 @@ tools:
         - comment
         - descendantCount
         - synonyms
+  getTermGenes:
+    description: Get genes associated with an HPO term
+    tags:
+      - phenotype-genes
+      - hpo-genes
+    method: GET
+    path: /terms/{termId}/genes
+    params:
+      termId:
+        type: string
+        required: true
+        description: HPO term identifier (e.g. HP:0001250)
+    response:
+      format: json
+      fields:
+        - genes[].geneSymbol
+        - genes[].geneId
+        - genes[].dbDiseases
+  getDisease:
+    description: Get disease details by disease identifier
+    tags:
+      - disease-info
+      - hpo-disease
+    method: GET
+    path: /diseases/{diseaseId}
+    params:
+      diseaseId:
+        type: string
+        required: true
+        description: Disease identifier (e.g. OMIM:154700)
+    response:
+      format: json
+      fields:
+        - disease.diseaseName
+        - disease.diseaseId
+        - disease.catTermsMap
 tests:
   searchTerms:
     - name: searches for epilepsy phenotype terms
@@ -74,3 +110,18 @@ tests:
         - path: id
           equals: HP:0001250
         - path: name
+  getTermGenes:
+    - name: gets genes associated with HP:0001250
+      params:
+        termId: HP:0001250
+      assert:
+        - path: genes
+          minLength: 1
+        - path: genes.0.geneSymbol
+  getDisease:
+    - name: gets disease details for OMIM:154700
+      params:
+        diseaseId: OMIM:154700
+      assert:
+        - path: disease.diseaseName
+        - path: disease.diseaseId

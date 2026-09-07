@@ -57,6 +57,110 @@ tools:
         - '[].cpiclevel'
         - '[].clinpgxlevel'
         - '[].pgxtesting'
+  getGene:
+    description: Get gene details by PharmGKB accession ID
+    tags:
+      - gene-info
+      - pgx-gene
+    method: GET
+    path: /data/gene/{accessionId}
+    params:
+      accessionId:
+        type: string
+        required: true
+        description: PharmGKB accession ID (e.g. PA24356)
+    response:
+      format: json
+      fields:
+        - data.id
+        - data.name
+        - data.symbol
+        - data.crossReferences[].resource
+        - data.crossReferences[].resourceId
+  searchGenes:
+    description: Search genes by symbol
+    tags:
+      - gene-search
+      - pgx-gene
+    method: GET
+    path: /data/gene
+    params:
+      symbol:
+        type: string
+        required: true
+        description: Gene symbol to search for (e.g. CYP2D6)
+    response:
+      format: json
+      fields:
+        - data[].id
+        - data[].name
+        - data[].symbol
+  getClinicalAnnotation:
+    description: Get clinical annotations filtered by gene, chemical, or location
+    tags:
+      - clinical-annotation
+      - pgx-annotation
+    method: GET
+    path: /data/clinicalAnnotation
+    params:
+      gene:
+        type: string
+        description: Gene symbol to filter by
+      chemical:
+        type: string
+        description: Chemical/drug name to filter by
+      location:
+        type: string
+        description: Variant location to filter by
+      limit:
+        type: integer
+        default: 10
+        description: Maximum number of results to return
+    response:
+      format: json
+      fields:
+        - data[].id
+        - data[].location
+        - data[].gene
+        - data[].chemicals
+        - data[].phenotypes
+  getPathway:
+    description: Get pharmacogenomics pathway by accession ID
+    tags:
+      - pathway-info
+      - pgx-pathway
+    method: GET
+    path: /data/pathway/{accessionId}
+    params:
+      accessionId:
+        type: string
+        required: true
+        description: PharmGKB pathway accession ID
+    response:
+      format: json
+      fields:
+        - data.id
+        - data.name
+        - data.description
+  getVariant:
+    description: Get variant details by accession ID
+    tags:
+      - variant-info
+      - pgx-variant
+    method: GET
+    path: /data/variant/{accessionId}
+    params:
+      accessionId:
+        type: string
+        required: true
+        description: PharmGKB variant accession ID (e.g. PA166153760)
+    response:
+      format: json
+      fields:
+        - data.id
+        - data.name
+        - data.gene
+        - data.location
 tests:
   searchDrugs:
     - name: searches for warfarin
@@ -73,3 +177,41 @@ tests:
       assert:
         - isArray: true
         - path: 0.genesymbol
+  getGene:
+    - name: gets gene details for CYP2D6
+      params:
+        accessionId: PA24356
+      assert:
+        - path: data.id
+          equals: PA24356
+        - path: data.symbol
+  searchGenes:
+    - name: searches for CYP2D6 gene
+      params:
+        symbol: CYP2D6
+      assert:
+        - path: data
+          minLength: 1
+        - path: data.0.symbol
+  getClinicalAnnotation:
+    - name: gets clinical annotations for CYP2D6
+      params:
+        gene: CYP2D6
+        limit: 5
+      assert:
+        - path: data
+          minLength: 1
+  getPathway:
+    - name: gets a pharmacogenomics pathway
+      params:
+        accessionId: PA150653776
+      assert:
+        - path: data.id
+        - path: data.name
+  getVariant:
+    - name: gets variant details
+      params:
+        accessionId: PA166153760
+      assert:
+        - path: data.id
+          equals: PA166153760

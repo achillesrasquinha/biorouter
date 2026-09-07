@@ -75,7 +75,7 @@ tools:
       - similarity
       - structure
     method: GET
-    path: /compound/similarity/smiles/{smiles}/cids/JSONThreshold={threshold}
+    path: /compound/fastsimilarity_2d/smiles/{smiles}/cids/JSON?Threshold={threshold}
     params:
       smiles:
         type: string
@@ -87,6 +87,116 @@ tools:
         description: Similarity threshold (0-100)
     response:
       format: json
+  getSubstructureSearch:
+    description: Search for compounds containing a given substructure by SMILES
+    tags:
+      - compound-search
+      - substructure
+      - smiles
+    method: GET
+    path: /compound/fastsubstructure/smiles/{smiles}/cids/JSON
+    params:
+      smiles:
+        type: string
+        required: true
+        description: SMILES string of the substructure to search for
+    response:
+      format: json
+      fields:
+        - IdentifierList.CID
+  getBioassaySummary:
+    description: Get bioassay summary by assay ID
+    tags:
+      - bioassay
+      - assay-summary
+    method: GET
+    path: /assay/aid/{aid}/summary/JSON
+    params:
+      aid:
+        type: string
+        required: true
+        description: PubChem BioAssay ID (e.g. 1259390)
+    response:
+      format: json
+      fields:
+        - AssaySummaries[].AID
+        - AssaySummaries[].SourceName
+        - AssaySummaries[].Name
+        - AssaySummaries[].Description
+  getCompoundBioactivities:
+    description: Get bioactivity data for a compound across all assays
+    tags:
+      - bioassay
+      - bioactivity
+      - compound-info
+    method: GET
+    path: /compound/cid/{cid}/assaysummary/JSON
+    params:
+      cid:
+        type: string
+        required: true
+        description: PubChem Compound ID
+    response:
+      format: json
+      fields:
+        - Table.Columns.Column
+        - Table.Row[].Cell
+  getCompoundClassification:
+    description: Get classification hierarchy for a compound
+    tags:
+      - compound-info
+      - classification
+      - taxonomy
+    method: GET
+    path: /compound/cid/{cid}/classification/JSON
+    params:
+      cid:
+        type: string
+        required: true
+        description: PubChem Compound ID
+    response:
+      format: json
+      fields:
+        - Hierarchies.Hierarchy[].SourceName
+        - Hierarchies.Hierarchy[].Node[].NodeName
+  getCompoundXrefs:
+    description: Get cross-references for a compound (registry IDs, CAS RN, PubMed IDs)
+    tags:
+      - compound-info
+      - cross-references
+      - identifiers
+    method: GET
+    path: /compound/cid/{cid}/xrefs/RegistryID,RN,PubMedID/JSON
+    params:
+      cid:
+        type: string
+        required: true
+        description: PubChem Compound ID
+    response:
+      format: json
+      fields:
+        - InformationList.Information[].CID
+        - InformationList.Information[].RegistryID
+        - InformationList.Information[].RN
+        - InformationList.Information[].PubMedID
+  getSids:
+    description: Get related substance IDs for a compound
+    tags:
+      - compound-info
+      - substance
+      - identifiers
+    method: GET
+    path: /compound/cid/{cid}/sids/JSON
+    params:
+      cid:
+        type: string
+        required: true
+        description: PubChem Compound ID
+    response:
+      format: json
+      fields:
+        - InformationList.Information[].CID
+        - InformationList.Information[].SID
 tests:
   search:
     - name: searches for aspirin
@@ -102,6 +212,38 @@ tests:
       assert: []
   getSynonyms:
     - name: gets synonyms
+      params:
+        cid: "2244"
+      assert: []
+  getSubstructureSearch:
+    - name: searches for benzene substructure
+      params:
+        smiles: c1ccccc1
+      assert:
+        - path: IdentifierList.CID
+          minLength: 1
+  getBioassaySummary:
+    - name: gets bioassay summary
+      params:
+        aid: "1259390"
+      assert: []
+  getCompoundBioactivities:
+    - name: gets bioactivities for aspirin
+      params:
+        cid: "2244"
+      assert: []
+  getCompoundClassification:
+    - name: gets classification for aspirin
+      params:
+        cid: "2244"
+      assert: []
+  getCompoundXrefs:
+    - name: gets cross-references for aspirin
+      params:
+        cid: "2244"
+      assert: []
+  getSids:
+    - name: gets substance IDs for aspirin
       params:
         cid: "2244"
       assert: []
