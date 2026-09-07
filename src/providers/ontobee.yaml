@@ -1,0 +1,45 @@
+name: ontobee
+displayName: Ontobee
+description: Ontobee — ontology term search and browsing across OBO and OWL ontologies
+tags:
+  - ontology
+  - search
+  - obo
+  - owl
+baseUrl: https://ontobee.org/api
+tools:
+  search:
+    description: Search for ontology terms across all loaded ontologies
+    tags:
+      - ontology-search
+      - term-search
+    method: GET
+    path: /search
+    params:
+      term:
+        type: string
+        required: true
+        description: Search term (e.g. diabetes, kinase, apoptosis)
+      ontology:
+        type: string
+        description: Filter by ontology (e.g. DOID, GO, HP, CHEBI)
+      max:
+        type: integer
+        default: 10
+        description: Maximum results
+    response:
+      format: json
+      fields:
+        - '[].id'
+        - '[].ontology'
+        - '[].label'
+        - '[].value'
+tests:
+  search:
+    - name: searches for diabetes in Disease Ontology
+      params:
+        term: diabetes
+        ontology: DOID
+        max: 5
+      assert:
+        - minLength: 1

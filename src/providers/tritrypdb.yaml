@@ -1,0 +1,49 @@
+name: tritrypdb
+displayName: TriTrypDB
+description: TriTrypDB — VEuPathDB resource for trypanosomatid genomics (Trypanosoma, Leishmania)
+tags:
+  - trypanosoma
+  - leishmania
+  - parasite
+  - veupathdb
+  - genomics
+baseUrl: https://tritrypdb.org/tritrypdb/service
+tools:
+  listRecordTypes:
+    description: List available record types in TriTrypDB
+    tags:
+      - record-types
+      - metadata
+    method: GET
+    path: /record-types
+    params: {}
+    response:
+      format: json
+  search:
+    description: Search TriTrypDB for genes, proteins, and genomic features
+    tags:
+      - gene-search
+      - parasite-search
+    method: GET
+    path: /search
+    params:
+      q:
+        type: string
+        required: true
+        description: Search query
+      format:
+        type: string
+        default: json
+        description: Response format
+      size:
+        type: integer
+        default: 10
+        description: Number of results
+    response:
+      format: json
+tests:
+  listRecordTypes:
+    - name: lists record types
+      params: {}
+      assert:
+        - minLength: 1

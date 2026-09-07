@@ -1,0 +1,48 @@
+name: cryptodb
+displayName: CryptoDB
+description: CryptoDB — VEuPathDB resource for Cryptosporidium genomics
+tags:
+  - cryptosporidium
+  - parasite
+  - veupathdb
+  - genomics
+baseUrl: https://cryptodb.org/cryptodb/service
+tools:
+  listRecordTypes:
+    description: List available record types in CryptoDB
+    tags:
+      - record-types
+      - metadata
+    method: GET
+    path: /record-types
+    params: {}
+    response:
+      format: json
+  search:
+    description: Search CryptoDB for genes, proteins, and genomic features
+    tags:
+      - gene-search
+      - parasite-search
+    method: GET
+    path: /search
+    params:
+      q:
+        type: string
+        required: true
+        description: Search query
+      format:
+        type: string
+        default: json
+        description: Response format
+      size:
+        type: integer
+        default: 10
+        description: Number of results
+    response:
+      format: json
+tests:
+  listRecordTypes:
+    - name: lists record types
+      params: {}
+      assert:
+        - minLength: 1

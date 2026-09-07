@@ -1,6 +1,6 @@
 # life-science-mcp
 
-A unified MCP server for 275 life science APIs and databases (258 free, 17 API key). Two tools — `findTools` and `callTools` — provide progressive discovery across 729 endpoints with field projection and batch execution.
+A unified MCP server for 282 life science APIs and databases (265 free, 17 API key). Two tools — `findTools` and `callTools` — provide progressive discovery across 742 endpoints with field projection and batch execution.
 
 ## Installation
 
@@ -24,6 +24,7 @@ A unified MCP server for 275 life science APIs and databases (258 free, 17 API k
 | [AIRR Data Commons](https://vdjserver.org/airr/v1) | AIRR Data Commons — adaptive immune receptor repertoire sequencing data | Free |
 | [Alliance of Genome Resources](https://www.alliancegenome.org/api) | Unified portal for model organism genes, diseases, and orthologs | Free |
 | [Allen Brain Atlas](https://api.brain-map.org/api/v2) | Allen Institute brain gene expression and connectivity data | Free |
+| [AmoebaDB](https://amoebadb.org/amoeba/service) | VEuPathDB resource for Entamoeba and free-living amoeba genomics | Free |
 | [AlphaFold DB](https://alphafold.ebi.ac.uk/api) | AI-predicted protein structures from DeepMind | Free |
 | [AquaMaps](https://aquamaps.org/webservice) | AquaMaps — predicted species distribution maps for marine and freshwater organisms | Free |
 | [ArrayExpress](https://www.ebi.ac.uk/biostudies/api/v1) | ArrayExpress — gene expression and functional genomics experiments archive (EBI BioStudies) | Free |
@@ -71,6 +72,7 @@ A unified MCP server for 275 life science APIs and databases (258 free, 17 API k
 | [Comparative Toxicogenomics Database](https://ctdbase.org/tools/batchQuery.go) | CTD curated chemical-gene-disease interactions for toxicogenomics research | Free |
 | [CompTox](https://comptox.epa.gov/dashboard-api) | EPA CompTox Chemicals Dashboard for toxicology and chemical safety | Free |
 | [Crossref](https://api.crossref.org) | Crossref — scholarly metadata for publications, journals, funders, and DOIs | Free |
+| [CryptoDB](https://cryptodb.org/cryptodb/service) | VEuPathDB resource for Cryptosporidium genomics | Free |
 | [DailyMed](https://dailymed.nlm.nih.gov/dailymed/services) | DailyMed drug label information from the National Library of Medicine — SPL documents and prescribing information | Free |
 | [DataCite](https://api.datacite.org) | DataCite — DOI registration and metadata for research datasets and publications | Free |
 | [DALI](http://ekhidna2.biocenter.helsinki.fi/dali) | DALI server — protein structure comparison by 3D alignment | Free |
@@ -115,6 +117,7 @@ A unified MCP server for 275 life science APIs and databases (258 free, 17 API k
 | [FishBase](https://fishbase.ropensci.org) | FishBase — comprehensive database of fish species biology, ecology, and taxonomy | Free |
 | [FlyBase](https://api.flybase.org/api/v1.0) | FlyBase — Drosophila melanogaster genomics, genetics, and molecular biology | Free |
 | [FlyMine](https://www.flymine.org/flymine/service) | InterMine data warehouse for Drosophila genomics, orthologs, and interactions | Free |
+| [FungiDB](https://fungidb.org/fungidb/service) | VEuPathDB resource for fungal genomics (Aspergillus, Candida, Cryptococcus) | Free |
 | [g:Profiler](https://biit.cs.ut.ee/gprofiler) | g:Profiler — functional enrichment and gene ID conversion | Free |
 | [GARD](https://rarediseases.info.nih.gov/gard-api) | GARD — Genetic and Rare Diseases Information Center from NIH | Free |
 | [GBIF](https://api.gbif.org/v1) | Global Biodiversity Information Facility — species occurrence and taxonomy data worldwide | Free |
@@ -137,6 +140,7 @@ A unified MCP server for 275 life science APIs and databases (258 free, 17 API k
 | [Harmonizome](https://maayanlab.cloud/Harmonizome/api/1.0) | Unified access to 177 datasets of gene and protein knowledge from Ma'ayan Lab | Free |
 | [HGNC](https://rest.genenames.org) | HUGO Gene Nomenclature Committee — approved human gene symbols and names | Free |
 | [HMMER](https://www.ebi.ac.uk/Tools/hmmer) | HMMER protein sequence search using profile hidden Markov models | Free |
+| [HostDB](https://hostdb.org/hostdb/service) | VEuPathDB resource for host response to pathogens (human, mouse, macaque) | Free |
 | [Human Cell Atlas](https://service.azul.data.humancellatlas.org) | Human Cell Atlas data portal — single-cell genomics projects and datasets | Free |
 | [HuBMAP](https://search.api.hubmapconsortium.org/v3/portal) | Human BioMolecular Atlas Program — atlas of human body at single-cell resolution | Free |
 | [HumanMine](https://www.humanmine.org/humanmine/service) | InterMine data warehouse for human genomics, disease, and interactions | Free |
@@ -211,6 +215,7 @@ A unified MCP server for 275 life science APIs and databases (258 free, 17 API k
 | [OLS4](https://www.ebi.ac.uk/ols4/api) | EBI Ontology Lookup Service v4 with 300+ biomedical ontologies | Free |
 | [OMA](https://omabrowser.org/api) | Orthologous Matrix — comprehensive ortholog database | Free |
 | [OMIM](https://api.omim.org/api) | Online Mendelian Inheritance in Man — catalog of human genes and genetic disorders | API Key |
+| [Ontobee](https://ontobee.org/api) | Ontology term search and browsing across OBO and OWL ontologies | Free |
 | [OmniPath](https://omnipathdb.org) | OmniPath — comprehensive signaling network and enzyme-substrate interactions | Free |
 | [OncoTree](https://oncotree.mskcc.org/api) | MSK Cancer Classification — standardized cancer type taxonomy and hierarchy | Free |
 | [OneZoom](https://www.onezoom.org/api/v1) | OneZoom tree of life explorer — interactive visualization and species search across the tree of life | Free |
@@ -272,6 +277,8 @@ A unified MCP server for 275 life science APIs and databases (258 free, 17 API k
 | [TCIA](https://services.cancerimagingarchive.net/nbia-api/services/v1) | The Cancer Imaging Archive — public access to cancer medical imaging data and collections | Free |
 | [TimeTree](https://timetree.org/api) | TimeTree — divergence time estimates between species pairs | Free |
 | [ToxCast](https://comptox.epa.gov/dashboard/api) | EPA ToxCast high-throughput toxicity assay screening data | Free |
+| [ToxoDB](https://toxodb.org/toxo/service) | VEuPathDB resource for Toxoplasma gondii and related apicomplexan genomics | Free |
+| [TriTrypDB](https://tritrypdb.org/tritrypdb/service) | VEuPathDB resource for trypanosomatid genomics (Trypanosoma, Leishmania) | Free |
 | [UCSC Genome Browser](https://api.genome.ucsc.edu) | UCSC Genome Browser — genome assemblies, annotations, and track data | Free |
 | [UCSC Genome Browser API](https://api.genome.ucsc.edu) | Programmatic access to genome search, sequences, tracks, and browser data | Free |
 | [UMLS](https://uts-ws.nlm.nih.gov/rest) | Unified Medical Language System — biomedical concepts, terminology crosswalk, and semantic network | API Key |

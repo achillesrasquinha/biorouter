@@ -1,0 +1,48 @@
+name: toxodb
+displayName: ToxoDB
+description: ToxoDB — VEuPathDB resource for Toxoplasma gondii and related apicomplexan genomics
+tags:
+  - toxoplasma
+  - parasite
+  - veupathdb
+  - genomics
+baseUrl: https://toxodb.org/toxo/service
+tools:
+  listRecordTypes:
+    description: List available record types in ToxoDB
+    tags:
+      - record-types
+      - metadata
+    method: GET
+    path: /record-types
+    params: {}
+    response:
+      format: json
+  search:
+    description: Search ToxoDB for genes, proteins, and genomic features
+    tags:
+      - gene-search
+      - parasite-search
+    method: GET
+    path: /search
+    params:
+      q:
+        type: string
+        required: true
+        description: Search query (e.g. TGME49_268720, kinase, ROP)
+      format:
+        type: string
+        default: json
+        description: Response format
+      size:
+        type: integer
+        default: 10
+        description: Number of results
+    response:
+      format: json
+tests:
+  listRecordTypes:
+    - name: lists record types
+      params: {}
+      assert:
+        - minLength: 1
