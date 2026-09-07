@@ -1,0 +1,67 @@
+name: flymine
+displayName: FlyMine
+description: FlyMine — InterMine data warehouse for Drosophila genomics, orthologs, and interactions
+tags:
+  - drosophila
+  - model-organism
+  - intermine
+  - flymine
+  - fruit-fly
+baseUrl: https://www.flymine.org/flymine/service
+tools:
+  search:
+    description: Search FlyMine for genes, proteins, pathways, and interactions
+    tags:
+      - gene-search
+      - drosophila-search
+    method: GET
+    path: /search
+    params:
+      q:
+        type: string
+        required: true
+        description: Search query (e.g. insulin, Notch, hedgehog)
+      format:
+        type: string
+        default: json
+        description: Response format
+      size:
+        type: integer
+        default: 10
+        description: Number of results
+    response:
+      format: json
+      fields:
+        - totalHits
+        - results[].id
+        - results[].type
+        - results[].fields
+  getGene:
+    description: Get gene details using InterMine PathQuery
+    tags:
+      - gene-info
+      - drosophila-gene
+    method: GET
+    path: /query/results
+    params:
+      query:
+        type: string
+        required: true
+        description: "InterMine PathQuery XML"
+      format:
+        type: string
+        default: json
+        description: Response format
+    response:
+      format: json
+tests:
+  search:
+    - name: searches for insulin
+      params:
+        q: insulin
+        format: json
+        size: 3
+      assert:
+        - path: totalHits
+        - path: results
+          minLength: 1

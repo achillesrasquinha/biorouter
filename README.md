@@ -1,6 +1,6 @@
 # life-science-mcp
 
-A unified MCP server for 238 life science APIs and databases (221 free, 17 API key). Two tools — `findTools` and `callTools` — provide progressive discovery across 682 endpoints with field projection and batch execution.
+A unified MCP server for 244 life science APIs and databases (227 free, 17 API key). Two tools — `findTools` and `callTools` — provide progressive discovery across 694 endpoints with field projection and batch execution.
 
 ## Installation
 
@@ -15,7 +15,7 @@ A unified MCP server for 238 life science APIs and databases (221 free, 17 API k
 }
 ```
 
-## Providers (238)
+## Providers (244)
 
 | Provider | Description | Auth |
 |----------|-------------|------|
@@ -88,6 +88,7 @@ A unified MCP server for 238 life science APIs and databases (221 free, 17 API k
 | [Enrichr](https://maayanlab.cloud/Enrichr) | Enrichr — gene set enrichment analysis against curated gene-set libraries | Free |
 | [Ensembl BioMart](https://www.ensembl.org/biomart/martservice) | Ensembl BioMart bulk annotation and data retrieval service | Free |
 | [Ensembl VEP](https://rest.ensembl.org) | Variant Effect Predictor — predict functional effects of genetic variants | Free |
+| [ENA Taxonomy](https://www.ebi.ac.uk/ena/taxonomy/rest) | EBI ENA Taxonomy — taxonomic classification lookup with lineage and common names | Free |
 | [Ensembl](https://rest.ensembl.org) | Genome browser and annotation database | Free |
 | [ELM](http://elm.eu.org) | Eukaryotic Linear Motifs — short functional motifs in proteins (cleavage sites, binding motifs, etc.) | Free |
 | [EU Clinical Trials Register](https://euclinicaltrials.eu/ctis-public/api) | European Union Clinical Trials Register for searching EU clinical studies | Free |
@@ -101,6 +102,7 @@ A unified MCP server for 238 life science APIs and databases (221 free, 17 API k
 | [FHIR R4](https://hapi.fhir.org/baseR4) | FHIR R4 public test server — HL7 FHIR standard for healthcare data interoperability | Free |
 | [FishBase](https://fishbase.ropensci.org) | FishBase — comprehensive database of fish species biology, ecology, and taxonomy | Free |
 | [FlyBase](https://api.flybase.org/api/v1.0) | FlyBase — Drosophila melanogaster genomics, genetics, and molecular biology | Free |
+| [FlyMine](https://www.flymine.org/flymine/service) | InterMine data warehouse for Drosophila genomics, orthologs, and interactions | Free |
 | [g:Profiler](https://biit.cs.ut.ee/gprofiler) | g:Profiler — functional enrichment and gene ID conversion | Free |
 | [GARD](https://rarediseases.info.nih.gov/gard-api) | GARD — Genetic and Rare Diseases Information Center from NIH | Free |
 | [GBIF](https://api.gbif.org/v1) | Global Biodiversity Information Facility — species occurrence and taxonomy data worldwide | Free |
@@ -119,10 +121,12 @@ A unified MCP server for 238 life science APIs and databases (221 free, 17 API k
 | [GTDB](https://gtdb-api.ecogenomic.org) | Genome Taxonomy Database — standardized bacterial and archaeal taxonomy based on genome phylogeny | Free |
 | [Guide to Pharmacology](https://www.guidetopharmacology.org/services) | IUPHAR/BPS Guide to Pharmacology database of drug targets and ligands | Free |
 | [GWAS Catalog](https://www.ebi.ac.uk/gwas/rest/api) | NHGRI-EBI Catalog of genome-wide association studies | Free |
+| [Harmonizome](https://maayanlab.cloud/Harmonizome/api/1.0) | Unified access to 177 datasets of gene and protein knowledge from Ma'ayan Lab | Free |
 | [HGNC](https://rest.genenames.org) | HUGO Gene Nomenclature Committee — approved human gene symbols and names | Free |
 | [HMMER](https://www.ebi.ac.uk/Tools/hmmer) | HMMER protein sequence search using profile hidden Markov models | Free |
 | [Human Cell Atlas](https://service.azul.data.humancellatlas.org) | Human Cell Atlas data portal — single-cell genomics projects and datasets | Free |
 | [HuBMAP](https://search.api.hubmapconsortium.org/v3/portal) | Human BioMolecular Atlas Program — atlas of human body at single-cell resolution | Free |
+| [HumanMine](https://www.humanmine.org/humanmine/service) | InterMine data warehouse for human genomics, disease, and interactions | Free |
 | [Human Metabolome Database](https://hmdb.ca) | HMDB — comprehensive human metabolite and biomarker database | Free |
 | [Human Phenotype Ontology](https://ontology.jax.org/api/hp) | Human Phenotype Ontology — standardized vocabulary of human phenotypic abnormalities | Free |
 | [Human Protein Atlas](https://www.proteinatlas.org) | Human protein expression and localization data across tissues and cell types | Free |
@@ -164,6 +168,7 @@ A unified MCP server for 238 life science APIs and databases (221 free, 17 API k
 | [MyDisease.info](https://mydisease.info/v1) | Disease annotation query service — aggregates disease data from multiple sources | Free |
 | [MyGene.info](https://mygene.info/v3) | Gene annotation query service — aggregated gene info from multiple sources | Free |
 | [MyVariant.info](https://myvariant.info/v1) | Variant annotation query service — aggregates genetic variant data from multiple sources | Free |
+| [NASA OSDR](https://osdr.nasa.gov/osdr/data) | NASA Open Science Data Repository — space biology and radiation genomics datasets | Free |
 | [Natural Products Atlas](https://www.npatlas.org/api/v1) | Database of microbially-derived natural products for drug discovery | Free |
 | [NatureServe](https://explorer.natureserve.org/api/data) | NatureServe Explorer — conservation status and biodiversity data for species across the Americas | API Key |
 | [NCBI BioSample](https://eutils.ncbi.nlm.nih.gov/entrez/eutils) | Database of biological sample metadata used in experimental assays | Free |
@@ -234,6 +239,7 @@ A unified MCP server for 238 life science APIs and databases (221 free, 17 API k
 | [SwissADME](http://www.swissadme.ch) | SwissADME drug-likeness and pharmacokinetics prediction tool | Free |
 | [SWISS-MODEL](https://swissmodel.expasy.org) | SWISS-MODEL Repository — homology models and 3D protein structure predictions | Free |
 | [SwissLipids](https://www.swisslipids.org/api) | SwissLipids — curated knowledge resource for lipid biology and lipidomics | Free |
+| [TargetMine](https://targetmine.mizuguchilab.org/targetmine/service) | Integrated data warehouse for drug target prioritization and biomarker discovery | Free |
 | [TCIA](https://services.cancerimagingarchive.net/nbia-api/services/v1) | The Cancer Imaging Archive — public access to cancer medical imaging data and collections | Free |
 | [TimeTree](https://timetree.org/api) | TimeTree — divergence time estimates between species pairs | Free |
 | [ToxCast](https://comptox.epa.gov/dashboard/api) | EPA ToxCast high-throughput toxicity assay screening data | Free |
