@@ -1,0 +1,48 @@
+name: sigcom-lincs
+displayName: SigCom LINCS
+description: SigCom LINCS — signatures of perturbation from the LINCS L1000 gene expression project
+tags:
+  - perturbation
+  - gene-expression
+  - lincs
+  - drug-response
+  - signatures
+baseUrl: https://maayanlab.cloud/sigcom-lincs/metadata-api
+tools:
+  countEntities:
+    description: Count entities (signatures, genes, drugs) matching a filter
+    tags:
+      - count
+      - metadata
+    method: GET
+    path: /entities/count
+    params:
+      filter:
+        type: string
+        required: true
+        description: JSON filter (e.g. {"where":{"meta.Organism":"Homo sapiens"}})
+    response:
+      format: json
+      fields:
+        - count
+  listEntities:
+    description: List entities (signatures, perturbations) with optional filters
+    tags:
+      - entity-list
+      - signature-search
+    method: GET
+    path: /entities/find
+    params:
+      filter:
+        type: string
+        required: true
+        description: JSON filter with where, limit, skip (e.g. {"where":{"meta.Organism":"Homo sapiens"},"limit":10})
+    response:
+      format: json
+tests:
+  countEntities:
+    - name: counts human entities
+      params:
+        filter: '{"where":{"meta.Organism":"Homo sapiens"}}'
+      assert:
+        - path: count

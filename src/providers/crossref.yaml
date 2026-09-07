@@ -1,0 +1,100 @@
+name: crossref
+displayName: Crossref
+description: Crossref — scholarly metadata for publications, journals, funders, and DOIs
+tags:
+  - publications
+  - doi
+  - journals
+  - scholarly
+  - citations
+baseUrl: https://api.crossref.org
+tools:
+  searchWorks:
+    description: Search for scholarly works (articles, books, datasets) by keyword
+    tags:
+      - publication-search
+      - article-search
+    method: GET
+    path: /works
+    params:
+      query:
+        type: string
+        required: true
+        description: Search query (e.g. BRCA1 breast cancer, CRISPR gene editing)
+      rows:
+        type: integer
+        default: 10
+        description: Number of results
+      filter:
+        type: string
+        description: Filters (e.g. from-pub-date:2023-01-01, type:journal-article)
+      sort:
+        type: string
+        description: Sort field (e.g. relevance, published, is-referenced-by-count)
+    response:
+      format: json
+      fields:
+        - message.total-results
+        - message.items[].DOI
+        - message.items[].title
+        - message.items[].author[].family
+        - message.items[].published.date-parts
+        - message.items[].is-referenced-by-count
+  getWork:
+    description: Get metadata for a specific work by DOI
+    tags:
+      - publication-info
+      - doi-info
+    method: GET
+    path: /works/{doi}
+    params:
+      doi:
+        type: string
+        required: true
+        description: DOI (e.g. 10.1038/nature12373)
+    response:
+      format: json
+      fields:
+        - message.DOI
+        - message.title
+        - message.author[].family
+        - message.abstract
+  searchJournals:
+    description: Search for journals by title
+    tags:
+      - journal-search
+    method: GET
+    path: /journals
+    params:
+      query:
+        type: string
+        required: true
+        description: Journal search query (e.g. bioinformatics, genomics)
+      rows:
+        type: integer
+        default: 10
+        description: Number of results
+    response:
+      format: json
+      fields:
+        - message.total-results
+        - message.items[].title
+        - message.items[].ISSN
+        - message.items[].publisher
+tests:
+  searchWorks:
+    - name: searches for BRCA1 publications
+      params:
+        query: BRCA1
+        rows: 2
+      assert:
+        - path: message.total-results
+        - path: message.items
+          minLength: 1
+  searchJournals:
+    - name: searches for bioinformatics journals
+      params:
+        query: bioinformatics
+        rows: 2
+      assert:
+        - path: message.total-results

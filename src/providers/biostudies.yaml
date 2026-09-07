@@ -1,0 +1,73 @@
+name: biostudies
+displayName: BioStudies
+description: BioStudies — EBI archive for biological study data linking publications to datasets
+tags:
+  - studies
+  - publications
+  - datasets
+  - ebi
+baseUrl: https://www.ebi.ac.uk/biostudies/api/v1
+tools:
+  search:
+    description: Search BioStudies for biological studies and datasets
+    tags:
+      - study-search
+      - dataset-search
+    method: GET
+    path: /search
+    params:
+      query:
+        type: string
+        required: true
+        description: Search query (e.g. cancer, BRCA1, RNA-seq)
+      pageSize:
+        type: integer
+        default: 10
+        description: Number of results per page
+      page:
+        type: integer
+        default: 1
+        description: Page number
+    response:
+      format: json
+      fields:
+        - totalHits
+        - hits[].accession
+        - hits[].title
+        - hits[].author
+        - hits[].type
+  getStudy:
+    description: Get details for a specific BioStudies entry
+    tags:
+      - study-info
+      - dataset-info
+    method: GET
+    path: /studies/{accession}
+    params:
+      accession:
+        type: string
+        required: true
+        description: BioStudies accession (e.g. S-EPMC10139049)
+    response:
+      format: json
+      fields:
+        - accno
+        - attributes[].name
+        - attributes[].value
+        - section.type
+tests:
+  search:
+    - name: searches for cancer studies
+      params:
+        query: cancer
+        pageSize: 2
+      assert:
+        - path: totalHits
+        - path: hits
+          minLength: 1
+  getStudy:
+    - name: gets a specific study
+      params:
+        accession: S-EPMC10139049
+      assert:
+        - path: accno

@@ -1,0 +1,66 @@
+name: datacite
+displayName: DataCite
+description: DataCite — DOI registration and metadata for research datasets and publications
+tags:
+  - doi
+  - datasets
+  - metadata
+  - research-data
+baseUrl: https://api.datacite.org
+tools:
+  searchDois:
+    description: Search for DOIs and associated metadata across research datasets
+    tags:
+      - doi-search
+      - dataset-search
+    method: GET
+    path: /dois
+    params:
+      query:
+        type: string
+        required: true
+        description: Search query (e.g. genomics, proteomics, BRCA1)
+      page[size]:
+        type: integer
+        default: 10
+        description: Number of results per page
+      resource-type-id:
+        type: string
+        description: Filter by resource type (e.g. dataset, text, software)
+    response:
+      format: json
+      fields:
+        - data[].id
+        - data[].attributes.doi
+        - data[].attributes.titles[].title
+        - data[].attributes.creators[].name
+        - data[].attributes.publicationYear
+        - data[].attributes.types.resourceType
+  getDoi:
+    description: Get metadata for a specific DOI
+    tags:
+      - doi-info
+      - metadata
+    method: GET
+    path: /dois/{doi}
+    params:
+      doi:
+        type: string
+        required: true
+        description: DOI identifier (e.g. 10.5281/zenodo.1234567)
+    response:
+      format: json
+      fields:
+        - data.attributes.doi
+        - data.attributes.titles[].title
+        - data.attributes.creators[].name
+        - data.attributes.descriptions[].description
+tests:
+  searchDois:
+    - name: searches for genomics datasets
+      params:
+        query: genomics
+        page[size]: 2
+      assert:
+        - path: data
+          minLength: 1

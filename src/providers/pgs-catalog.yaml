@@ -1,0 +1,85 @@
+name: pgs-catalog
+displayName: PGS Catalog
+description: PGS Catalog — Polygenic Score Catalog for risk prediction scores and trait associations
+tags:
+  - polygenic-score
+  - risk-prediction
+  - gwas
+  - traits
+baseUrl: https://www.pgscatalog.org/rest
+tools:
+  searchTraits:
+    description: Search for traits in the PGS Catalog
+    tags:
+      - trait-search
+      - pgs-trait
+    method: GET
+    path: /trait/search
+    params:
+      term:
+        type: string
+        required: true
+        description: Trait search term (e.g. breast cancer, diabetes, BMI)
+      limit:
+        type: integer
+        default: 10
+        description: Maximum results per page
+    response:
+      format: json
+      fields:
+        - count
+        - results[].id
+        - results[].label
+        - results[].description
+  getScore:
+    description: Get details of a polygenic score by PGS ID
+    tags:
+      - score-info
+      - pgs-details
+    method: GET
+    path: /score/{pgsId}
+    params:
+      pgsId:
+        type: string
+        required: true
+        description: PGS ID (e.g. PGS000001, PGS000018)
+    response:
+      format: json
+      fields:
+        - id
+        - name
+        - trait_reported
+        - variants_number
+        - method_name
+  listScores:
+    description: List all polygenic scores with optional trait filter
+    tags:
+      - score-list
+      - pgs-browse
+    method: GET
+    path: /score/all
+    params:
+      trait_id:
+        type: string
+        description: Filter by EFO trait ID (e.g. EFO_0000305)
+      limit:
+        type: integer
+        default: 10
+        description: Maximum results
+    response:
+      format: json
+      fields:
+        - count
+        - results[].id
+        - results[].name
+        - results[].trait_reported
+tests:
+  searchTraits:
+    - name: searches for breast cancer traits
+      params:
+        term: breast cancer
+        limit: 2
+      assert:
+        - path: count
+        - path: results
+          minLength: 1

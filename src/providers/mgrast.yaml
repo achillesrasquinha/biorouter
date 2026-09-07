@@ -1,0 +1,76 @@
+name: mgrast
+displayName: MG-RAST
+description: MG-RAST — metagenomics analysis and annotation server for microbiome datasets
+tags:
+  - metagenomics
+  - microbiome
+  - annotation
+  - sequencing
+baseUrl: https://api.mg-rast.org
+tools:
+  getMetagenome:
+    description: Get details for a specific metagenome sample
+    tags:
+      - metagenome-info
+      - sample-info
+    method: GET
+    path: /metagenome/{id}
+    params:
+      id:
+        type: string
+        required: true
+        description: MG-RAST metagenome ID (e.g. mgm4441593.3)
+      verbosity:
+        type: string
+        default: minimal
+        description: Level of detail (minimal, verbose, full)
+    response:
+      format: json
+      fields:
+        - name
+        - project
+        - pipeline_parameters
+        - owner
+  getMetadata:
+    description: Get metadata for a metagenome sample
+    tags:
+      - metadata
+      - sample-metadata
+    method: GET
+    path: /metadata/export/{id}
+    params:
+      id:
+        type: string
+        required: true
+        description: MG-RAST metagenome ID (e.g. mgm4441593.3)
+    response:
+      format: json
+      fields:
+        - sample.name
+        - sample.data
+  getProject:
+    description: Get project information
+    tags:
+      - project-info
+      - study-info
+    method: GET
+    path: /project/{id}
+    params:
+      id:
+        type: string
+        required: true
+        description: MG-RAST project ID (e.g. mgp27)
+      verbosity:
+        type: string
+        default: minimal
+        description: Level of detail
+    response:
+      format: json
+tests:
+  getMetagenome:
+    - name: gets a metagenome sample
+      params:
+        id: mgm4441593.3
+        verbosity: minimal
+      assert:
+        - path: name

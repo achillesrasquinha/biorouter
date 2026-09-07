@@ -1,0 +1,71 @@
+name: doaj
+displayName: DOAJ
+description: DOAJ — Directory of Open Access Journals, indexing quality open access research
+tags:
+  - open-access
+  - journals
+  - articles
+  - scholarly
+baseUrl: https://doaj.org/api
+tools:
+  searchArticles:
+    description: Search for open access articles across all indexed journals
+    tags:
+      - article-search
+      - open-access
+    method: GET
+    path: /search/articles/{query}
+    params:
+      query:
+        type: string
+        required: true
+        description: Search query (e.g. BRCA1, CRISPR, microbiome)
+      pageSize:
+        type: integer
+        default: 10
+        description: Number of results per page
+      page:
+        type: integer
+        default: 1
+        description: Page number
+    response:
+      format: json
+      fields:
+        - total
+        - results[].bibjson.title
+        - results[].bibjson.journal.title
+        - results[].bibjson.identifier[].id
+        - results[].bibjson.keywords
+  searchJournals:
+    description: Search for open access journals by title or subject
+    tags:
+      - journal-search
+      - open-access
+    method: GET
+    path: /search/journals/{query}
+    params:
+      query:
+        type: string
+        required: true
+        description: Search query (e.g. genomics, bioinformatics)
+      pageSize:
+        type: integer
+        default: 10
+        description: Number of results
+    response:
+      format: json
+      fields:
+        - total
+        - results[].bibjson.title
+        - results[].bibjson.publisher.name
+        - results[].bibjson.subject[].term
+tests:
+  searchArticles:
+    - name: searches for BRCA1 articles
+      params:
+        query: BRCA1
+        pageSize: 2
+      assert:
+        - path: total
+        - path: results
+          minLength: 1

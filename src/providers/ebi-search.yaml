@@ -1,0 +1,78 @@
+name: ebi-search
+displayName: EBI Search
+description: EBI Search — unified search across 400+ EBI databases (UniProt, PDB, SRA, metagenomics, etc.)
+tags:
+  - search
+  - ebi
+  - cross-database
+  - unified-search
+baseUrl: https://www.ebi.ac.uk/ebisearch/ws/rest
+tools:
+  search:
+    description: Search across a specific EBI domain (e.g. uniprot, pdb, sra-experiment)
+    tags:
+      - cross-database-search
+      - ebi-search
+    method: GET
+    path: /{domain}
+    params:
+      domain:
+        type: string
+        required: true
+        description: EBI domain to search (e.g. uniprot, pdb, sra-experiment, metagenomics_analyses, chembl-target)
+      query:
+        type: string
+        required: true
+        description: Search query
+      size:
+        type: integer
+        default: 10
+        description: Number of results
+      format:
+        type: string
+        default: json
+        description: Response format
+    response:
+      format: json
+      fields:
+        - hitCount
+        - entries[].acc
+        - entries[].id
+        - entries[].source
+  listDomains:
+    description: List all available EBI search domains
+    tags:
+      - domain-list
+      - metadata
+    method: GET
+    path: /
+    params:
+      format:
+        type: string
+        default: json
+        description: Response format
+    response:
+      format: json
+      fields:
+        - domains[].id
+        - domains[].name
+        - domains[].description
+tests:
+  search:
+    - name: searches UniProt for BRCA1
+      params:
+        domain: uniprot
+        query: BRCA1
+        size: 2
+        format: json
+      assert:
+        - path: hitCount
+        - path: entries
+          minLength: 1
+  listDomains:
+    - name: lists available domains
+      params:
+        format: json
+      assert:
+        - path: domains
+          minLength: 1

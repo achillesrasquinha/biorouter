@@ -1,0 +1,41 @@
+name: geneshot
+displayName: Geneshot
+description: Geneshot — Ma'ayan Lab tool for gene set discovery from PubMed literature mining
+tags:
+  - literature-mining
+  - gene-set
+  - pubmed
+  - text-mining
+baseUrl: https://maayanlab.cloud/geneshot/api
+tools:
+  searchGenes:
+    description: Find genes associated with a search term by mining PubMed literature
+    tags:
+      - gene-search
+      - literature-mining
+    method: GET
+    path: /search
+    params:
+      rif:
+        type: string
+        required: true
+        description: Type of association (autorif for automatic, generif for curated)
+        default: autorif
+      term:
+        type: string
+        required: true
+        description: Search term (e.g. BRCA1, kinase, Alzheimer)
+    response:
+      format: json
+      fields:
+        - PubMedID_count
+        - gene_count
+tests:
+  searchGenes:
+    - name: searches for BRCA1 associated genes
+      params:
+        rif: autorif
+        term: BRCA1
+      assert:
+        - path: PubMedID_count
+        - path: gene_count

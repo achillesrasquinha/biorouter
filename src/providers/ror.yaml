@@ -1,0 +1,70 @@
+name: ror
+displayName: ROR
+description: ROR — Research Organization Registry for identifying research institutions worldwide
+tags:
+  - research-organizations
+  - institutions
+  - registry
+  - identifiers
+baseUrl: https://api.ror.org/v2
+tools:
+  searchOrganizations:
+    description: Search for research organizations by name or keyword
+    tags:
+      - organization-search
+      - institution-search
+    method: GET
+    path: /organizations
+    params:
+      query:
+        type: string
+        required: true
+        description: Search query (e.g. Harvard, MIT, EMBL)
+      page:
+        type: integer
+        default: 1
+        description: Page number
+    response:
+      format: json
+      fields:
+        - number_of_results
+        - items[].id
+        - items[].names[].value
+        - items[].locations[].geonames_details.country_name
+        - items[].established
+  getOrganization:
+    description: Get details for a specific research organization by ROR ID
+    tags:
+      - organization-info
+      - institution-info
+    method: GET
+    path: /organizations/{rorId}
+    params:
+      rorId:
+        type: string
+        required: true
+        description: ROR ID (e.g. 00hx57361 for Princeton)
+    response:
+      format: json
+      fields:
+        - id
+        - names[].value
+        - established
+        - locations[].geonames_details.country_name
+        - links[].value
+        - external_ids[].type
+tests:
+  searchOrganizations:
+    - name: searches for Harvard
+      params:
+        query: Harvard
+      assert:
+        - path: number_of_results
+        - path: items
+          minLength: 1
+  getOrganization:
+    - name: gets Princeton by ROR ID
+      params:
+        rorId: 00hx57361
+      assert:
+        - path: id

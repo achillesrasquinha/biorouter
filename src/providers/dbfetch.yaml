@@ -1,0 +1,46 @@
+name: dbfetch
+displayName: EBI dbfetch
+description: EBI dbfetch — sequence and entry retrieval from EMBL, UniProt, PDB, RefSeq, and 50+ databases
+tags:
+  - sequence-retrieval
+  - entry-retrieval
+  - ebi
+  - multi-database
+baseUrl: https://www.ebi.ac.uk/Tools/dbfetch
+tools:
+  fetchEntry:
+    description: Fetch an entry from any supported EBI database
+    tags:
+      - entry-fetch
+      - sequence-fetch
+    method: GET
+    path: /dbfetch
+    params:
+      db:
+        type: string
+        required: true
+        description: Database name (e.g. embl, uniprotkb, pdb, refseqn, refseqp)
+      id:
+        type: string
+        required: true
+        description: Entry ID (e.g. AF000658, P00734, 4HHB)
+      format:
+        type: string
+        default: fasta
+        description: Output format (fasta, embl, gff3, json, xml)
+      style:
+        type: string
+        default: raw
+        description: Output style (raw, html)
+    response:
+      format: text
+tests:
+  fetchEntry:
+    - name: fetches a UniProt entry in fasta format
+      params:
+        db: uniprotkb
+        id: P00734
+        format: fasta
+        style: raw
+      assert:
+        - contains: MAHVRGLQLPG

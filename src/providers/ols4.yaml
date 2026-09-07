@@ -1,0 +1,68 @@
+name: ols4
+displayName: OLS4
+description: OLS4 — EBI Ontology Lookup Service v4 with 300+ biomedical ontologies
+tags:
+  - ontology
+  - terminology
+  - ebi
+  - controlled-vocabulary
+baseUrl: https://www.ebi.ac.uk/ols4/api
+tools:
+  listOntologies:
+    description: List available ontologies in OLS4
+    tags:
+      - ontology-list
+      - registry
+    method: GET
+    path: /ontologies
+    params:
+      page:
+        type: integer
+        default: 0
+        description: Page number
+      size:
+        type: integer
+        default: 20
+        description: Results per page
+    response:
+      format: json
+      fields:
+        - _embedded.ontologies[].ontologyId
+        - _embedded.ontologies[].config.title
+        - _embedded.ontologies[].numberOfTerms
+  searchTerms:
+    description: Search for terms across all ontologies
+    tags:
+      - term-search
+      - ontology-search
+    method: GET
+    path: /search
+    params:
+      q:
+        type: string
+        required: true
+        description: Search query (e.g. diabetes, kinase, apoptosis)
+      ontology:
+        type: string
+        description: Filter by ontology ID (e.g. go, hp, mondo)
+      rows:
+        type: integer
+        default: 10
+        description: Number of results
+    response:
+      format: json
+      fields:
+        - response.numFound
+        - response.docs[].label
+        - response.docs[].obo_id
+        - response.docs[].ontology_name
+        - response.docs[].description
+tests:
+  listOntologies:
+    - name: lists available ontologies
+      params:
+        page: 0
+        size: 2
+      assert:
+        - path: _embedded.ontologies
+          minLength: 1

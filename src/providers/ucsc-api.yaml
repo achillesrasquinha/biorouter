@@ -1,0 +1,125 @@
+name: ucsc-api
+displayName: UCSC Genome Browser API
+description: UCSC Genome Browser API — programmatic access to genome tracks, sequences, and search
+tags:
+  - genome-browser
+  - tracks
+  - sequence
+  - ucsc
+baseUrl: https://api.genome.ucsc.edu
+tools:
+  search:
+    description: Search the UCSC genome browser for genes and positions
+    tags:
+      - genome-search
+      - gene-search
+    method: GET
+    path: /search
+    params:
+      genome:
+        type: string
+        required: true
+        description: Genome assembly (e.g. hg38, mm39)
+      search:
+        type: string
+        required: true
+        description: Search term (e.g. BRCA1, TP53, chr17:43044295-43170245)
+    response:
+      format: json
+      fields:
+        - positionMatches[].matches[].position
+        - positionMatches[].matches[].posName
+  getSequence:
+    description: Get DNA sequence for a genomic region
+    tags:
+      - sequence
+      - dna
+    method: GET
+    path: /getData/sequence
+    params:
+      genome:
+        type: string
+        required: true
+        description: Genome assembly (e.g. hg38, mm39)
+      chrom:
+        type: string
+        required: true
+        description: Chromosome (e.g. chr17)
+      start:
+        type: integer
+        required: true
+        description: Start position (0-based)
+      end:
+        type: integer
+        required: true
+        description: End position
+    response:
+      format: json
+      fields:
+        - dna
+        - genome
+        - chrom
+        - start
+        - end
+  getTrackData:
+    description: Get track data for a specific genomic region
+    tags:
+      - track-data
+      - annotation
+    method: GET
+    path: /getData/track
+    params:
+      genome:
+        type: string
+        required: true
+        description: Genome assembly (e.g. hg38)
+      track:
+        type: string
+        required: true
+        description: Track name (e.g. knownGene, refGene, gc5BaseBw)
+      chrom:
+        type: string
+        required: true
+        description: Chromosome (e.g. chr17)
+      start:
+        type: integer
+        required: true
+        description: Start position
+      end:
+        type: integer
+        required: true
+        description: End position
+    response:
+      format: json
+  listTracks:
+    description: List available tracks for a genome assembly
+    tags:
+      - track-list
+      - metadata
+    method: GET
+    path: /list/tracks
+    params:
+      genome:
+        type: string
+        required: true
+        description: Genome assembly (e.g. hg38, mm39)
+    response:
+      format: json
+tests:
+  search:
+    - name: searches for BRCA1 in hg38
+      params:
+        genome: hg38
+        search: BRCA1
+      assert:
+        - path: positionMatches
+          minLength: 1
+  getSequence:
+    - name: gets DNA sequence
+      params:
+        genome: hg38
+        chrom: chr17
+        start: 43044295
+        end: 43044395
+      assert:
+        - path: dna

@@ -1,0 +1,78 @@
+name: epigraphdb
+displayName: EpiGraphDB
+description: EpiGraphDB — epidemiological graph database for Mendelian randomization and causal inference
+tags:
+  - epidemiology
+  - mendelian-randomization
+  - causal-inference
+  - gwas
+baseUrl: https://api.epigraphdb.org
+tools:
+  mendelianRandomization:
+    description: Query Mendelian randomization results between exposure and outcome traits
+    tags:
+      - mr
+      - causal-inference
+    method: GET
+    path: /mr
+    params:
+      exposure_trait:
+        type: string
+        required: true
+        description: Exposure trait name (e.g. Body mass index)
+      outcome_trait:
+        type: string
+        required: true
+        description: Outcome trait name (e.g. Coronary heart disease)
+      pval_threshold:
+        type: number
+        default: 1e-5
+        description: P-value threshold
+    response:
+      format: json
+      fields:
+        - results[].exposure.trait
+        - results[].outcome.trait
+        - results[].mr.b
+        - results[].mr.pval
+        - results[].mr.method
+  getSchema:
+    description: Get the EpiGraphDB database schema (node and relationship types)
+    tags:
+      - schema
+      - metadata
+    method: GET
+    path: /meta/schema
+    params: {}
+    response:
+      format: json
+  topicSearch:
+    description: Search for GWAS traits and literature evidence
+    tags:
+      - trait-search
+      - gwas
+    method: GET
+    path: /literature/gwas
+    params:
+      trait:
+        type: string
+        required: true
+        description: GWAS trait to search (e.g. body mass index)
+      semmanticTypes:
+        type: string
+        description: Comma-separated UMLS semantic types to filter
+    response:
+      format: json
+      fields:
+        - results[].gwas.trait
+        - results[].literature.title
+tests:
+  mendelianRandomization:
+    - name: queries MR for BMI and CHD
+      params:
+        exposure_trait: Body mass index
+        outcome_trait: Coronary heart disease
+        pval_threshold: 1e-5
+      assert:
+        - path: results
+          minLength: 1
