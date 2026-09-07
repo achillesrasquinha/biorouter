@@ -1,0 +1,99 @@
+name: agr
+displayName: Alliance of Genome Resources
+description: Alliance of Genome Resources — unified portal for model organism genes, diseases, and orthologs
+tags:
+  - model-organism
+  - gene
+  - disease
+  - orthology
+  - alliance
+baseUrl: https://www.alliancegenome.org/api
+tools:
+  searchAutocomplete:
+    description: Search genes, diseases, and GO terms across model organisms
+    tags:
+      - gene-search
+      - disease-search
+    method: GET
+    path: /search_autocomplete
+    params:
+      q:
+        type: string
+        required: true
+        description: Search query (e.g. BRCA1, insulin, diabetes)
+      limit:
+        type: integer
+        default: 10
+        description: Maximum results to return
+    response:
+      format: json
+      fields:
+        - results[].curie
+        - results[].name
+        - results[].category
+  getGene:
+    description: Get gene details by curie ID
+    tags:
+      - gene-info
+      - model-organism
+    method: GET
+    path: /gene/{geneId}
+    params:
+      geneId:
+        type: string
+        required: true
+        description: Gene curie (e.g. HGNC:11998 for TP53, MGI:104537 for mouse Brca1)
+    response:
+      format: json
+  getDisease:
+    description: Get disease information and gene associations
+    tags:
+      - disease-info
+      - disease-gene
+    method: GET
+    path: /disease/{diseaseId}
+    params:
+      diseaseId:
+        type: string
+        required: true
+        description: Disease ID (e.g. DOID:9351 for diabetes mellitus)
+      limit:
+        type: integer
+        default: 10
+        description: Maximum gene associations to return
+    response:
+      format: json
+  getOrthologs:
+    description: Get orthologs for a gene across model organisms
+    tags:
+      - orthology
+      - cross-species
+    method: GET
+    path: /gene/{geneId}/orthologs
+    params:
+      geneId:
+        type: string
+        required: true
+        description: Gene curie (e.g. HGNC:11998)
+      limit:
+        type: integer
+        default: 10
+        description: Maximum results
+    response:
+      format: json
+tests:
+  searchAutocomplete:
+    - name: searches for BRCA1 across organisms
+      params:
+        q: BRCA1
+        limit: 5
+      assert:
+        - path: results
+          minLength: 1
+        - path: results.0.name
+  getGene:
+    - name: gets TP53 gene details
+      params:
+        geneId: HGNC:11998
+      assert:
+        - path: gene

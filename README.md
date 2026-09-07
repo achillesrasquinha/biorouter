@@ -1,6 +1,6 @@
 # life-science-mcp
 
-A unified MCP server for 244 life science APIs and databases (227 free, 17 API key). Two tools — `findTools` and `callTools` — provide progressive discovery across 694 endpoints with field projection and batch execution.
+A unified MCP server for 247 life science APIs and databases (230 free, 17 API key). Two tools — `findTools` and `callTools` — provide progressive discovery across 700 endpoints with field projection and batch execution.
 
 ## Installation
 
@@ -15,13 +15,14 @@ A unified MCP server for 244 life science APIs and databases (227 free, 17 API k
 }
 ```
 
-## Providers (244)
+## Providers (247)
 
 | Provider | Description | Auth |
 |----------|-------------|------|
 | [1000 Genomes (IGSR)](https://www.internationalgenome.org/api) | International Genome Sample Resource — population genomics data from the 1000 Genomes Project | Free |
 | [Addgene](https://www.addgene.org/api) | Addgene — nonprofit plasmid repository for sharing molecular biology reagents | Free |
 | [AIRR Data Commons](https://vdjserver.org/airr/v1) | AIRR Data Commons — adaptive immune receptor repertoire sequencing data | Free |
+| [Alliance of Genome Resources](https://www.alliancegenome.org/api) | Unified portal for model organism genes, diseases, and orthologs | Free |
 | [Allen Brain Atlas](https://api.brain-map.org/api/v2) | Allen Institute brain gene expression and connectivity data | Free |
 | [AlphaFold DB](https://alphafold.ebi.ac.uk/api) | AI-predicted protein structures from DeepMind | Free |
 | [AquaMaps](https://aquamaps.org/webservice) | AquaMaps — predicted species distribution maps for marine and freshwater organisms | Free |
@@ -187,6 +188,7 @@ A unified MCP server for 244 life science APIs and databases (227 free, 17 API k
 | [NetMHCIIpan](https://services.healthtech.dtu.dk/api) | NetMHCIIpan 4.3 — MHC class II binding prediction for peptides across HLA-DR/DP/DQ alleles | Free |
 | [NetMHCpan](https://services.healthtech.dtu.dk/api) | NetMHCpan 4.1 — MHC class I binding prediction for peptides across HLA alleles | Free |
 | [OBIS](https://api.obis.org/v3) | Ocean Biodiversity Information System — marine species occurrence and distribution data | Free |
+| [OBO Foundry](https://obofoundry.org/registry) | Registry of 267 interoperable biomedical ontologies (GO, HPO, ChEBI, etc.) | Free |
 | [OLS](https://www.ebi.ac.uk/ols4/api) | Ontology Lookup Service — search and browse biomedical ontologies (GO, EFO, HPO, etc.) | Free |
 | [OMA](https://omabrowser.org/api) | Orthologous Matrix — comprehensive ortholog database | Free |
 | [OMIM](https://api.omim.org/api) | Online Mendelian Inheritance in Man — catalog of human genes and genetic disorders | API Key |
@@ -215,6 +217,7 @@ A unified MCP server for 244 life science APIs and databases (227 free, 17 API k
 | [Planteome](https://planteome.org/api) | Planteome — plant trait ontologies and gene annotations for plant biology | Free |
 | [PomBase](https://www.pombase.org/api/v1/dataset/latest) | S. pombe genome database — fission yeast genetics and genomics | Free |
 | [PRIDE](https://www.ebi.ac.uk/pride/ws/archive/v2) | PRIDE proteomics archive — mass spectrometry proteomics data repository | Free |
+| [ProteomeXchange](https://proteomecentral.proteomexchange.org/cgi) | Centralized proteomics dataset repository linking PRIDE, MassIVE, and other archives | Free |
 | [PubChem](https://pubchem.ncbi.nlm.nih.gov/rest/pug) | Open chemistry database with compound, substance, and bioassay data | Free |
 | [PubMed](https://eutils.ncbi.nlm.nih.gov/entrez/eutils) | Biomedical literature search engine (NCBI) | Free |
 | [PubTator](https://www.ncbi.nlm.nih.gov/research/pubtator3-api) | PubTator3 biomedical text mining — named entity recognition and annotation of PubMed articles | Free |
