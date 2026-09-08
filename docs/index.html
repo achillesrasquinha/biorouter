@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>life-science-mcp — 299 Life Science APIs, One MCP Server</title>
-<meta name="description" content="A unified MCP server for 299 life science APIs and databases. Two tools, 857 endpoints, 19 orchestrated BioRouter queries.">
+<title>biorouter — 299 Life Science APIs, One MCP Server</title>
+<meta name="description" content="A unified MCP server for 299 life science APIs and databases. Two tools, 857 endpoints, 19 orchestrated endpoints.">
 <style>
 :root{--bg:#0a0e14;--sf:#131920;--cd:#1a2028;--bd:#252d38;--tx:#e6edf3;--mt:#7d8590;--dm:#484f58;--ac:#58a6ff;--gn:#3fb950;--or:#d29922;--rd:#f85149;--pu:#bc8cff;--cy:#39d2c0;--pk:#f778ba;--radius:10px}
 *{box-sizing:border-box;margin:0;padding:0}
@@ -83,8 +83,8 @@ footer{border-top:1px solid var(--bd);padding:32px;text-align:center;font-size:1
   <div class="nav-links">
     <a href="#endpoints">Endpoints</a>
     <a href="#providers">Providers</a>
-    <a href="https://github.com/achillesrasquinha/life-science-mcp">GitHub</a>
-    <a href="https://www.npmjs.com/package/life-science-mcp">npm</a>
+    <a href="https://github.com/achillesrasquinha/biorouter">GitHub</a>
+    <a href="https://www.npmjs.com/package/biorouter">npm</a>
   </div>
 </nav>
 
@@ -94,17 +94,17 @@ footer{border-top:1px solid var(--bd);padding:32px;text-align:center;font-size:1
   <div class="hero-stats">
     <div class="hero-stat"><div class="n">299</div><div class="l">Providers</div></div>
     <div class="hero-stat"><div class="n">857</div><div class="l">Tools</div></div>
-    <div class="hero-stat"><div class="n">19</div><div class="l">BioRouter Endpoints</div></div>
+    <div class="hero-stat"><div class="n">19</div><div class="l">Endpoints</div></div>
     <div class="hero-stat"><div class="n">281</div><div class="l">Free APIs</div></div>
   </div>
   <div class="install-box" onclick="copyInstall(this)">
-    npx -y life-science-mcp
+    npx -y biorouter
     <span class="copy-hint">click to copy</span>
   </div>
 </div>
 
 <section id="endpoints">
-  <h2>BioRouter Endpoints</h2>
+  <h2>Endpoints</h2>
   <div class="sec-desc">High-level orchestrated queries that resolve identifiers, fan out to multiple APIs in parallel, and merge results with ranked provenance.</div>
   <div class="ep-grid" id="epGrid"></div>
 </section>
@@ -121,7 +121,7 @@ footer{border-top:1px solid var(--bd);padding:32px;text-align:center;font-size:1
 </section>
 
 <footer>
-  life-science-mcp &mdash; MIT License &mdash; <a href="https://github.com/achillesrasquinha/life-science-mcp">GitHub</a>
+  biorouter &mdash; MIT License &mdash; <a href="https://github.com/achillesrasquinha/biorouter">GitHub</a>
 </footer>
 
 <script>
@@ -197,7 +197,7 @@ renderProviders();
 function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
 function copyInstall(el) {
-  navigator.clipboard.writeText('npx -y life-science-mcp');
+  navigator.clipboard.writeText('npx -y biorouter');
   el.querySelector('.copy-hint').textContent = 'copied!';
   el.querySelector('.copy-hint').classList.add('copied');
   setTimeout(() => { el.querySelector('.copy-hint').textContent = 'click to copy'; el.querySelector('.copy-hint').classList.remove('copied'); }, 2000);

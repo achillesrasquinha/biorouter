@@ -1,10 +1,10 @@
 {
-  "name": "life-science-mcp",
+  "name": "biorouter",
   "version": "0.3.0",
-  "description": "MCP server providing tools for life science APIs and databases",
+  "description": "A unified MCP server for 299 life science APIs and databases",
   "type": "module",
   "bin": {
-    "life-science-mcp": "./src/index.js"
+    "biorouter": "./src/index.js"
   },
   "scripts": {
     "start": "node src/index.js",
@@ -16,6 +16,7 @@
   ],
   "keywords": [
     "mcp",
+    "biorouter",
     "life-science",
     "bioinformatics",
     "genomics",

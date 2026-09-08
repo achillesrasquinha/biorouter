@@ -1,23 +1,23 @@
-# life-science-mcp
+# biorouter
 
 A unified MCP server for 299 life science APIs and databases (281 free, 18 API key). Two tools — `findTools` and `callTools` — provide progressive discovery across 857 endpoints with field projection and batch execution.
 
-On top of individual API tools, **19 BioRouter endpoints** orchestrate multi-source queries across 197 providers in parallel — a single call like `compound/profile "ibuprofen"` fans out to 40+ APIs and returns a merged, deduplicated result.
+On top of individual API tools, **19 endpoints** orchestrate multi-source queries across 197 providers in parallel — a single call like `compound/profile "ibuprofen"` fans out to 40+ APIs and returns a merged, deduplicated result.
 
 ## Installation
 
 ```json
 {
   "mcpServers": {
-    "life-science": {
+    "biorouter": {
       "command": "npx",
-      "args": ["-y", "life-science-mcp"]
+      "args": ["-y", "biorouter"]
     }
   }
 }
 ```
 
-## BioRouter Endpoints (19)
+## Endpoints (19)
 
 High-level orchestrated queries that resolve identifiers, fan out to multiple APIs in parallel, and merge results with ranked provenance.
 
