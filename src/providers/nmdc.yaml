@@ -2,18 +2,18 @@ name: nmdc
 displayName: NMDC
 description: National Microbiome Data Collaborative — integrated microbiome multi-omics data
 tags:
-  - microbiome
-  - metagenomics
-  - biosample
-  - nmdc
-  - environmental
+- microbiome
+- metagenomics
+- biosample
+- nmdc
+- environmental
 baseUrl: https://api.microbiomedata.org
 tools:
   searchStudies:
     description: Search microbiome studies
     tags:
-      - study-search
-      - microbiome-study
+    - study-search
+    - microbiome-study
     method: GET
     path: /nmdcschema/study_set
     params:
@@ -24,14 +24,15 @@ tools:
     response:
       format: json
       fields:
-        - "resources[].id"
-        - "resources[].name"
-        - "resources[].description"
+      - resources[].id
+      - resources[].name
+      - resources[].description
+    entity: dataset
   getBiosample:
     description: Get biosample details
     tags:
-      - biosample
-      - sample-details
+    - biosample
+    - sample-details
     method: GET
     path: /nmdcschema/biosample_set/{id}
     params:
@@ -41,19 +42,20 @@ tools:
         description: NMDC biosample identifier
     response:
       format: json
+    entity: sample
 tests:
   searchStudies:
-    - name: retrieves microbiome studies
-      params:
-        max_page_size: 5
-      assert:
-        - path: resources
-          minLength: 1
-        - path: resources.0.id
-        - path: resources.0.name
+  - name: retrieves microbiome studies
+    params:
+      max_page_size: 5
+    assert:
+    - path: resources
+      minLength: 1
+    - path: resources.0.id
+    - path: resources.0.name
   getBiosample:
-    - name: gets biosample details by ID
-      params:
-        id: nmdc:bsm-11-ha8m2d60
-      assert:
-        - path: id
+  - name: gets biosample details by ID
+    params:
+      id: nmdc:bsm-13-amrnys72
+    assert:
+    - path: id

@@ -2,17 +2,17 @@ name: orthodb
 displayName: OrthoDB
 description: Hierarchical catalog of orthologs — gene evolutionary relationships
 tags:
-  - orthology
-  - evolution
-  - comparative-genomics
-  - orthodb
+- orthology
+- evolution
+- comparative-genomics
+- orthodb
 baseUrl: https://data.orthodb.org/v12
 tools:
   search:
     description: Search orthologous groups by gene name
     tags:
-      - ortholog-search
-      - gene-search
+    - ortholog-search
+    - gene-search
     method: GET
     path: /search
     params:
@@ -31,13 +31,14 @@ tools:
     response:
       format: json
       fields:
-        - status
-        - data
+      - status
+      - data
+    entity: gene
   getGroup:
     description: Get orthologous group details by OrthoDB group ID
     tags:
-      - ortholog-group
-      - group-info
+    - ortholog-group
+    - group-info
     method: GET
     path: /group
     params:
@@ -48,30 +49,31 @@ tools:
     response:
       format: json
       fields:
-        - status
-        - data.id
-        - data.name
-        - data.level_name
-        - data.tax_id
-        - data.evolutionary_rate
-        - data.phyletic_profile.gene_count
-        - data.phyletic_profile.species_count
-        - data.interpro_domains[].description
+      - status
+      - data.id
+      - data.name
+      - data.level_name
+      - data.tax_id
+      - data.evolutionary_rate
+      - data.phyletic_profile.gene_count
+      - data.phyletic_profile.species_count
+      - data.interpro_domains[].description
+    entity: gene
 tests:
   search:
-    - name: searches for BRCA1 orthologous groups
-      params:
-        query: BRCA1
-      assert:
-        - path: data
-          minLength: 1
-        - path: status
-          equals: ok
+  - name: searches for BRCA1 orthologous groups
+    params:
+      query: BRCA1
+    assert:
+    - path: data
+      minLength: 1
+    - path: status
+      equals: ok
   getGroup:
-    - name: gets orthologous group details
-      params:
-        id: 733642at2759
-      assert:
-        - path: data.id
-          equals: 733642at2759
-        - path: data.name
+  - name: gets orthologous group details
+    params:
+      id: 733642at2759
+    assert:
+    - path: data.id
+      equals: 733642at2759
+    - path: data.name

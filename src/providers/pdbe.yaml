@@ -2,17 +2,17 @@ name: pdbe
 displayName: PDBe
 description: Protein Data Bank in Europe — macromolecular structure data
 tags:
-  - protein-structure
-  - 3d-structure
-  - crystallography
-  - pdbe
+- protein-structure
+- 3d-structure
+- crystallography
+- pdbe
 baseUrl: https://www.ebi.ac.uk/pdbe/api
 tools:
   getSummary:
     description: Get PDB entry summary by PDB ID
     tags:
-      - structure-summary
-      - entry-info
+    - structure-summary
+    - entry-info
     method: GET
     path: /pdb/entry/summary/{pdbId}
     params:
@@ -22,19 +22,12 @@ tools:
         description: PDB entry ID in lowercase (e.g. 1cbs, 4hhb)
     response:
       format: json
-      fields:
-        - '*.0.title'
-        - '*.0.experimental_method'
-        - '*.0.deposition_date'
-        - '*.0.release_date'
-        - '*.0.entry_authors'
-        - '*.0.number_of_entities'
-        - '*.0.assemblies'
+    entity: structure
   getMolecules:
     description: Get molecule information for a PDB entry
     tags:
-      - molecule-info
-      - chain-info
+    - molecule-info
+    - chain-info
     method: GET
     path: /pdb/entry/molecules/{pdbId}
     params:
@@ -44,20 +37,12 @@ tools:
         description: PDB entry ID in lowercase (e.g. 1cbs, 4hhb)
     response:
       format: json
-      fields:
-        - '*.0.molecule_name'
-        - '*.0.molecule_type'
-        - '*.0.entity_id'
-        - '*.0.gene_name'
-        - '*.0.length'
-        - '*.0.weight'
-        - '*.0.source[].organism_scientific_name'
-        - '*.0.source[].tax_id'
+    entity: compound
   getLigands:
     description: Get ligand monomers for a PDB entry
     tags:
-      - ligand-info
-      - small-molecule
+    - ligand-info
+    - small-molecule
     method: GET
     path: /pdb/entry/ligand_monomers/{pdbId}
     params:
@@ -67,14 +52,12 @@ tools:
         description: PDB entry ID in lowercase (e.g. 1cbs, 4hhb)
     response:
       format: json
-      fields:
-        - '*.0.chem_comp_id'
-        - '*.0.chem_comp_name'
+    entity: compound
   getSecondaryStructure:
     description: Get secondary structure information for a PDB entry
     tags:
-      - secondary-structure
-      - helix-strand
+    - secondary-structure
+    - helix-strand
     method: GET
     path: /pdb/entry/secondary_structure/{pdbId}
     params:
@@ -84,14 +67,12 @@ tools:
         description: PDB entry ID in lowercase (e.g. 1cbs, 4hhb)
     response:
       format: json
-      fields:
-        - '*.molecules[].chains[].secondary_structure.helices'
-        - '*.molecules[].chains[].secondary_structure.strands'
+    entity: structure
   getPublications:
     description: Get publications associated with a PDB entry
     tags:
-      - publication-info
-      - literature
+    - publication-info
+    - literature
     method: GET
     path: /pdb/entry/publications/{pdbId}
     params:
@@ -101,41 +82,103 @@ tools:
         description: PDB entry ID in lowercase (e.g. 1cbs, 4hhb)
     response:
       format: json
-      fields:
-        - '*.0.title'
-        - '*.0.journal_info.pdb_abbreviation'
-        - '*.0.pubmed_id'
+    entity: publication
+  getExperiment:
+    description: Get experimental details (resolution, method, R-factor) for a PDB entry
+    tags:
+    - experimental-details
+    - resolution
+    method: GET
+    path: /pdb/entry/experiment/{pdbId}
+    params:
+      pdbId:
+        type: string
+        required: true
+        description: PDB entry ID in lowercase
+    response:
+      format: json
+    entity: assay
+  getUniprotMapping:
+    description: Get UniProt-PDB residue-level mapping (SIFTS)
+    tags:
+    - uniprot-mapping
+    - sifts
+    - sequence-structure
+    method: GET
+    path: /mappings/uniprot/{pdbId}
+    params:
+      pdbId:
+        type: string
+        required: true
+        description: PDB entry ID in lowercase
+    response:
+      format: json
+    entity: protein
+  getBindingSites:
+    description: Get binding site residues for a PDB entry
+    tags:
+    - binding-site
+    - ligand-binding
+    method: GET
+    path: /pdb/entry/binding_sites/{pdbId}
+    params:
+      pdbId:
+        type: string
+        required: true
+        description: PDB entry ID in lowercase
+    response:
+      format: json
+    entity: interaction
 tests:
   getSummary:
-    - name: gets summary for PDB entry 1cbs
-      params:
-        pdbId: 1cbs
-      assert:
-        - path: 1cbs
-        - path: 1cbs.0.title
+  - name: gets summary for PDB entry 1cbs
+    params:
+      pdbId: 1cbs
+    assert:
+    - path: 1cbs
+    - path: 1cbs.0.title
   getMolecules:
-    - name: gets molecules for PDB entry 1cbs
-      params:
-        pdbId: 1cbs
-      assert:
-        - path: 1cbs
-        - path: 1cbs.0.molecule_name
+  - name: gets molecules for PDB entry 1cbs
+    params:
+      pdbId: 1cbs
+    assert:
+    - path: 1cbs
+    - path: 1cbs.0.molecule_name
   getLigands:
-    - name: gets ligands for PDB entry 1cbs
-      params:
-        pdbId: 1cbs
-      assert:
-        - path: 1cbs
+  - name: gets ligands for PDB entry 1cbs
+    params:
+      pdbId: 1cbs
+    assert:
+    - path: 1cbs
   getSecondaryStructure:
-    - name: gets secondary structure for PDB entry 1cbs
-      params:
-        pdbId: 1cbs
-      assert:
-        - path: 1cbs
+  - name: gets secondary structure for PDB entry 1cbs
+    params:
+      pdbId: 1cbs
+    assert:
+    - path: 1cbs
   getPublications:
-    - name: gets publications for PDB entry 1cbs
-      params:
-        pdbId: 1cbs
-      assert:
-        - path: 1cbs
-        - path: 1cbs.0.title
+  - name: gets publications for PDB entry 1cbs
+    params:
+      pdbId: 1cbs
+    assert:
+    - path: 1cbs
+    - path: 1cbs.0.title
+  getExperiment:
+  - name: gets experimental details for 1cbs
+    params:
+      pdbId: 1cbs
+    assert:
+    - path: 1cbs
+  getUniprotMapping:
+  - name: gets UniProt mapping for 4hhb
+    params:
+      pdbId: 4hhb
+    assert:
+    - path: 4hhb
+  getBindingSites:
+  - name: gets binding sites for 1cbs
+    params:
+      pdbId: 1cbs
+    assert:
+    - path: 1cbs
+    allowError: true

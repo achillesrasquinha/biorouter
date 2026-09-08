@@ -2,18 +2,18 @@ name: panther
 displayName: PANTHER
 description: PANTHER — protein classification, gene ontology, and phylogenetic analysis
 tags:
-  - protein-classification
-  - gene-ontology
-  - panther
-  - phylogenetics
-  - functional
+- protein-classification
+- gene-ontology
+- panther
+- phylogenetics
+- functional
 baseUrl: https://pantherdb.org/services/oai/pantherdb
 tools:
   searchGenes:
     description: Search PANTHER for gene information and ortholog classification
     tags:
-      - gene-search
-      - ortholog-search
+    - gene-search
+    - ortholog-search
     method: GET
     path: /geneinfo
     params:
@@ -23,7 +23,7 @@ tools:
         description: Gene symbol or ID (e.g. "BRCA1")
       organism:
         type: string
-        default: "9606"
+        default: '9606'
         description: NCBI taxonomy ID (9606 = human)
       type:
         type: string
@@ -32,18 +32,19 @@ tools:
     response:
       format: json
       fields:
-        - search.product.source
-        - search.product.version
-        - search.mapped_genes.gene.family_id
-        - search.mapped_genes.gene.sf_id
-        - search.mapped_genes.gene.annotation_type_list.annotation_data_type[].content
-        - search.mapped_genes.gene.annotation_type_list.annotation_data_type[].annotation_list
+      - search.product.source
+      - search.product.version
+      - search.mapped_genes.gene.family_id
+      - search.mapped_genes.gene.sf_id
+      - search.mapped_genes.gene.annotation_type_list.annotation_data_type[].content
+      - search.mapped_genes.gene.annotation_type_list.annotation_data_type[].annotation_list
+    entity: gene
   getEnrichment:
     description: Run gene ontology enrichment analysis via PANTHER overrepresentation test
     tags:
-      - enrichment
-      - gene-ontology
-      - overrepresentation
+    - enrichment
+    - gene-ontology
+    - overrepresentation
     method: GET
     path: /enrich/overrep
     params:
@@ -53,7 +54,7 @@ tools:
         description: Comma-separated list of gene symbols
       organism:
         type: string
-        default: "9606"
+        default: '9606'
         description: NCBI taxonomy ID
       annotDataSet:
         type: string
@@ -70,27 +71,30 @@ tools:
     response:
       format: json
       fields:
-        - results.result[].term.id
-        - results.result[].term.label
-        - results.result[].number_in_list
-        - results.result[].number_in_reference
-        - results.result[].expected
-        - results.result[].fold_enrichment
-        - results.result[].pValue
-        - results.result[].fdr
-        - results.result[].plus_minus
+      - results.reference
+      - results.input_list
+      - results.result[].term.id
+      - results.result[].term.label
+      - results.result[].number_in_list
+      - results.result[].number_in_reference
+      - results.result[].expected
+      - results.result[].fold_enrichment
+      - results.result[].pValue
+      - results.result[].fdr
+      - results.result[].plus_minus
+    entity: pathway
 tests:
   searchGenes:
-    - name: searches gene info for BRCA1
-      params:
-        geneInputList: BRCA1
-      assert:
-        - path: search
-        - path: search.mapped_genes
+  - name: searches gene info for BRCA1
+    params:
+      geneInputList: BRCA1
+    assert:
+    - path: search
+    - path: search.mapped_genes
   getEnrichment:
-    - name: runs enrichment analysis for BRCA1,TP53
-      params:
-        geneInputList: BRCA1,TP53
-      assert:
-        - path: results
-        - path: results.reference
+  - name: runs enrichment analysis for BRCA1,TP53
+    params:
+      geneInputList: BRCA1,TP53
+    assert:
+    - path: results
+    - path: results.reference

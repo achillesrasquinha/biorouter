@@ -2,19 +2,18 @@ name: atc
 displayName: ATC Classification
 description: ATC (Anatomical Therapeutic Chemical) drug classification via RxNav/RxClass API
 tags:
-  - drug-classification
-  - atc
-  - pharmacology
-  - rxclass
-  - medication
+- drug-classification
+- atc
+- pharmacology
+- rxclass
+- medication
 baseUrl: https://rxnav.nlm.nih.gov/REST/rxclass
-
 tools:
   searchByDrug:
     description: Find ATC classes for a given drug name
     tags:
-      - drug-lookup
-      - atc-search
+    - drug-lookup
+    - atc-search
     method: GET
     path: /class/byDrugName.json
     params:
@@ -29,19 +28,19 @@ tools:
     response:
       format: json
       fields:
-        - rxclassDrugInfoList.rxclassDrugInfo[].minConcept.rxcui
-        - rxclassDrugInfoList.rxclassDrugInfo[].minConcept.name
-        - rxclassDrugInfoList.rxclassDrugInfo[].minConcept.tty
-        - rxclassDrugInfoList.rxclassDrugInfo[].rxclassMinConceptItem.classId
-        - rxclassDrugInfoList.rxclassDrugInfo[].rxclassMinConceptItem.className
-        - rxclassDrugInfoList.rxclassDrugInfo[].rxclassMinConceptItem.classType
-        - rxclassDrugInfoList.rxclassDrugInfo[].relaSource
-
+      - rxclassDrugInfoList.rxclassDrugInfo[].minConcept.rxcui
+      - rxclassDrugInfoList.rxclassDrugInfo[].minConcept.name
+      - rxclassDrugInfoList.rxclassDrugInfo[].minConcept.tty
+      - rxclassDrugInfoList.rxclassDrugInfo[].rxclassMinConceptItem.classId
+      - rxclassDrugInfoList.rxclassDrugInfo[].rxclassMinConceptItem.className
+      - rxclassDrugInfoList.rxclassDrugInfo[].rxclassMinConceptItem.classType
+      - rxclassDrugInfoList.rxclassDrugInfo[].relaSource
+    entity: compound
   getClassMembers:
     description: Get drugs belonging to an ATC class
     tags:
-      - class-members
-      - atc-class
+    - class-members
+    - atc-class
     method: GET
     path: /classMembers.json
     params:
@@ -56,24 +55,24 @@ tools:
     response:
       format: json
       fields:
-        - drugMemberGroup.drugMember[].minConcept.rxcui
-        - drugMemberGroup.drugMember[].minConcept.name
-        - drugMemberGroup.drugMember[].minConcept.tty
-        - drugMemberGroup.drugMember[].nodeAttr[].attrName
-        - drugMemberGroup.drugMember[].nodeAttr[].attrValue
-
+      - drugMemberGroup.drugMember[].minConcept.rxcui
+      - drugMemberGroup.drugMember[].minConcept.name
+      - drugMemberGroup.drugMember[].minConcept.tty
+      - drugMemberGroup.drugMember[].nodeAttr[].attrName
+      - drugMemberGroup.drugMember[].nodeAttr[].attrValue
+    entity: ontology-term
 tests:
   searchByDrug:
-    - name: finds ATC class for metformin
-      params:
-        drugName: metformin
-      assert:
-        - {}
-      allowError: true
+  - name: finds ATC class for metformin
+    params:
+      drugName: metformin
+    assert:
+    - {}
+    allowError: true
   getClassMembers:
-    - name: gets members of biguanides ATC class
-      params:
-        classId: A10BA
-      assert:
-        - {}
-      allowError: true
+  - name: gets members of biguanides ATC class
+    params:
+      classId: A10BA
+    assert:
+    - {}
+    allowError: true

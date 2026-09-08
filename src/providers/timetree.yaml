@@ -2,18 +2,18 @@ name: timetree
 displayName: TimeTree
 description: TimeTree — divergence time estimates between species pairs
 tags:
-  - evolution
-  - divergence
-  - phylogenetics
-  - timetree
-  - species
+- evolution
+- divergence
+- phylogenetics
+- timetree
+- species
 baseUrl: https://timetree.org/api
 tools:
   getPairwiseTime:
     description: Get estimated divergence time between two species
     tags:
-      - divergence-time
-      - species-pair
+    - divergence-time
+    - species-pair
     method: GET
     path: /pairwise/{taxonA}/{taxonB}
     params:
@@ -28,15 +28,16 @@ tools:
     response:
       format: json
       fields:
-        - studies[].time
-        - studies[].citation
-        - studies[].taxon_a
-        - studies[].taxon_b
+      - studies[].time
+      - studies[].citation
+      - studies[].taxon_a
+      - studies[].taxon_b
+    entity: organism
   getTimeline:
     description: Get evolutionary timeline for a taxon
     tags:
-      - timeline
-      - evolution-history
+    - timeline
+    - evolution-history
     method: GET
     path: /timeline/{taxon}
     params:
@@ -47,19 +48,20 @@ tools:
     response:
       format: json
       fields:
-        - "[].scientific_name"
-        - "[].common_name"
-        - "[].rank"
-        - "[].branch_length"
-        - "[].ncbi-id"
+      - '[].scientific_name'
+      - '[].common_name'
+      - '[].rank'
+      - '[].branch_length'
+      - '[].ncbi-id'
+    entity: organism
 tests:
   getPairwiseTime:
-    - name: gets pairwise divergence time between Homo sapiens and Mus musculus
-      params:
-        taxonA: Homo sapiens
-        taxonB: Mus musculus
-      assert:
-        - {}
-        - anyOf:
-            - studies
-            - time
+  - name: gets pairwise divergence time between Homo sapiens and Mus musculus
+    params:
+      taxonA: Homo sapiens
+      taxonB: Mus musculus
+    assert:
+    - {}
+    - anyOf:
+      - studies
+      - time

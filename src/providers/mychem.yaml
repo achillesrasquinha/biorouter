@@ -2,18 +2,18 @@ name: mychem
 displayName: MyChem.info
 description: Chemical and drug annotation query service — aggregates compound data from multiple sources
 tags:
-  - chemical
-  - drug
-  - compound
-  - biothings
-  - pharmacology
+- chemical
+- drug
+- compound
+- biothings
+- pharmacology
 baseUrl: https://mychem.info/v1
 tools:
   search:
     description: Search for chemicals or drugs by keyword or query
     tags:
-      - drug-search
-      - chemical-search
+    - drug-search
+    - chemical-search
     method: GET
     path: /query
     params:
@@ -29,18 +29,19 @@ tools:
     response:
       format: json
       fields:
-        - total
-        - hits[]._id
-        - hits[]._score
-        - hits[].chebi
-        - hits[].chembl
-        - hits[].drugbank
-        - hits[].pubchem
+      - total
+      - hits[]._id
+      - hits[]._score
+      - hits[].chebi
+      - hits[].chembl
+      - hits[].drugbank
+      - hits[].pubchem
+    entity: compound
   getDrug:
     description: Get chemical/drug annotation by ID
     tags:
-      - drug-info
-      - compound-info
+    - drug-info
+    - compound-info
     method: GET
     path: /chem/{chemId}
     params:
@@ -51,25 +52,26 @@ tools:
     response:
       format: json
       fields:
-        - _id
-        - chebi
-        - chembl
-        - drugbank
-        - pubchem
-        - umls
+      - _id
+      - chebi
+      - chembl
+      - drugbank
+      - pubchem
+      - umls
+    entity: compound
 tests:
   search:
-    - name: searches for aspirin
-      params:
-        query: aspirin
-      assert:
-        - path: hits
-          minLength: 1
+  - name: searches for aspirin
+    params:
+      query: aspirin
+    assert:
+    - path: hits
+      minLength: 1
   getDrug:
-    - name: gets drug annotation by ChEMBL ID
-      params:
-        chemId: CHEMBL25
-      assert:
-        - anyOf:
-            - _id
-            - chembl
+  - name: gets drug annotation by ChEMBL ID
+    params:
+      chemId: CHEMBL25
+    assert:
+    - anyOf:
+      - _id
+      - chembl

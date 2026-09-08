@@ -2,18 +2,20 @@ name: cath
 displayName: CATH
 description: Protein structure classification database — hierarchical domain classification
 tags:
-  - protein-structure
-  - classification
-  - domain
-  - superfamily
-  - cath
+- protein-structure
+- classification
+- domain
+- superfamily
+- cath
 baseUrl: https://www.cathdb.info/version/v4_3_0/api/rest
+headers:
+  Accept: application/json
 tools:
   getSuperfamily:
     description: Get details of a CATH superfamily
     tags:
-      - superfamily
-      - classification
+    - superfamily
+    - classification
     method: GET
     path: /superfamily/{superfamilyId}
     params:
@@ -24,17 +26,19 @@ tools:
     response:
       format: json
       fields:
-        - "data.classification_description"
-        - "data.cath_id_depth"
-        - "data.example_domain_id"
-        - "data.child_count_s35_code"
+      - data.classification_name
+      - data.classification_description
+      - data.cath_id_depth
+      - data.example_domain_id
+      - data.child_count_s35_code
+    entity: structure
   getDomain:
     description: Get domain summary by CATH domain ID
     tags:
-      - domain
-      - protein-domain
+    - domain
+    - protein-domain
     method: GET
-    path: /id/{domainId}
+    path: /domain_summary/{domainId}
     params:
       domainId:
         type: string
@@ -42,17 +46,18 @@ tools:
         description: CATH domain ID (e.g. "1xmkA00")
     response:
       format: json
+    entity: structure
 tests:
   getSuperfamily:
-    - name: gets superfamily details for 1.10.10.10
-      params:
-        superfamilyId: "1.10.10.10"
-      assert:
-        - path: data.classification_description
-        - path: data.example_domain_id
+  - name: gets superfamily details for 1.10.10.10
+    params:
+      superfamilyId: 1.10.10.10
+    assert:
+    - path: data.classification_name
+    - path: data.example_domain_id
   getDomain:
-    - name: gets domain summary for 1xmkA00
-      params:
-        domainId: 1xmkA00
-      assert:
-        - path: data
+  - name: gets domain summary for 1xmkA00
+    params:
+      domainId: 1xmkA00
+    assert:
+    - path: data

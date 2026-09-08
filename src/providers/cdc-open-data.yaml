@@ -2,18 +2,18 @@ name: cdc-open-data
 displayName: CDC Open Data
 description: CDC Open Data — public health datasets via the Socrata Open Data API
 tags:
-  - public-health
-  - cdc
-  - open-data
-  - socrata
-  - health-statistics
+- public-health
+- cdc
+- open-data
+- socrata
+- health-statistics
 baseUrl: https://data.cdc.gov/resource
 tools:
   queryDataset:
     description: Query a specific CDC dataset by dataset ID using SoQL filters
     tags:
-      - dataset-query
-      - public-health-query
+    - dataset-query
+    - public-health-query
     method: GET
     path: /{datasetId}.json
     params:
@@ -23,27 +23,28 @@ tools:
         description: Socrata dataset identifier (e.g. "bi63-dtpu" for chronic disease indicators)
       $where:
         type: string
-        description: "SoQL WHERE clause to filter results (e.g. \"yearstart='2020'\")"
+        description: SoQL WHERE clause to filter results (e.g. "yearstart='2020'")
       $limit:
         type: integer
         default: 10
         description: Maximum number of records to return
       $select:
         type: string
-        description: "Comma-separated list of columns to return (e.g. \"yearstart,locationdesc,topic\")"
+        description: Comma-separated list of columns to return (e.g. "yearstart,locationdesc,topic")
     response:
       format: json
       fields:
-        - "[].year"
-        - "[].cause_name"
-        - "[].state"
-        - "[].deaths"
-        - "[].aadr"
+      - '[].year'
+      - '[].cause_name'
+      - '[].state'
+      - '[].deaths'
+      - '[].aadr'
+    entity: dataset
   searchDatasets:
     description: Search the CDC data catalog for available datasets
     tags:
-      - dataset-search
-      - catalog-search
+    - dataset-search
+    - catalog-search
     baseUrl: https://api.us.socrata.com/api/catalog/v1
     method: GET
     path: /
@@ -63,25 +64,26 @@ tools:
     response:
       format: json
       fields:
-        - results[].resource.name
-        - results[].resource.description
-        - results[].resource.id
-        - results[].resource.updatedAt
+      - results[].resource.name
+      - results[].resource.description
+      - results[].resource.id
+      - results[].resource.updatedAt
+    entity: dataset
 tests:
   queryDataset:
-    - name: queries chronic disease indicators dataset
-      params:
-        datasetId: bi63-dtpu
-        $limit: 5
-      assert:
-        - minLength: 1
-      allowError: true
+  - name: queries chronic disease indicators dataset
+    params:
+      datasetId: bi63-dtpu
+      $limit: 5
+    assert:
+    - minLength: 1
+    allowError: true
   searchDatasets:
-    - name: searches CDC catalog for COVID-19 datasets
-      params:
-        q: COVID-19
-        domains: data.cdc.gov
-        limit: 5
-      assert:
-        - minLength: 1
-      allowError: true
+  - name: searches CDC catalog for COVID-19 datasets
+    params:
+      q: COVID-19
+      domains: data.cdc.gov
+      limit: 5
+    assert:
+    - minLength: 1
+    allowError: true

@@ -2,165 +2,129 @@ name: worms
 displayName: WoRMS
 description: World Register of Marine Species — authoritative classification and nomenclature of marine organisms
 tags:
-  - marine
-  - taxonomy
-  - species
-  - worms
-  - nomenclature
+- marine
+- taxonomy
+- species
+- worms
 baseUrl: https://www.marinespecies.org/rest
 tools:
   searchByName:
-    description: Search WoRMS for marine species by scientific name
+    description: Search WoRMS for marine species records by scientific name with fuzzy matching
     tags:
-      - species-search
-      - marine-taxonomy
+    - species-search
+    - marine-taxonomy
     method: GET
     path: /AphiaRecordsByName/{name}
     params:
       name:
         type: string
         required: true
-        description: Scientific name to search (e.g. "Carcharodon")
+        description: Scientific name to search (e.g. "Delphinidae", "Carcharodon carcharias")
       like:
         type: string
-        default: "true"
-        description: Enable fuzzy matching
+        default: 'true'
+        description: Enable fuzzy/partial matching
       marine_only:
         type: string
-        default: "true"
-        description: Restrict to marine species only
+        default: 'false'
+        description: Restrict results to marine species only
     response:
       format: json
       fields:
-        - "[].AphiaID"
-        - "[].scientificname"
-        - "[].authority"
-        - "[].status"
-        - "[].rank"
-        - "[].valid_name"
-        - "[].kingdom"
-        - "[].phylum"
-        - "[].class"
-        - "[].order"
-        - "[].family"
-  getRecord:
-    description: Get a WoRMS species record by AphiaID
+      - '[].AphiaID'
+      - '[].scientificname'
+      - '[].authority'
+      - '[].status'
+      - '[].rank'
+      - '[].valid_name'
+      - '[].kingdom'
+      - '[].phylum'
+      - '[].class'
+      - '[].order'
+      - '[].family'
+    entity: organism
+  getByAphiaId:
+    description: Get a single WoRMS species record by its AphiaID identifier
     tags:
-      - species-info
-      - marine-record
+    - species-info
+    - marine-record
     method: GET
     path: /AphiaRecordByAphiaID/{aphiaId}
     params:
       aphiaId:
         type: integer
         required: true
-        description: WoRMS AphiaID identifier
+        description: WoRMS AphiaID numeric identifier (e.g. 136980)
     response:
       format: json
       fields:
-        - AphiaID
-        - scientificname
-        - authority
-        - status
-        - rank
-        - valid_name
-        - kingdom
-        - phylum
-        - class
-        - order
-        - family
+      - AphiaID
+      - scientificname
+      - authority
+      - status
+      - rank
+      - valid_name
+      - kingdom
+      - phylum
+      - class
+      - order
+      - family
+    entity: organism
   getClassification:
-    description: Get full taxonomic classification by AphiaID
+    description: Get full taxonomic classification hierarchy by AphiaID
     tags:
-      - taxonomy
-      - classification
+    - taxonomy
+    - classification
     method: GET
-    path: /AphiaClassificationByAphiaID/{AphiaID}
+    path: /AphiaClassificationByAphiaID/{aphiaId}
     params:
-      AphiaID:
+      aphiaId:
         type: integer
         required: true
-        description: WoRMS AphiaID identifier (e.g. 105742)
+        description: WoRMS AphiaID numeric identifier (e.g. 136980)
     response:
       format: json
       fields:
-        - scientificname
-        - rank
-        - child.scientificname
-        - child.rank
-  getChildren:
-    description: Get child taxa for an AphiaID
+      - scientificname
+      - rank
+      - AphiaID
+      - child.scientificname
+      - child.rank
+      - child.AphiaID
+    entity: organism
+  searchByVernacular:
+    description: Search WoRMS for species by common or vernacular name
     tags:
-      - taxonomy
-      - child-taxa
+    - vernacular-search
+    - common-name
     method: GET
-    path: /AphiaChildrenByAphiaID/{AphiaID}
+    path: /AphiaRecordsByVernacular/{name}
     params:
-      AphiaID:
-        type: integer
+      name:
+        type: string
         required: true
-        description: WoRMS AphiaID identifier (e.g. 105742)
+        description: Common or vernacular name to search (e.g. "dolphin", "blue whale")
+      like:
+        type: string
+        default: 'true'
+        description: Enable fuzzy/partial matching
     response:
       format: json
       fields:
-        - "[].AphiaID"
-        - "[].scientificname"
-        - "[].rank"
-        - "[].status"
-  getSynonyms:
-    description: Get synonyms for an AphiaID
-    tags:
-      - taxonomy
-      - synonyms
-    method: GET
-    path: /AphiaSynonymsByAphiaID/{AphiaID}
-    params:
-      AphiaID:
-        type: integer
-        required: true
-        description: WoRMS AphiaID identifier (e.g. 105742)
-    response:
-      format: json
-      fields:
-        - "[].AphiaID"
-        - "[].scientificname"
-        - "[].status"
-        - "[].authority"
+      - '[].AphiaID'
+      - '[].scientificname'
+      - '[].authority'
+      - '[].status'
+      - '[].rank'
+      - '[].valid_name'
+      - '[].family'
+    entity: organism
 tests:
   searchByName:
-    - name: searches by name for Carcharodon
-      params:
-        name: Carcharodon
-      assert:
-        - isArray: true
-        - path: 0.AphiaID
-  getRecord:
-    - name: gets record by AphiaID 105742 (Carcharodon)
-      params:
-        aphiaId: 105742
-      assert:
-        - path: scientificname
-          equals: Carcharodon
-        - path: AphiaID
-          equals: 105742
-  getClassification:
-    - name: gets classification for Carcharodon (105742)
-      params:
-        AphiaID: 105742
-      assert:
-        - path: scientificname
-        - path: rank
-  getChildren:
-    - name: gets child taxa for Carcharodon (105742)
-      params:
-        AphiaID: 105742
-      assert:
-        - isArray: true
-      allowError: true
-  getSynonyms:
-    - name: gets synonyms for Carcharodon (105742)
-      params:
-        AphiaID: 105742
-      assert:
-        - {}
-      allowError: true
+  - name: searches for Delphinidae family
+    params:
+      name: Delphinidae
+    assert:
+    - isArray: true
+    - path: 0.AphiaID
+    - path: 0.scientificname

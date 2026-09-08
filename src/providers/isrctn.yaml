@@ -1,0 +1,80 @@
+name: isrctn
+displayName: ISRCTN Registry
+description: ISRCTN clinical trial registry — international database of clinical studies
+tags:
+- clinical-trials
+- registry
+- isrctn
+baseUrl: https://www.isrctn.com/api/query
+tools:
+  search:
+    description: Search the ISRCTN registry for clinical trials by condition, intervention, or keyword
+    tags:
+    - trial-search
+    - clinical-study-search
+    method: GET
+    path: /Search
+    params:
+      query:
+        type: string
+        required: true
+        mapsTo: q
+        description: Search terms (e.g. "diabetes", "cancer immunotherapy", "COVID-19 vaccine")
+      pageSize:
+        type: integer
+        default: 10
+        description: Number of results per page
+    response:
+      format: json
+      fields:
+      - totalCount
+      - items[].isrctn
+      - items[].title
+      - items[].condition
+      - items[].intervention
+      - items[].recruitmentStatus
+      - items[].lastEdited
+    entity: dataset
+  getTrial:
+    description: Get details of a specific ISRCTN clinical trial by its registration number
+    tags:
+    - trial-info
+    - trial-details
+    method: GET
+    path: /ISRCTN{id}
+    params:
+      id:
+        type: string
+        required: true
+        description: ISRCTN numeric identifier (e.g. "13340584" for ISRCTN13340584)
+    response:
+      format: json
+      fields:
+      - isrctn
+      - title
+      - condition
+      - intervention
+      - recruitmentStatus
+      - trialDesign
+      - primaryOutcome
+      - secondaryOutcome
+      - sponsorOrganisation
+      - overallStartDate
+      - overallEndDate
+    entity: dataset
+tests:
+  search:
+  - name: searches for diabetes clinical trials
+    params:
+      query: diabetes
+      pageSize: 5
+    assert:
+    - isNotEmpty: true
+    allowError: true
+  getTrial:
+  - name: gets trial ISRCTN13340584
+    params:
+      id: '13340584'
+    assert:
+    - isNotEmpty: true
+    allowError: true

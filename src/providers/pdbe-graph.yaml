@@ -2,18 +2,18 @@ name: pdbe-graph
 displayName: PDBe Graph API
 description: PDBe Graph API — programmatic access to PDB structure data, compounds, and protein mappings
 tags:
-  - structure
-  - pdb
-  - protein
-  - compound
-  - ebi
+- structure
+- pdb
+- protein
+- compound
+- ebi
 baseUrl: https://www.ebi.ac.uk/pdbe/graph-api
 tools:
   getCompoundSummary:
     description: Get summary information for a chemical compound in PDB
     tags:
-      - compound-info
-      - ligand
+    - compound-info
+    - ligand
     method: GET
     path: /compound/summary/{compId}
     params:
@@ -23,11 +23,12 @@ tools:
         description: PDB compound ID (e.g. ATP, HEM, NAD)
     response:
       format: json
+    entity: compound
   getUniprotSummary:
     description: Get PDB structure summary for a UniProt accession
     tags:
-      - protein-structure
-      - uniprot-mapping
+    - protein-structure
+    - uniprot-mapping
     method: GET
     path: /uniprot/summary/{accession}
     params:
@@ -37,11 +38,12 @@ tools:
         description: UniProt accession (e.g. P00734, P53_HUMAN)
     response:
       format: json
+    entity: protein
   getMolecules:
     description: Get molecule details for a PDB entry
     tags:
-      - molecule-info
-      - pdb-entry
+    - molecule-info
+    - pdb-entry
     method: GET
     path: /pdb/entry/molecules/{pdbId}
     params:
@@ -51,10 +53,11 @@ tools:
         description: PDB ID (e.g. 1a2k, 4hhb)
     response:
       format: json
+    entity: compound
 tests:
   getCompoundSummary:
-    - name: gets ATP compound summary
-      params:
-        compId: ATP
-      assert:
-        - path: ATP
+  - name: gets ATP compound summary
+    params:
+      compId: ATP
+    assert:
+    - path: ATP

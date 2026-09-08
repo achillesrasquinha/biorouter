@@ -2,18 +2,18 @@ name: swisslipids
 displayName: SwissLipids
 description: SwissLipids — curated knowledge resource for lipid biology and lipidomics
 tags:
-  - lipidomics
-  - lipids
-  - swisslipids
-  - metabolism
-  - fatty-acids
+- lipidomics
+- lipids
+- swisslipids
+- metabolism
+- fatty-acids
 baseUrl: https://www.swisslipids.org/api
 tools:
   search:
     description: Search SwissLipids for lipid entities by name or keyword
     tags:
-      - lipid-search
-      - lipidomics-search
+    - lipid-search
+    - lipidomics-search
     method: GET
     path: /search
     params:
@@ -24,16 +24,17 @@ tools:
     response:
       format: json
       fields:
-        - "[].id"
-        - "[].name"
-        - "[].synonyms"
-        - "[].formula"
-        - "[].mass"
+      - '[].id'
+      - '[].name'
+      - '[].synonyms'
+      - '[].formula'
+      - '[].mass'
+    entity: dataset
   getEntity:
     description: Get detailed lipid entity information by SwissLipids identifier
     tags:
-      - lipid-detail
-      - lipid-info
+    - lipid-detail
+    - lipid-info
     method: GET
     path: /entity/{id}
     params:
@@ -44,22 +45,23 @@ tools:
     response:
       format: json
       fields:
-        - id
-        - name
-        - level
-        - formula
-        - mass
-        - smiles
+      - id
+      - name
+      - level
+      - formula
+      - mass
+      - smiles
+    entity: compound
 tests:
   search:
-    - name: searches for cholesterol
-      params:
-        term: cholesterol
-      assert:
-        - {}
+  - name: searches for cholesterol
+    params:
+      term: cholesterol
+    assert:
+    - {}
   getEntity:
-    - name: gets a lipid entity
-      params:
-        id: SLM:000000224
-      assert:
-        - {}
+  - name: gets a lipid entity
+    params:
+      id: SLM:000000224
+    assert:
+    - {}

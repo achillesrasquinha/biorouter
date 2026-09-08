@@ -1,13 +1,19 @@
 name: classyfire
 displayName: ClassyFire
 description: Automated chemical classification using the ChemOnt ontology
-tags: [chemistry, classification, chemical-taxonomy, chemont, metabolites]
+tags:
+- chemistry
+- classification
+- chemical-taxonomy
+- chemont
+- metabolites
 baseUrl: http://classyfire.wishartlab.com
-
 tools:
   classify:
     description: Classify a chemical compound by InChIKey
-    tags: [chemical-classification, compound-info]
+    tags:
+    - chemical-classification
+    - compound-info
     method: GET
     path: /entities/{inchikey}.json
     params:
@@ -18,22 +24,22 @@ tools:
     response:
       format: json
       fields:
-        - inchikey
-        - smiles
-        - kingdom.name
-        - superclass.name
-        - class.name
-        - subclass.name
-        - direct_parent.name
-        - molecular_framework
-        - description
-
+      - inchikey
+      - smiles
+      - kingdom.name
+      - superclass.name
+      - class.name
+      - subclass.name
+      - direct_parent.name
+      - molecular_framework
+      - description
+    entity: ontology-term
 tests:
   classify:
-    - name: classifies aspirin by InChIKey
-      params:
-        inchikey: BSYNRYMUTXBXSQ-UHFFFAOYSA-N
-      assert:
-        - path: inchikey
-        - path: kingdom.name
-      allowError: true
+  - name: classifies aspirin by InChIKey
+    params:
+      inchikey: BSYNRYMUTXBXSQ-UHFFFAOYSA-N
+    assert:
+    - path: inchikey
+    - path: kingdom.name
+    allowError: true

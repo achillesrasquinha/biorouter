@@ -2,18 +2,18 @@ name: uniprot
 displayName: UniProt
 description: Universal Protein Resource — protein sequence and functional information
 tags:
-  - protein
-  - sequence
-  - annotation
-  - function
-  - uniprot
+- protein
+- sequence
+- annotation
+- function
+- uniprot
 baseUrl: https://rest.uniprot.org
 tools:
   search:
     description: Search UniProt proteins by keyword
     tags:
-      - protein-search
-      - sequence-search
+    - protein-search
+    - sequence-search
     method: GET
     path: /uniprotkb/search
     params:
@@ -31,17 +31,18 @@ tools:
     response:
       format: json
       fields:
-        - results[].primaryAccession
-        - results[].uniProtkbId
-        - results[].organism.scientificName
-        - results[].proteinDescription.recommendedName.fullName.value
-        - results[].genes[].geneName.value
-        - results[].sequence.length
+      - results[].primaryAccession
+      - results[].uniProtkbId
+      - results[].organism.scientificName
+      - results[].proteinDescription.recommendedName.fullName.value
+      - results[].genes[].geneName.value
+      - results[].sequence.length
+    entity: protein
   getEntry:
     description: Get a UniProt protein entry by accession
     tags:
-      - protein-info
-      - accession
+    - protein-info
+    - accession
     method: GET
     path: /uniprotkb/{accession}
     params:
@@ -55,27 +56,28 @@ tools:
     response:
       format: json
       fields:
-        - primaryAccession
-        - uniProtkbId
-        - entryType
-        - organism.scientificName
-        - organism.commonName
-        - organism.taxonId
-        - proteinDescription.recommendedName.fullName.value
-        - genes[].geneName.value
-        - sequence.length
-        - sequence.value
-        - annotationScore
-        - features[].type
-        - features[].location.start.value
-        - features[].location.end.value
-        - features[].description
-        - comments[].subcellularLocations[].location.value
+      - primaryAccession
+      - uniProtkbId
+      - entryType
+      - organism.scientificName
+      - organism.commonName
+      - organism.taxonId
+      - proteinDescription.recommendedName.fullName.value
+      - genes[].geneName.value
+      - sequence.length
+      - sequence.value
+      - annotationScore
+      - features[].type
+      - features[].location.start.value
+      - features[].location.end.value
+      - features[].description
+      - comments[].subcellularLocations[].location.value
+    entity: protein
   getFeatures:
     description: Get protein features and domains for a UniProt entry
     tags:
-      - protein-features
-      - domains
+    - protein-features
+    - domains
     method: GET
     path: /uniprotkb/{accession}
     params:
@@ -86,15 +88,16 @@ tools:
     response:
       format: json
       fields:
-        - features[].type
-        - features[].location.start.value
-        - features[].location.end.value
-        - features[].description
+      - features[].type
+      - features[].location.start.value
+      - features[].location.end.value
+      - features[].description
+    entity: protein
   getSubcellularLocation:
     description: Get subcellular location information for a UniProt entry
     tags:
-      - subcellular-location
-      - localization
+    - subcellular-location
+    - localization
     method: GET
     path: /uniprotkb/{accession}
     params:
@@ -112,13 +115,14 @@ tools:
     response:
       format: json
       fields:
-        - primaryAccession
-        - comments[].subcellularLocations[].location.value
+      - primaryAccession
+      - comments[].subcellularLocations[].location.value
+    entity: protein
   getProteome:
     description: Get proteome information by proteome ID
     tags:
-      - proteome
-      - organism
+    - proteome
+    - organism
     method: GET
     path: /proteomes/{proteomeId}
     params:
@@ -129,17 +133,18 @@ tools:
     response:
       format: json
       fields:
-        - id
-        - description
-        - taxonomy.taxonId
-        - taxonomy.scientificName
-        - proteinCount
+      - id
+      - description
+      - taxonomy.taxonId
+      - taxonomy.scientificName
+      - proteinCount
+    entity: protein
   searchUniRef:
     description: Search UniRef clusters for sequence similarity groupings
     tags:
-      - uniref
-      - cluster
-      - sequence-similarity
+    - uniref
+    - cluster
+    - sequence-similarity
     method: GET
     path: /uniref/search
     params:
@@ -154,16 +159,17 @@ tools:
     response:
       format: json
       fields:
-        - results[].id
-        - results[].name
-        - results[].memberCount
-        - results[].representativeMember.memberIdType
+      - results[].id
+      - results[].name
+      - results[].memberCount
+      - results[].representativeMember.memberIdType
+    entity: sequence
   getUniParcEntry:
     description: Get UniParc cross-reference archive entry by UPI identifier
     tags:
-      - uniparc
-      - cross-reference
-      - archive
+    - uniparc
+    - cross-reference
+    - archive
     method: GET
     path: /uniparc/{upi}
     params:
@@ -174,61 +180,126 @@ tools:
     response:
       format: json
       fields:
-        - uniParcId
-        - uniParcCrossReferences[].database
-        - uniParcCrossReferences[].id
+      - uniParcId
+      - uniParcCrossReferences[].database
+      - uniParcCrossReferences[].id
+    entity: sequence
+  getTaxonomy:
+    description: Look up taxonomy information by taxon ID
+    tags:
+    - taxonomy
+    - organism
+    method: GET
+    path: /taxonomy/{taxonId}
+    params:
+      taxonId:
+        type: integer
+        required: true
+        description: NCBI taxonomy ID (e.g. 9606 for human)
+      format:
+        type: string
+        default: json
+    response:
+      format: json
+      fields:
+      - taxonId
+      - scientificName
+      - commonName
+      - mnemonic
+      - rank
+    entity: organism
+  searchDiseases:
+    description: Search UniProt disease database
+    tags:
+    - disease-search
+    - disease-gene
+    method: GET
+    path: /diseases/search
+    params:
+      query:
+        type: string
+        required: true
+        description: Disease name or keyword
+      size:
+        type: integer
+        default: 10
+      format:
+        type: string
+        default: json
+    response:
+      format: json
+      fields:
+      - results[].name
+      - results[].id
+      - results[].acronym
+      - results[].definition
+    entity: disease
 tests:
   search:
-    - name: searches for BRCA1 human
-      params:
-        query: BRCA1 AND organism_id:9606
-      assert:
-        - path: results
-          minLength: 1
-        - path: results.0.primaryAccession
+  - name: searches for BRCA1 human
+    params:
+      query: BRCA1 AND organism_id:9606
+    assert:
+    - path: results
+      minLength: 1
+    - path: results.0.primaryAccession
   getEntry:
-    - name: gets entry by accession
-      params:
-        accession: P00533
-      assert:
-        - path: primaryAccession
-          equals: P00533
-        - path: proteinDescription
+  - name: gets entry by accession
+    params:
+      accession: P00533
+    assert:
+    - path: primaryAccession
+      equals: P00533
+    - path: proteinDescription
   getFeatures:
-    - name: gets protein features for P04637
-      params:
-        accession: P04637
-      assert:
-        - path: features
-          minLength: 1
-        - path: features.0.type
+  - name: gets protein features for P04637
+    params:
+      accession: P04637
+    assert:
+    - path: features
+      minLength: 1
+    - path: features.0.type
   getSubcellularLocation:
-    - name: gets subcellular location for P04637
-      params:
-        accession: P04637
-      assert:
-        - path: primaryAccession
-          equals: P04637
+  - name: gets subcellular location for P04637
+    params:
+      accession: P04637
+    assert:
+    - path: primaryAccession
+      equals: P04637
   getProteome:
-    - name: gets human proteome info
-      params:
-        proteomeId: UP000005640
-      assert:
-        - path: id
-          equals: UP000005640
-        - path: taxonomy.scientificName
+  - name: gets human proteome info
+    params:
+      proteomeId: UP000005640
+    assert:
+    - path: id
+      equals: UP000005640
+    - path: taxonomy.scientificName
   searchUniRef:
-    - name: searches UniRef clusters for P53
-      params:
-        query: P53
-      assert:
-        - path: results
-          minLength: 1
-        - path: results.0.id
+  - name: searches UniRef clusters for P53
+    params:
+      query: P53
+    assert:
+    - path: results
+      minLength: 1
+    - path: results.0.id
   getUniParcEntry:
-    - name: gets UniParc entry by UPI
-      params:
-        upi: UPI000000000A
-      assert:
-        - path: uniParcId
-          equals: UPI000000000A
+  - name: gets UniParc entry by UPI
+    params:
+      upi: UPI000000000A
+    assert:
+    - path: uniParcId
+      equals: UPI000000000A
+  getTaxonomy:
+  - name: gets taxonomy for human
+    params:
+      taxonId: 9606
+    assert:
+    - path: scientificName
+      equals: Homo sapiens
+  searchDiseases:
+  - name: searches for cancer diseases
+    params:
+      query: cancer
+    assert:
+    - path: results
+      minLength: 1

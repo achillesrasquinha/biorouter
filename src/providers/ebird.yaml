@@ -1,18 +1,24 @@
 name: ebird
 displayName: eBird
 description: Cornell Lab eBird — bird observations, hotspots, and taxonomy worldwide
-tags: [birds, ornithology, observations, biodiversity, citizen-science, ebird]
+tags:
+- birds
+- ornithology
+- observations
+- biodiversity
+- citizen-science
+- ebird
 baseUrl: https://api.ebird.org/v2
-
 auth:
   type: header
   header: X-eBirdApiToken
   env: LS_EBIRD_API_KEY
-
 tools:
   recentObservations:
     description: Get recent bird observations near a location
-    tags: [bird-sightings, recent-observations]
+    tags:
+    - bird-sightings
+    - recent-observations
     method: GET
     path: /data/obs/geo/recent
     params:
@@ -35,18 +41,20 @@ tools:
     response:
       format: json
       fields:
-        - "[].speciesCode"
-        - "[].comName"
-        - "[].sciName"
-        - "[].locName"
-        - "[].obsDt"
-        - "[].howMany"
-        - "[].lat"
-        - "[].lng"
-
+      - '[].speciesCode'
+      - '[].comName'
+      - '[].sciName'
+      - '[].locName'
+      - '[].obsDt'
+      - '[].howMany'
+      - '[].lat'
+      - '[].lng'
+    entity: organism
   notableObservations:
     description: Get notable/rare bird sightings near a location
-    tags: [rare-birds, notable-sightings]
+    tags:
+    - rare-birds
+    - notable-sightings
     method: GET
     path: /data/obs/geo/recent/notable
     params:
@@ -68,18 +76,20 @@ tools:
     response:
       format: json
       fields:
-        - "[].speciesCode"
-        - "[].comName"
-        - "[].sciName"
-        - "[].locName"
-        - "[].obsDt"
-        - "[].howMany"
-        - "[].lat"
-        - "[].lng"
-
+      - '[].speciesCode'
+      - '[].comName'
+      - '[].sciName'
+      - '[].locName'
+      - '[].obsDt'
+      - '[].howMany'
+      - '[].lat'
+      - '[].lng'
+    entity: organism
   hotspots:
     description: Get birding hotspots near a location
-    tags: [birding-hotspots, locations]
+    tags:
+    - birding-hotspots
+    - locations
     method: GET
     path: /ref/hotspot/geo
     params:
@@ -101,16 +111,18 @@ tools:
     response:
       format: json
       fields:
-        - "[].locId"
-        - "[].locName"
-        - "[].lat"
-        - "[].lng"
-        - "[].numSpeciesAllTime"
-        - "[].latestObsDt"
-
+      - '[].locId'
+      - '[].locName'
+      - '[].lat'
+      - '[].lng'
+      - '[].numSpeciesAllTime'
+      - '[].latestObsDt'
+    entity: organism
   regionObservations:
     description: Get recent observations for a region (country/state)
-    tags: [region-birds, country-observations]
+    tags:
+    - region-birds
+    - country-observations
     method: GET
     path: /data/obs/{regionCode}/recent
     params:
@@ -127,16 +139,18 @@ tools:
     response:
       format: json
       fields:
-        - "[].speciesCode"
-        - "[].comName"
-        - "[].sciName"
-        - "[].locName"
-        - "[].obsDt"
-        - "[].howMany"
-
+      - '[].speciesCode'
+      - '[].comName'
+      - '[].sciName'
+      - '[].locName'
+      - '[].obsDt'
+      - '[].howMany'
+    entity: organism
   getRecentObservations:
     description: Get recent bird observations for a region by region code
-    tags: [region-recent, bird-sightings]
+    tags:
+    - region-recent
+    - bird-sightings
     method: GET
     path: /data/obs/{regionCode}/recent
     params:
@@ -155,16 +169,18 @@ tools:
     response:
       format: json
       fields:
-        - "[].speciesCode"
-        - "[].comName"
-        - "[].sciName"
-        - "[].howMany"
-        - "[].obsDt"
-        - "[].locName"
-
+      - '[].speciesCode'
+      - '[].comName'
+      - '[].sciName'
+      - '[].howMany'
+      - '[].obsDt'
+      - '[].locName'
+    entity: organism
   getHotspots:
     description: Get birding hotspots in a region by region code
-    tags: [region-hotspots, birding-locations]
+    tags:
+    - region-hotspots
+    - birding-locations
     method: GET
     path: /ref/hotspot/{regionCode}
     params:
@@ -178,15 +194,17 @@ tools:
     response:
       format: json
       fields:
-        - "[].locId"
-        - "[].locName"
-        - "[].lat"
-        - "[].lng"
-        - "[].numSpeciesAllTime"
-
+      - '[].locId'
+      - '[].locName'
+      - '[].lat'
+      - '[].lng'
+      - '[].numSpeciesAllTime'
+    entity: organism
   getSpeciesList:
     description: Get list of species observed in a region
-    tags: [species-list, region-species]
+    tags:
+    - species-list
+    - region-species
     method: GET
     path: /product/spplist/{regionCode}
     params:
@@ -197,46 +215,46 @@ tools:
     response:
       format: json
       fields:
-        - "[]"
-
+      - '[]'
+    entity: organism
 tests:
   recentObservations:
-    - name: gets recent bird observations near Central Park NYC
-      params:
-        lat: 40.78
-        lng: -73.97
-        maxResults: 5
-      assert:
-        - minLength: 1
-        - path: 0.comName
-      allowError: true
+  - name: gets recent bird observations near Central Park NYC
+    params:
+      lat: 40.78
+      lng: -73.97
+      maxResults: 5
+    assert:
+    - minLength: 1
+    - path: 0.comName
+    allowError: true
   hotspots:
-    - name: gets birding hotspots near San Francisco
-      params:
-        lat: 37.77
-        lng: -122.42
-      assert:
-        - minLength: 1
-      allowError: true
+  - name: gets birding hotspots near San Francisco
+    params:
+      lat: 37.77
+      lng: -122.42
+    assert:
+    - minLength: 1
+    allowError: true
   getRecentObservations:
-    - name: gets recent observations for US-NY
-      params:
-        regionCode: US-NY
-        maxResults: 5
-      assert:
-        - minLength: 1
-      allowError: true
+  - name: gets recent observations for US-NY
+    params:
+      regionCode: US-NY
+      maxResults: 5
+    assert:
+    - minLength: 1
+    allowError: true
   getHotspots:
-    - name: gets hotspots in US-NY
-      params:
-        regionCode: US-NY
-      assert:
-        - minLength: 1
-      allowError: true
+  - name: gets hotspots in US-NY
+    params:
+      regionCode: US-NY
+    assert:
+    - minLength: 1
+    allowError: true
   getSpeciesList:
-    - name: gets species list for US-NY
-      params:
-        regionCode: US-NY
-      assert:
-        - minLength: 1
-      allowError: true
+  - name: gets species list for US-NY
+    params:
+      regionCode: US-NY
+    assert:
+    - minLength: 1
+    allowError: true

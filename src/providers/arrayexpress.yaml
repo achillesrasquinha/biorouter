@@ -2,17 +2,17 @@ name: arrayexpress
 displayName: ArrayExpress
 description: ArrayExpress — gene expression and functional genomics experiments archive (EBI BioStudies)
 tags:
-  - gene-expression
-  - microarray
-  - transcriptomics
-  - arrayexpress
+- gene-expression
+- microarray
+- transcriptomics
+- arrayexpress
 baseUrl: https://www.ebi.ac.uk/biostudies/api/v1
 tools:
   search:
     description: Search ArrayExpress for gene expression experiments by keyword
     tags:
-      - experiment-search
-      - expression-search
+    - experiment-search
+    - expression-search
     method: GET
     path: /search
     params:
@@ -33,20 +33,21 @@ tools:
     response:
       format: json
       fields:
-        - totalHits
-        - hits[].accession
-        - hits[].type
-        - hits[].title
-        - hits[].author
-        - hits[].release_date
-        - hits[].links
-        - hits[].files
-        - hits[].isPublic
+      - totalHits
+      - hits[].accession
+      - hits[].type
+      - hits[].title
+      - hits[].author
+      - hits[].release_date
+      - hits[].links
+      - hits[].files
+      - hits[].isPublic
+    entity: gene
   getStudy:
     description: Get details of a specific study by accession
     tags:
-      - study-info
-      - experiment-info
+    - study-info
+    - experiment-info
     method: GET
     path: /studies/{accession}
     params:
@@ -57,27 +58,28 @@ tools:
     response:
       format: json
       fields:
-        - accno
-        - attributes[].name
-        - attributes[].value
-        - section.type
-        - section.attributes[].name
-        - section.attributes[].value
-        - section.links
-        - section.subsections
+      - accno
+      - attributes[].name
+      - attributes[].value
+      - section.type
+      - section.attributes[].name
+      - section.attributes[].value
+      - section.links
+      - section.subsections
+    entity: dataset
 tests:
   search:
-    - name: searches for cancer expression experiments
-      params:
-        query: cancer
-        type: study
-      assert:
-        - path: hits
-      allowError: true
+  - name: searches for cancer expression experiments
+    params:
+      query: cancer
+      type: study
+    assert:
+    - path: hits
+    allowError: true
   getStudy:
-    - name: gets study by accession
-      params:
-        accession: E-MTAB-513
-      assert:
-        - path: accno
-      allowError: true
+  - name: gets study by accession
+    params:
+      accession: E-MTAB-513
+    assert:
+    - path: accno
+    allowError: true

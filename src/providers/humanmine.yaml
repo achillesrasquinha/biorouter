@@ -2,18 +2,18 @@ name: humanmine
 displayName: HumanMine
 description: HumanMine — InterMine data warehouse for human genomics, disease, and interactions
 tags:
-  - human
-  - genomics
-  - disease
-  - intermine
-  - humanmine
+- human
+- genomics
+- disease
+- intermine
+- humanmine
 baseUrl: https://www.humanmine.org/humanmine/service
 tools:
   search:
     description: Search HumanMine for genes, diseases, proteins, and pathways
     tags:
-      - gene-search
-      - disease-search
+    - gene-search
+    - disease-search
     method: GET
     path: /search
     params:
@@ -32,36 +32,39 @@ tools:
     response:
       format: json
       fields:
-        - totalHits
-        - results[].id
-        - results[].type
-        - results[].fields
+      - totalHits
+      - results[].id
+      - results[].type
+      - results[].fields
+    entity: gene
   getGene:
     description: Get gene details by symbol or ID
     tags:
-      - gene-info
-      - human-gene
+    - gene-info
+    - human-gene
     method: GET
     path: /query/results
     params:
       query:
         type: string
         required: true
-        description: "InterMine PathQuery XML (e.g. <query model=\"genomic\" view=\"Gene.symbol Gene.name Gene.primaryIdentifier\"><constraint path=\"Gene.symbol\" op=\"=\" value=\"BRCA1\"/></query>)"
+        description: InterMine PathQuery XML (e.g. <query model="genomic" view="Gene.symbol Gene.name Gene.primaryIdentifier"><constraint
+          path="Gene.symbol" op="=" value="BRCA1"/></query>)
       format:
         type: string
         default: json
         description: Response format
     response:
       format: json
+    entity: gene
 tests:
   search:
-    - name: searches for BRCA1
-      params:
-        q: BRCA1
-        format: json
-        size: 3
-      assert:
-        - path: totalHits
-        - path: results
-          minLength: 1
+  - name: searches for BRCA1
+    params:
+      q: BRCA1
+      format: json
+      size: 3
+    assert:
+    - path: totalHits
+    - path: results
+      minLength: 1

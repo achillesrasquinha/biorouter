@@ -1,6 +1,6 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
-import { parseTsv, parseLines, parseKeyValue, parseXml } from "../src/lib/http/parsers.js";
+import { parseTsv, parseLines, parseKeyValue, parseXml } from "../src/parsers.js";
 
 describe("parseTsv", () => {
   it("parses with explicit columns", () => {

@@ -2,17 +2,17 @@ name: metabolomics-workbench
 displayName: Metabolomics Workbench
 description: Metabolomics Workbench — metabolomics data repository and metadata
 tags:
-  - metabolomics
-  - metabolomics-workbench
-  - studies
-  - mass-spec
+- metabolomics
+- metabolomics-workbench
+- studies
+- mass-spec
 baseUrl: https://www.metabolomicsworkbench.org/rest
 tools:
   searchStudies:
     description: Search Metabolomics Workbench studies by title keyword
     tags:
-      - study-search
-      - metabolomics-study
+    - study-search
+    - metabolomics-study
     method: GET
     path: /study/study_title/{query}/summary
     params:
@@ -23,19 +23,20 @@ tools:
     response:
       format: json
       fields:
-        - "{n}.study_id"
-        - "{n}.study_title"
-        - "{n}.species"
-        - "{n}.institute"
-        - "{n}.analysis_type"
-        - "{n}.number_of_samples"
-        - "{n}.submission_date"
-        - "{n}.release_date"
+      - '{n}.study_id'
+      - '{n}.study_title'
+      - '{n}.species'
+      - '{n}.institute'
+      - '{n}.analysis_type'
+      - '{n}.number_of_samples'
+      - '{n}.submission_date'
+      - '{n}.release_date'
+    entity: dataset
   getMetabolite:
     description: Get metabolite information from RefMet by name
     tags:
-      - metabolite-info
-      - refmet
+    - metabolite-info
+    - refmet
     method: GET
     path: /refmet/name/{name}/all
     params:
@@ -46,28 +47,29 @@ tools:
     response:
       format: json
       fields:
-        - name
-        - formula
-        - exactmass
-        - super_class
-        - main_class
-        - sub_class
-        - pubchem_cid
-        - inchi_key
-        - smiles
-        - refmet_id
+      - name
+      - formula
+      - exactmass
+      - super_class
+      - main_class
+      - sub_class
+      - pubchem_cid
+      - inchi_key
+      - smiles
+      - refmet_id
+    entity: compound
 tests:
   searchStudies:
-    - name: searches studies by title keyword diabetes
-      params:
-        query: diabetes
-      assert: []
+  - name: searches studies by title keyword diabetes
+    params:
+      query: diabetes
+    assert: []
   getMetabolite:
-    - name: gets metabolite Glucose from RefMet
-      params:
-        name: Glucose
-      assert:
-        - path: name
-          equals: Glucose
-        - path: formula
-          equals: C6H12O6
+  - name: gets metabolite Glucose from RefMet
+    params:
+      name: Glucose
+    assert:
+    - path: name
+      equals: Glucose
+    - path: formula
+      equals: C6H12O6

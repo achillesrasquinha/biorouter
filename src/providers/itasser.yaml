@@ -2,17 +2,17 @@ name: itasser
 displayName: I-TASSER
 description: I-TASSER — protein structure and function prediction server (Zhang Lab)
 tags:
-  - protein-structure
-  - prediction
-  - homology-modeling
-  - itasser
+- protein-structure
+- prediction
+- homology-modeling
+- itasser
 baseUrl: https://zhanggroup.org/I-TASSER
 tools:
-  submit:
+  submitPrediction:
     description: Submit a protein sequence for structure prediction (async job)
     tags:
-      - structure-prediction
-      - job-submission
+    - structure-prediction
+    - job-submission
     method: POST
     path: /submit
     params:
@@ -26,11 +26,12 @@ tools:
         description: Email address for job notification
     response:
       format: json
-  getResults:
+    entity: structure
+  getPredictionResults:
     description: Get results of an I-TASSER structure prediction job
     tags:
-      - structure-results
-      - job-results
+    - structure-results
+    - job-results
     method: GET
     path: /results/{jobId}
     params:
@@ -40,19 +41,20 @@ tools:
         description: Job ID returned from the submit endpoint
     response:
       format: json
+    entity: structure
 tests:
-  submit:
-    - name: submits a sequence for structure prediction
-      params:
-        sequence: MVLSPADKTNVKAAWGKVGAHAGEYGAEALERMFLSFPTTKTYFPHFDLSH
-        email: test@example.com
-      assert:
-        - path: jobId
-      allowError: true
-  getResults:
-    - name: gets results for a prediction job
-      params:
-        jobId: test123
-      assert:
-        - path: status
-      allowError: true
+  submitPrediction:
+  - name: submits a sequence for structure prediction
+    params:
+      sequence: MVLSPADKTNVKAAWGKVGAHAGEYGAEALERMFLSFPTTKTYFPHFDLSH
+      email: test@example.com
+    assert:
+    - path: jobId
+    allowError: true
+  getPredictionResults:
+  - name: gets results for a prediction job
+    params:
+      jobId: test123
+    assert:
+    - path: status
+    allowError: true

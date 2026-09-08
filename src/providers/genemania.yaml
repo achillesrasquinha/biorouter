@@ -2,18 +2,18 @@ name: genemania
 displayName: GeneMANIA
 description: GeneMANIA — gene interaction network prediction and visualization
 tags:
-  - gene-interactions
-  - functional-networks
-  - protein-interactions
-  - gene-function
-  - network-prediction
+- gene-interactions
+- functional-networks
+- protein-interactions
+- gene-function
+- network-prediction
 baseUrl: https://genemania.org/api
 tools:
   search:
     description: Search for gene interaction networks by gene name and organism
     tags:
-      - gene-search
-      - interaction-search
+    - gene-search
+    - interaction-search
     method: GET
     path: /network/search
     params:
@@ -27,11 +27,12 @@ tools:
         description: Organism identifier (e.g. H_sapiens, M_musculus, S_cerevisiae)
     response:
       format: json
+    entity: gene
   getNetwork:
     description: Get details of a specific gene interaction network by ID
     tags:
-      - network-info
-      - network-details
+    - network-info
+    - network-details
     method: GET
     path: /network/{id}
     params:
@@ -41,19 +42,20 @@ tools:
         description: GeneMANIA network identifier
     response:
       format: json
+    entity: network
 tests:
   search:
-    - name: searches for BRCA1 interaction network
-      params:
-        query: BRCA1
-        organism: H_sapiens
-      assert:
-        - minLength: 1
-      allowError: true
+  - name: searches for BRCA1 interaction network
+    params:
+      query: BRCA1
+      organism: H_sapiens
+    assert:
+    - minLength: 1
+    allowError: true
   getNetwork:
-    - name: gets a network by ID
-      params:
-        id: "1"
-      assert:
-        - minLength: 1
-      allowError: true
+  - name: gets a network by ID
+    params:
+      id: '1'
+    assert:
+    - minLength: 1
+    allowError: true

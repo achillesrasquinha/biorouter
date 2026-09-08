@@ -2,18 +2,18 @@ name: hubmap
 displayName: HuBMAP
 description: Human BioMolecular Atlas Program — atlas of human body at single-cell resolution
 tags:
-  - atlas
-  - single-cell
-  - spatial
-  - human-body
-  - hubmap
+- atlas
+- single-cell
+- spatial
+- human-body
+- hubmap
 baseUrl: https://search.api.hubmapconsortium.org/v3/portal
 tools:
   search:
     description: Search HuBMAP datasets, donors, and samples via Elasticsearch
     tags:
-      - dataset-search
-      - sample-search
+    - dataset-search
+    - sample-search
     method: POST
     path: /search
     params:
@@ -24,33 +24,35 @@ tools:
       query:
         type: object
         required: true
-        description: >
-          Elasticsearch query object (e.g. {"multi_match":{"query":"kidney","fields":["description","entity_type","hubmap_id","group_name","data_types","origin_samples.organ"]}})
+        description: 'Elasticsearch query object (e.g. {"multi_match":{"query":"kidney","fields":["description","entity_type","hubmap_id","group_name","data_types","origin_samples.organ"]}})
+
+          '
     response:
       format: json
       fields:
-        - hits.total.value
-        - hits.hits[]._source.entity_type
-        - hits.hits[]._source.hubmap_id
-        - hits.hits[]._source.uuid
-        - hits.hits[]._source.group_name
+      - hits.total.value
+      - hits.hits[]._source.entity_type
+      - hits.hits[]._source.hubmap_id
+      - hits.hits[]._source.uuid
+      - hits.hits[]._source.group_name
+    entity: sample
 tests:
   search:
-    - name: searches for kidney datasets
-      params:
-        size: 2
-        query:
-          multi_match:
-            query: kidney
-            fields:
-              - description
-              - entity_type
-              - hubmap_id
-              - group_name
-              - data_types
-              - origin_samples.organ
-      assert:
-        - path: hits.total.value
-          gt: 0
-        - path: hits.hits
-          minLength: 1
+  - name: searches for kidney datasets
+    params:
+      size: 2
+      query:
+        multi_match:
+          query: kidney
+          fields:
+          - description
+          - entity_type
+          - hubmap_id
+          - group_name
+          - data_types
+          - origin_samples.organ
+    assert:
+    - path: hits.total.value
+      gt: 0
+    - path: hits.hits
+      minLength: 1

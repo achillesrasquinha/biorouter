@@ -2,35 +2,36 @@ name: cellxgene
 displayName: CELLxGENE
 description: CZ CELLxGENE Discover — single-cell datasets and gene expression
 tags:
-  - single-cell
-  - rna-seq
-  - gene-expression
-  - cellxgene
-  - cziscience
+- single-cell
+- rna-seq
+- gene-expression
+- cellxgene
+- cziscience
 baseUrl: https://api.cellxgene.cziscience.com
 tools:
   getCollections:
     description: List dataset collections
     tags:
-      - collections
-      - datasets
+    - collections
+    - datasets
     method: GET
     path: /curation/v1/collections
     params: {}
     response:
       format: json
       fields:
-        - "[].collection_id"
-        - "[].name"
-        - "[].description"
-        - "[].doi"
-        - "[].contact_name"
-        - "[].consortia"
-        - "[].published_at"
+      - '[].collection_id'
+      - '[].name'
+      - '[].description'
+      - '[].doi'
+      - '[].contact_name'
+      - '[].consortia'
+      - '[].published_at'
+    entity: dataset
   getCollection:
     description: Get collection details by ID
     tags:
-      - collection-detail
+    - collection-detail
     method: GET
     path: /curation/v1/collections/{collectionId}
     params:
@@ -41,42 +42,44 @@ tools:
     response:
       format: json
       fields:
-        - collection_id
-        - name
-        - description
-        - doi
-        - contact_name
-        - consortia
-        - datasets[].dataset_id
-        - datasets[].title
-        - datasets[].tissue
-        - datasets[].disease
-        - datasets[].organism
-        - datasets[].cell_count
-        - datasets[].assay
+      - collection_id
+      - name
+      - description
+      - doi
+      - contact_name
+      - consortia
+      - datasets[].dataset_id
+      - datasets[].title
+      - datasets[].tissue
+      - datasets[].disease
+      - datasets[].organism
+      - datasets[].cell_count
+      - datasets[].assay
+    entity: dataset
   getDatasets:
     description: List datasets
     tags:
-      - datasets
-      - single-cell
+    - datasets
+    - single-cell
     method: GET
     path: /curation/v1/datasets
     params: {}
     response:
       format: json
       fields:
-        - "[].dataset_id"
-        - "[].title"
-        - "[].collection_id"
-        - "[].collection_name"
-        - "[].cell_count"
-        - "[].organism"
-        - "[].tissue"
-        - "[].disease"
-        - "[].assay"
+      - '[].dataset_id'
+      - '[].title'
+      - '[].collection_id'
+      - '[].collection_name'
+      - '[].cell_count'
+      - '[].organism'
+      - '[].tissue'
+      - '[].disease'
+      - '[].assay'
+    entity: dataset
 tests:
   getCollections:
-    - name: lists dataset collections
-      params: {}
-      assert:
-        - isArray: true
+  - name: lists dataset collections
+    params: {}
+    assert:
+    - isArray: true

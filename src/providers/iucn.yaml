@@ -1,18 +1,24 @@
 name: iucn
 displayName: IUCN Red List
 description: IUCN Red List of Threatened Species — conservation status for 150,000+ species
-tags: [conservation, endangered-species, biodiversity, ecology, iucn, red-list]
+tags:
+- conservation
+- endangered-species
+- biodiversity
+- ecology
+- iucn
+- red-list
 baseUrl: https://apiv3.iucnredlist.org/api/v3
-
 auth:
   type: apiKey
   param: token
   env: LS_IUCN_API_KEY
-
 tools:
   searchSpecies:
     description: Search species by name on the IUCN Red List
-    tags: [species-search, conservation-search]
+    tags:
+    - species-search
+    - conservation-search
     method: GET
     path: /species/search/{query}
     params:
@@ -23,18 +29,20 @@ tools:
     response:
       format: json
       fields:
-        - result[].taxonid
-        - result[].scientific_name
-        - result[].kingdom
-        - result[].phylum
-        - result[].class
-        - result[].order
-        - result[].family
-        - result[].category
-
+      - result[].taxonid
+      - result[].scientific_name
+      - result[].kingdom
+      - result[].phylum
+      - result[].class
+      - result[].order
+      - result[].family
+      - result[].category
+    entity: organism
   getSpecies:
     description: Get conservation details for a species by name
-    tags: [species-info, conservation-status]
+    tags:
+    - species-info
+    - conservation-status
     method: GET
     path: /species/{name}
     params:
@@ -45,15 +53,17 @@ tools:
     response:
       format: json
       fields:
-        - result[].taxonid
-        - result[].scientific_name
-        - result[].category
-        - result[].main_common_name
-        - result[].population_trend
-
+      - result[].taxonid
+      - result[].scientific_name
+      - result[].category
+      - result[].main_common_name
+      - result[].population_trend
+    entity: organism
   getThreats:
     description: Get threats facing a species
-    tags: [threat-assessment, conservation-threats]
+    tags:
+    - threat-assessment
+    - conservation-threats
     method: GET
     path: /threats/species/name/{name}
     params:
@@ -64,16 +74,18 @@ tools:
     response:
       format: json
       fields:
-        - result[].code
-        - result[].title
-        - result[].timing
-        - result[].scope
-        - result[].severity
-        - result[].score
-
+      - result[].code
+      - result[].title
+      - result[].timing
+      - result[].scope
+      - result[].severity
+      - result[].score
+    entity: organism
   getConservationActions:
     description: Get conservation measures for a species
-    tags: [conservation-actions, protection-measures]
+    tags:
+    - conservation-actions
+    - protection-measures
     method: GET
     path: /measures/species/name/{name}
     params:
@@ -84,12 +96,14 @@ tools:
     response:
       format: json
       fields:
-        - result[].code
-        - result[].title
-
+      - result[].code
+      - result[].title
+    entity: organism
   getCountryOccurrences:
     description: Get countries where a species occurs
-    tags: [species-distribution, country-occurrence]
+    tags:
+    - species-distribution
+    - country-occurrence
     method: GET
     path: /species/countries/name/{name}
     params:
@@ -100,14 +114,16 @@ tools:
     response:
       format: json
       fields:
-        - result[].country
-        - result[].presence
-        - result[].origin
-        - result[].distribution_code
-
+      - result[].country
+      - result[].presence
+      - result[].origin
+      - result[].distribution_code
+    entity: organism
   getSpeciesNarrative:
     description: Get species narrative including habitat, threats, and population info
-    tags: [species-narrative, conservation-narrative]
+    tags:
+    - species-narrative
+    - conservation-narrative
     method: GET
     path: /species/narrative/{name}
     params:
@@ -118,13 +134,15 @@ tools:
     response:
       format: json
       fields:
-        - result[].habitat
-        - result[].threats
-        - result[].population
-
+      - result[].habitat
+      - result[].threats
+      - result[].population
+    entity: organism
   getSpeciesByCountry:
     description: Get species list for a specific country
-    tags: [species-by-country, country-biodiversity]
+    tags:
+    - species-by-country
+    - country-biodiversity
     method: GET
     path: /country/getspecies/{isoCode}
     params:
@@ -135,40 +153,40 @@ tools:
     response:
       format: json
       fields:
-        - result[].scientific_name
-        - result[].category
-        - result[].count
-
+      - result[].scientific_name
+      - result[].category
+      - result[].count
+    entity: organism
 tests:
   searchSpecies:
-    - name: searches for tiger
-      params:
-        query: tiger
-      assert:
-        - path: result
-          minLength: 1
-      allowError: true
+  - name: searches for tiger
+    params:
+      query: tiger
+    assert:
+    - path: result
+      minLength: 1
+    allowError: true
   getSpecies:
-    - name: gets Panthera tigris conservation status
-      params:
-        name: Panthera tigris
-      assert:
-        - path: result
-          minLength: 1
-      allowError: true
+  - name: gets Panthera tigris conservation status
+    params:
+      name: Panthera tigris
+    assert:
+    - path: result
+      minLength: 1
+    allowError: true
   getSpeciesNarrative:
-    - name: gets narrative for Panthera tigris
-      params:
-        name: Panthera tigris
-      assert:
-        - path: result
-          minLength: 1
-      allowError: true
+  - name: gets narrative for Panthera tigris
+    params:
+      name: Panthera tigris
+    assert:
+    - path: result
+      minLength: 1
+    allowError: true
   getSpeciesByCountry:
-    - name: gets species for US
-      params:
-        isoCode: US
-      assert:
-        - path: result
-          minLength: 1
-      allowError: true
+  - name: gets species for US
+    params:
+      isoCode: US
+    assert:
+    - path: result
+      minLength: 1
+    allowError: true

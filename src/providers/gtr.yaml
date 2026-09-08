@@ -1,0 +1,84 @@
+name: gtr
+displayName: Genetic Testing Registry
+description: NCBI Genetic Testing Registry — catalog of genetic tests and their associated genes, conditions, and laboratories
+tags:
+- genetic-testing
+- clinical
+- diagnostics
+- gtr
+baseUrl: https://eutils.ncbi.nlm.nih.gov/entrez/eutils
+tools:
+  search:
+    description: Search the Genetic Testing Registry for genetic tests by gene, condition, or keyword
+    tags:
+    - genetic-test-search
+    - clinical-diagnostics
+    method: GET
+    path: /esearch.fcgi
+    params:
+      query:
+        type: string
+        required: true
+        mapsTo: term
+        description: Search query (e.g. "BRCA1", "cystic fibrosis", "pharmacogenomics")
+      limit:
+        type: integer
+        default: 10
+        mapsTo: retmax
+        description: Maximum number of results to return
+      db:
+        type: string
+        default: gtr
+        description: NCBI database name (fixed to gtr)
+      retmode:
+        type: string
+        default: json
+        description: Return format
+    response:
+      format: json
+      fields:
+      - esearchresult.count
+      - esearchresult.idlist
+      - esearchresult.querytranslation
+    entity: assay
+  getSummary:
+    description: Get summary information for a GTR record by its NCBI ID
+    tags:
+    - genetic-test-info
+    - test-summary
+    method: GET
+    path: /esummary.fcgi
+    params:
+      id:
+        type: string
+        required: true
+        description: NCBI GTR ID returned from search (e.g. a numeric identifier)
+      db:
+        type: string
+        default: gtr
+        description: NCBI database name (fixed to gtr)
+      retmode:
+        type: string
+        default: json
+        description: Return format
+    response:
+      format: json
+      fields:
+      - result
+    entity: assay
+tests:
+  search:
+  - name: searches for BRCA1 genetic tests
+    params:
+      query: BRCA1
+      limit: 5
+    assert:
+    - path: esearchresult.idlist
+      minLength: 1
+  getSummary:
+  - name: gets summary for a GTR record
+    params:
+      id: '519789'
+    assert:
+    - path: result
+    allowError: true

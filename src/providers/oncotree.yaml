@@ -2,67 +2,69 @@ name: oncotree
 displayName: OncoTree
 description: MSK Cancer Classification — standardized cancer type taxonomy and hierarchy
 tags:
-  - cancer
-  - oncology
-  - tumor-types
-  - classification
-  - oncotree
+- cancer
+- oncology
+- tumor-types
+- classification
+- oncotree
 baseUrl: https://oncotree.mskcc.org/api
 tools:
   getTumorTypes:
     description: Get all tumor types in OncoTree hierarchy
     tags:
-      - tumor-types
-      - cancer-classification
+    - tumor-types
+    - cancer-classification
     method: GET
     path: /tumorTypes
     params: {}
     response:
       format: json
       fields:
-        - "[].code"
-        - "[].name"
-        - "[].mainType"
-        - "[].tissue"
-        - "[].parent"
-        - "[].level"
-        - "[].externalReferences"
+      - '[].code'
+      - '[].name'
+      - '[].mainType'
+      - '[].tissue'
+      - '[].parent'
+      - '[].level'
+      - '[].externalReferences'
+    entity: disease
   searchTumorType:
-    description: Search tumor types by keyword
+    description: Search tumor types by name
     tags:
-      - tumor-search
-      - cancer-search
+    - tumor-search
+    - cancer-search
     method: GET
-    path: /tumorTypes
+    path: /tumorTypes/search/name/{query}
     params:
-      type:
+      query:
         type: string
         required: true
-        description: Search keyword (e.g. melanoma, lung)
+        description: Tumor type name to search for (e.g. melanoma, lung)
     response:
       format: json
       fields:
-        - "[].code"
-        - "[].name"
-        - "[].mainType"
-        - "[].tissue"
-        - "[].parent"
-        - "[].level"
+      - '[].code'
+      - '[].name'
+      - '[].mainType'
+      - '[].tissue'
+      - '[].parent'
+      - '[].level'
+    entity: disease
 tests:
   getTumorTypes:
-    - name: retrieves all tumor types
-      params: {}
-      assert:
-        - path: ""
-          minLength: 1
-        - path: "0.code"
-        - path: "0.name"
+  - name: retrieves all tumor types
+    params: {}
+    assert:
+    - isArray: true
+    - minLength: 1
+    - path: 0.code
+    - path: 0.name
   searchTumorType:
-    - name: searches for melanoma tumor types
-      params:
-        query: melanoma
-      assert:
-        - path: ""
-          minLength: 1
-        - path: "0.code"
-        - path: "0.name"
+  - name: searches for melanoma tumor types
+    params:
+      query: melanoma
+    assert:
+    - isArray: true
+    - minLength: 1
+    - path: 0.code
+    - path: 0.name

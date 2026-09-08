@@ -2,29 +2,29 @@ name: onegenomes
 displayName: 1000 Genomes (IGSR)
 description: International Genome Sample Resource — population genomics data from the 1000 Genomes Project
 tags:
-  - population-genetics
-  - genomics
-  - 1000-genomes
-  - igsr
-  - diversity
+- population-genetics
+- genomics
+- 1000-genomes
+- igsr
+- diversity
 baseUrl: https://www.internationalgenome.org/api
-
 tools:
   getPopulations:
     description: List populations catalogued in the 1000 Genomes Project
     tags:
-      - population-list
-      - population-info
+    - population-list
+    - population-info
     method: GET
     path: /population
     params: {}
     response:
       format: json
+    entity: organism
   getSamples:
     description: Get samples from a specific population
     tags:
-      - sample-search
-      - sample-list
+    - sample-search
+    - sample-list
     method: GET
     path: /sample
     params:
@@ -34,34 +34,35 @@ tools:
         description: Population code (e.g. GBR, YRI, CHB, CEU)
     response:
       format: json
+    entity: sample
   getDataCollections:
     description: List available data collections in the 1000 Genomes Project
     tags:
-      - data-collection
-      - dataset-list
+    - data-collection
+    - dataset-list
     method: GET
     path: /data-collection
     params: {}
     response:
       format: json
-
+    entity: dataset
 tests:
   getPopulations:
-    - name: lists all populations
-      params: {}
-      assert:
-        - minLength: 1
-      allowError: true
+  - name: lists all populations
+    params: {}
+    assert:
+    - minLength: 1
+    allowError: true
   getSamples:
-    - name: gets samples from British population
-      params:
-        population: GBR
-      assert:
-        - minLength: 1
-      allowError: true
+  - name: gets samples from British population
+    params:
+      population: GBR
+    assert:
+    - minLength: 1
+    allowError: true
   getDataCollections:
-    - name: lists data collections
-      params: {}
-      assert:
-        - minLength: 1
-      allowError: true
+  - name: lists data collections
+    params: {}
+    assert:
+    - minLength: 1
+    allowError: true

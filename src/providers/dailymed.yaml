@@ -2,18 +2,18 @@ name: dailymed
 displayName: DailyMed
 description: DailyMed drug label information from the National Library of Medicine — SPL documents and prescribing information
 tags:
-  - drug-labels
-  - prescribing
-  - dailymed
-  - fda
-  - medication
+- drug-labels
+- prescribing
+- dailymed
+- fda
+- medication
 baseUrl: https://dailymed.nlm.nih.gov/dailymed/services
 tools:
   searchDrugs:
     description: Search DailyMed for drug labels by drug name
     tags:
-      - drug-search
-      - label-search
+    - drug-search
+    - label-search
     method: GET
     path: /v2/spls.json
     params:
@@ -25,16 +25,17 @@ tools:
     response:
       format: json
       fields:
-        - "data[].setid"
-        - "data[].title"
-        - "data[].spl_version"
-        - "data[].published_date"
-        - "metadata.total_elements"
+      - data[].setid
+      - data[].title
+      - data[].spl_version
+      - data[].published_date
+      - metadata.total_elements
+    entity: compound
   getSpl:
     description: Get a specific SPL drug label by set ID
     tags:
-      - drug-label
-      - spl
+    - drug-label
+    - spl
     method: GET
     path: /v2/spls.json
     params:
@@ -46,34 +47,34 @@ tools:
     response:
       format: json
       fields:
-        - "data[].setid"
-        - "data[].title"
-        - "data[].spl_version"
-        - "data[].published_date"
+      - data[].setid
+      - data[].title
+      - data[].spl_version
+      - data[].published_date
+    entity: compound
   getNdc:
-    description: Get NDC (National Drug Code) details
+    description: Search NDC (National Drug Code) records
     tags:
-      - ndc-info
-      - drug-code
+    - ndc-info
+    - drug-code
     method: GET
-    path: /v2/ndcs/{ndc}.json
+    path: /v2/ndcs.json
     params:
       ndc:
         type: string
         required: true
+        mapsTo: ndc
         description: National Drug Code (e.g. 0002-1433-80)
     response:
       format: json
       fields:
-        - data.ndc
-        - data.rxcui
-        - data.product_name
-        - data.labeler_name
+      - data[].ndc
+    entity: compound
   getPackaging:
     description: Get drug packaging information by SPL set ID
     tags:
-      - packaging-info
-      - drug-packaging
+    - packaging-info
+    - drug-packaging
     method: GET
     path: /v2/spls/{setid}/packaging.json
     params:
@@ -83,14 +84,12 @@ tools:
         description: SPL set ID (UUID)
     response:
       format: json
-      fields:
-        - data[].ndc
-        - data[].packageDescription
+    entity: compound
   getMedia:
     description: Get drug images and media by SPL set ID
     tags:
-      - drug-media
-      - drug-images
+    - drug-media
+    - drug-images
     method: GET
     path: /v2/spls/{setid}/media.json
     params:
@@ -100,44 +99,42 @@ tools:
         description: SPL set ID (UUID)
     response:
       format: json
-      fields:
-        - data[].name
-        - data[].mime_type
-        - data[].url
+    entity: compound
 tests:
   searchDrugs:
-    - name: searches for aspirin drug labels
-      params:
-        name: aspirin
-      assert:
-        - path: data
-          minLength: 1
-        - path: data.0.title
-        - path: data.0.setid
+  - name: searches for aspirin drug labels
+    params:
+      name: aspirin
+    assert:
+    - path: data
+      minLength: 1
+    - path: data.0.title
+    - path: data.0.setid
   getSpl:
-    - name: gets a specific SPL by set ID
-      params:
-        setid: 2777beea-06d7-4ff5-ae4a-ad7a117dfb62
-      assert:
-        - path: data
-          minLength: 1
-        - path: data.0.setid
-          equals: 2777beea-06d7-4ff5-ae4a-ad7a117dfb62
+  - name: gets a specific SPL by set ID
+    params:
+      setid: 2777beea-06d7-4ff5-ae4a-ad7a117dfb62
+    assert:
+    - path: data
+      minLength: 1
+    - path: data.0.setid
+      equals: 2777beea-06d7-4ff5-ae4a-ad7a117dfb62
   getNdc:
-    - name: gets NDC details
-      params:
-        ndc: 0002-1433-80
-      assert:
-        - path: data
+  - name: gets NDC details
+    params:
+      ndc: 0002-1433-80
+    assert:
+    - path: data
+      minLength: 1
   getPackaging:
-    - name: gets packaging for a drug label
-      params:
-        setid: 2777beea-06d7-4ff5-ae4a-ad7a117dfb62
-      assert:
-        - path: data
+  - name: gets packaging for a drug label
+    params:
+      setid: 2777beea-06d7-4ff5-ae4a-ad7a117dfb62
+    assert:
+    - path: data
   getMedia:
-    - name: gets media for a drug label
-      params:
-        setid: 2777beea-06d7-4ff5-ae4a-ad7a117dfb62
-      assert:
-        - path: data
+  - name: gets media for a drug label
+    params:
+      setid: 2777beea-06d7-4ff5-ae4a-ad7a117dfb62
+    assert:
+    - path: data

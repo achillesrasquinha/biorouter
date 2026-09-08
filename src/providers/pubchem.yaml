@@ -2,20 +2,20 @@ name: pubchem
 displayName: PubChem
 description: Open chemistry database with compound, substance, and bioassay data
 tags:
-  - compounds
-  - chemistry
-  - drugs
-  - toxicology
-  - bioassay
-  - smiles
-  - inchi
+- compounds
+- chemistry
+- drugs
+- toxicology
+- bioassay
+- smiles
+- inchi
 baseUrl: https://pubchem.ncbi.nlm.nih.gov/rest/pug
 tools:
   search:
     description: Search PubChem compounds by name or SMILES
     tags:
-      - compound-search
-      - chemical-name
+    - compound-search
+    - chemical-name
     method: GET
     path: /compound/name/{query}/cids/JSON
     params:
@@ -26,12 +26,13 @@ tools:
     response:
       format: json
       fields:
-        - IdentifierList.CID
+      - IdentifierList.CID
+    entity: compound
   getCompound:
     description: Get compound properties by CID
     tags:
-      - compound-info
-      - properties
+    - compound-info
+    - properties
     method: GET
     path: /compound/cid/{cid}/property/MolecularFormula,MolecularWeight,IUPACName,InChI,CanonicalSMILES,XLogP,ExactMass/JSON
     params:
@@ -42,20 +43,21 @@ tools:
     response:
       format: json
       fields:
-        - PropertyTable.Properties[].CID
-        - PropertyTable.Properties[].MolecularFormula
-        - PropertyTable.Properties[].MolecularWeight
-        - PropertyTable.Properties[].IUPACName
-        - PropertyTable.Properties[].CanonicalSMILES
-        - PropertyTable.Properties[].InChI
-        - PropertyTable.Properties[].XLogP
-        - PropertyTable.Properties[].ExactMass
+      - PropertyTable.Properties[].CID
+      - PropertyTable.Properties[].MolecularFormula
+      - PropertyTable.Properties[].MolecularWeight
+      - PropertyTable.Properties[].IUPACName
+      - PropertyTable.Properties[].CanonicalSMILES
+      - PropertyTable.Properties[].InChI
+      - PropertyTable.Properties[].XLogP
+      - PropertyTable.Properties[].ExactMass
+    entity: compound
   getSynonyms:
     description: Get all known synonyms/names for a compound
     tags:
-      - compound-info
-      - synonyms
-      - names
+    - compound-info
+    - synonyms
+    - names
     method: GET
     path: /compound/cid/{cid}/synonyms/JSON
     params:
@@ -66,14 +68,15 @@ tools:
     response:
       format: json
       fields:
-        - InformationList.Information[].CID
-        - InformationList.Information[].Synonym
+      - InformationList.Information[].CID
+      - InformationList.Information[].Synonym
+    entity: compound
   similaritySearch:
     description: Find structurally similar compounds by SMILES
     tags:
-      - compound-search
-      - similarity
-      - structure
+    - compound-search
+    - similarity
+    - structure
     method: GET
     path: /compound/fastsimilarity_2d/smiles/{smiles}/cids/JSON?Threshold={threshold}
     params:
@@ -87,12 +90,13 @@ tools:
         description: Similarity threshold (0-100)
     response:
       format: json
+    entity: compound
   getSubstructureSearch:
     description: Search for compounds containing a given substructure by SMILES
     tags:
-      - compound-search
-      - substructure
-      - smiles
+    - compound-search
+    - substructure
+    - smiles
     method: GET
     path: /compound/fastsubstructure/smiles/{smiles}/cids/JSON
     params:
@@ -103,12 +107,13 @@ tools:
     response:
       format: json
       fields:
-        - IdentifierList.CID
+      - IdentifierList.CID
+    entity: structure
   getBioassaySummary:
     description: Get bioassay summary by assay ID
     tags:
-      - bioassay
-      - assay-summary
+    - bioassay
+    - assay-summary
     method: GET
     path: /assay/aid/{aid}/summary/JSON
     params:
@@ -119,16 +124,17 @@ tools:
     response:
       format: json
       fields:
-        - AssaySummaries[].AID
-        - AssaySummaries[].SourceName
-        - AssaySummaries[].Name
-        - AssaySummaries[].Description
+      - AssaySummaries[].AID
+      - AssaySummaries[].SourceName
+      - AssaySummaries[].Name
+      - AssaySummaries[].Description
+    entity: assay
   getCompoundBioactivities:
     description: Get bioactivity data for a compound across all assays
     tags:
-      - bioassay
-      - bioactivity
-      - compound-info
+    - bioassay
+    - bioactivity
+    - compound-info
     method: GET
     path: /compound/cid/{cid}/assaysummary/JSON
     params:
@@ -139,14 +145,15 @@ tools:
     response:
       format: json
       fields:
-        - Table.Columns.Column
-        - Table.Row[].Cell
+      - Table.Columns.Column
+      - Table.Row[].Cell
+    entity: compound
   getCompoundClassification:
     description: Get classification hierarchy for a compound
     tags:
-      - compound-info
-      - classification
-      - taxonomy
+    - compound-info
+    - classification
+    - taxonomy
     method: GET
     path: /compound/cid/{cid}/classification/JSON
     params:
@@ -157,14 +164,15 @@ tools:
     response:
       format: json
       fields:
-        - Hierarchies.Hierarchy[].SourceName
-        - Hierarchies.Hierarchy[].Node[].NodeName
+      - Hierarchies.Hierarchy[].SourceName
+      - Hierarchies.Hierarchy[].Node[].NodeName
+    entity: compound
   getCompoundXrefs:
     description: Get cross-references for a compound (registry IDs, CAS RN, PubMed IDs)
     tags:
-      - compound-info
-      - cross-references
-      - identifiers
+    - compound-info
+    - cross-references
+    - identifiers
     method: GET
     path: /compound/cid/{cid}/xrefs/RegistryID,RN,PubMedID/JSON
     params:
@@ -175,16 +183,17 @@ tools:
     response:
       format: json
       fields:
-        - InformationList.Information[].CID
-        - InformationList.Information[].RegistryID
-        - InformationList.Information[].RN
-        - InformationList.Information[].PubMedID
+      - InformationList.Information[].CID
+      - InformationList.Information[].RegistryID
+      - InformationList.Information[].RN
+      - InformationList.Information[].PubMedID
+    entity: compound
   getSids:
     description: Get related substance IDs for a compound
     tags:
-      - compound-info
-      - substance
-      - identifiers
+    - compound-info
+    - substance
+    - identifiers
     method: GET
     path: /compound/cid/{cid}/sids/JSON
     params:
@@ -195,55 +204,56 @@ tools:
     response:
       format: json
       fields:
-        - InformationList.Information[].CID
-        - InformationList.Information[].SID
+      - InformationList.Information[].CID
+      - InformationList.Information[].SID
+    entity: compound
 tests:
   search:
-    - name: searches for aspirin
-      params:
-        query: aspirin
-      assert:
-        - path: IdentifierList.CID
-          minLength: 1
+  - name: searches for aspirin
+    params:
+      query: aspirin
+    assert:
+    - path: IdentifierList.CID
+      minLength: 1
   getCompound:
-    - name: gets compound properties
-      params:
-        cid: "2244"
-      assert: []
+  - name: gets compound properties
+    params:
+      cid: '2244'
+    assert: []
   getSynonyms:
-    - name: gets synonyms
-      params:
-        cid: "2244"
-      assert: []
+  - name: gets synonyms
+    params:
+      cid: '2244'
+    assert: []
   getSubstructureSearch:
-    - name: searches for benzene substructure
-      params:
-        smiles: c1ccccc1
-      assert:
-        - path: IdentifierList.CID
-          minLength: 1
+  - name: searches for benzene substructure
+    params:
+      smiles: c1ccccc1
+    assert:
+    - path: IdentifierList.CID
+      minLength: 1
   getBioassaySummary:
-    - name: gets bioassay summary
-      params:
-        aid: "1259390"
-      assert: []
+  - name: gets bioassay summary
+    params:
+      aid: '1259390'
+    assert: []
   getCompoundBioactivities:
-    - name: gets bioactivities for aspirin
-      params:
-        cid: "2244"
-      assert: []
+  - name: gets bioactivities for aspirin
+    params:
+      cid: '2244'
+    assert: []
   getCompoundClassification:
-    - name: gets classification for aspirin
-      params:
-        cid: "2244"
-      assert: []
+  - name: gets classification for aspirin
+    params:
+      cid: '2244'
+    assert: []
   getCompoundXrefs:
-    - name: gets cross-references for aspirin
-      params:
-        cid: "2244"
-      assert: []
+  - name: gets cross-references for aspirin
+    params:
+      cid: '2244'
+    assert: []
   getSids:
-    - name: gets substance IDs for aspirin
-      params:
-        cid: "2244"
-      assert: []
+  - name: gets substance IDs for aspirin
+    params:
+      cid: '2244'
+    assert: []

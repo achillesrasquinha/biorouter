@@ -2,18 +2,18 @@ name: sgd
 displayName: SGD
 description: Saccharomyces Genome Database — yeast genomics
 tags:
-  - yeast
-  - saccharomyces
-  - model-organism
-  - sgd
-  - genomics
+- yeast
+- saccharomyces
+- model-organism
+- sgd
+- genomics
 baseUrl: https://www.yeastgenome.org/backend
 tools:
   getLocusDetails:
     description: Get locus details by gene name or SGD ID
     tags:
-      - locus-info
-      - yeast-gene
+    - locus-info
+    - yeast-gene
     method: GET
     path: /locus/{sgdId}
     params:
@@ -24,18 +24,19 @@ tools:
     response:
       format: json
       fields:
-        - display_name
-        - format_name
-        - gene_name
-        - sgdid
-        - description
-        - locus_type
-        - qualifier
+      - display_name
+      - format_name
+      - gene_name
+      - sgdid
+      - description
+      - locus_type
+      - qualifier
+    entity: gene
   getLocusGOTerms:
     description: Get GO annotations for a yeast gene
     tags:
-      - go-annotation
-      - gene-ontology
+    - go-annotation
+    - gene-ontology
     method: GET
     path: /locus/{sgdId}/go_details
     params:
@@ -46,17 +47,18 @@ tools:
     response:
       format: json
       fields:
-        - "[].qualifier"
-        - "[].go.display_name"
-        - "[].go.go_id"
-        - "[].go.go_aspect"
-        - "[].annotation_type"
-        - "[].locus.display_name"
+      - '[].qualifier'
+      - '[].go.display_name'
+      - '[].go.go_id'
+      - '[].go.go_aspect'
+      - '[].annotation_type'
+      - '[].locus.display_name'
+    entity: ontology-term
   getLocusPhenotypes:
     description: Get phenotype annotations for a yeast gene
     tags:
-      - phenotype
-      - yeast-phenotype
+    - phenotype
+    - yeast-phenotype
     method: GET
     path: /locus/{sgdId}/phenotype_details
     params:
@@ -67,19 +69,20 @@ tools:
     response:
       format: json
       fields:
-        - "[].phenotype.display_name"
-        - "[].mutant_type"
-        - "[].locus.display_name"
-        - "[].experiment.display_name"
-        - "[].experiment.category"
-        - "[].strain.display_name"
+      - '[].phenotype.display_name'
+      - '[].mutant_type'
+      - '[].locus.display_name'
+      - '[].experiment.display_name'
+      - '[].experiment.category'
+      - '[].strain.display_name'
+    entity: disease
 tests:
   getLocusDetails:
-    - name: gets locus details for CDC28
-      params:
-        sgdId: CDC28
-      assert:
-        - {}
-        - anyOf:
-            - display_name
-            - gene_name
+  - name: gets locus details for CDC28
+    params:
+      sgdId: CDC28
+    assert:
+    - {}
+    - anyOf:
+      - display_name
+      - gene_name

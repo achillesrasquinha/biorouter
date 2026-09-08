@@ -1,0 +1,71 @@
+name: smpdb
+displayName: SMPDB
+description: Small Molecule Pathway Database — metabolic and disease pathways involving small molecules
+tags:
+- small-molecule
+- pathway
+- metabolism
+- smpdb
+baseUrl: https://smpdb.ca
+tools:
+  searchPathways:
+    description: Search SMPDB for metabolic and disease pathways by keyword
+    tags:
+    - pathway-search
+    - metabolic-pathway
+    method: GET
+    path: /search
+    params:
+      query:
+        type: string
+        required: true
+        mapsTo: q
+        description: Search keyword (e.g. "glycolysis", "citric acid cycle", "warfarin")
+      button:
+        type: string
+        default: ''
+        description: Form submit parameter (leave empty)
+    response:
+      format: text
+      fields:
+      - pathway.name
+      - pathway.smpdbId
+      - pathway.category
+      - pathway.description
+    entity: pathway
+  getPathway:
+    description: Get details of a specific SMPDB pathway by identifier
+    tags:
+    - pathway-info
+    - pathway-details
+    method: GET
+    path: /view/{smpdbId}
+    params:
+      smpdbId:
+        type: string
+        required: true
+        description: SMPDB pathway identifier (e.g. SMP0000040 for glycolysis)
+    response:
+      format: text
+      fields:
+      - pathway.name
+      - pathway.description
+      - pathway.category
+      - pathway.metabolites
+      - pathway.enzymes
+    entity: pathway
+tests:
+  searchPathways:
+  - name: searches for glycolysis pathway
+    params:
+      query: glycolysis
+    assert:
+    - isNotEmpty: true
+    allowError: true
+  getPathway:
+  - name: gets glycolysis pathway SMP0000040
+    params:
+      smpdbId: SMP0000040
+    assert:
+    - isNotEmpty: true
+    allowError: true

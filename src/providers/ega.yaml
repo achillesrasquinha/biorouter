@@ -2,19 +2,18 @@ name: ega
 displayName: European Genome-phenome Archive
 description: EGA metadata API for controlled-access genomic and phenomic datasets
 tags:
-  - genomics
-  - phenomics
-  - archive
-  - controlled-access
-  - ega
+- genomics
+- phenomics
+- archive
+- controlled-access
+- ega
 baseUrl: https://ega-archive.org/metadata/v2
-
 tools:
   searchDatasets:
     description: Search EGA datasets by keyword or list recent datasets
     tags:
-      - dataset-search
-      - ega-search
+    - dataset-search
+    - ega-search
     method: GET
     path: /datasets
     params:
@@ -28,11 +27,12 @@ tools:
         description: Number of datasets to skip (for pagination)
     response:
       format: json
+    entity: dataset
   getDataset:
     description: Get metadata for a specific EGA dataset by accession ID
     tags:
-      - dataset-info
-      - ega-detail
+    - dataset-info
+    - ega-detail
     method: GET
     path: /datasets/{id}
     params:
@@ -42,11 +42,12 @@ tools:
         description: EGA dataset accession (e.g. EGAD00001000001)
     response:
       format: json
+    entity: dataset
   searchStudies:
     description: Search EGA studies or list recent studies
     tags:
-      - study-search
-      - ega-studies
+    - study-search
+    - ega-studies
     method: GET
     path: /studies
     params:
@@ -60,26 +61,26 @@ tools:
         description: Number of studies to skip (for pagination)
     response:
       format: json
-
+    entity: dataset
 tests:
   searchDatasets:
-    - name: lists EGA datasets
-      params:
-        limit: 5
-      assert:
-        - minLength: 1
-      allowError: true
+  - name: lists EGA datasets
+    params:
+      limit: 5
+    assert:
+    - minLength: 1
+    allowError: true
   getDataset:
-    - name: gets a specific EGA dataset
-      params:
-        id: EGAD00001000001
-      assert:
-        - minLength: 1
-      allowError: true
+  - name: gets a specific EGA dataset
+    params:
+      id: EGAD00001000001
+    assert:
+    - minLength: 1
+    allowError: true
   searchStudies:
-    - name: lists EGA studies
-      params:
-        limit: 5
-      assert:
-        - minLength: 1
-      allowError: true
+  - name: lists EGA studies
+    params:
+      limit: 5
+    assert:
+    - minLength: 1
+    allowError: true

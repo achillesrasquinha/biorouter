@@ -1,0 +1,114 @@
+name: prosite
+displayName: PROSITE
+description: PROSITE protein motifs, patterns, and profiles accessed via the InterPro API
+tags:
+- motif
+- pattern
+- protein-domain
+- prosite
+baseUrl: https://www.ebi.ac.uk/interpro/api
+tools:
+  searchPrositeEntries:
+    description: Search PROSITE protein motif and pattern entries by keyword via InterPro
+    tags:
+    - motif-search
+    - pattern-search
+    method: GET
+    path: /entry/prosite
+    params:
+      query:
+        type: string
+        required: true
+        mapsTo: search
+        description: Search keyword (e.g. "zinc finger", "serine protease", "EGF-like")
+      pageSize:
+        type: integer
+        default: 10
+        mapsTo: page_size
+        description: Number of results per page
+    response:
+      format: json
+      fields:
+      - count
+      - results[].metadata.accession
+      - results[].metadata.name
+      - results[].metadata.source_database
+      - results[].metadata.type
+      - results[].metadata.integrated
+    entity: motif
+  getPrositeEntry:
+    description: Get detailed information for a specific PROSITE entry by accession
+    tags:
+    - motif-info
+    - pattern-info
+    method: GET
+    path: /entry/prosite/{accession}
+    params:
+      accession:
+        type: string
+        required: true
+        description: PROSITE accession (e.g. PS00028 for zinc finger C2H2 pattern)
+    response:
+      format: json
+      fields:
+      - metadata.accession
+      - metadata.name
+      - metadata.source_database
+      - metadata.type
+      - metadata.integrated
+      - metadata.counters.proteins
+      - metadata.counters.structures
+      - metadata.counters.taxa
+    entity: motif
+  getProteinsWithMotif:
+    description: Get UniProt proteins matching a PROSITE motif or pattern
+    tags:
+    - motif-proteins
+    - pattern-proteins
+    method: GET
+    path: /protein/entry/prosite/{accession}
+    params:
+      accession:
+        type: string
+        required: true
+        description: PROSITE accession (e.g. PS00028)
+      pageSize:
+        type: integer
+        default: 10
+        mapsTo: page_size
+        description: Number of results per page
+    response:
+      format: json
+      fields:
+      - count
+      - results[].metadata.accession
+      - results[].metadata.name
+      - results[].metadata.source_organism.scientificName
+      - results[].metadata.length
+      - results[].metadata.gene
+    entity: protein
+tests:
+  searchPrositeEntries:
+  - name: searches for zinc finger motifs
+    params:
+      query: zinc finger
+    assert:
+    - path: results
+      minLength: 1
+    allowError: true
+  getPrositeEntry:
+  - name: gets PROSITE entry PS00028
+    params:
+      accession: PS00028
+    assert:
+    - path: metadata.accession
+      equals: PS00028
+    allowError: true
+  getProteinsWithMotif:
+  - name: gets proteins matching PROSITE motif PS00028
+    params:
+      accession: PS00028
+    assert:
+    - path: results
+      minLength: 1
+    allowError: true

@@ -2,17 +2,17 @@ name: proteomexchange
 displayName: ProteomeXchange
 description: ProteomeXchange — centralized proteomics dataset repository linking PRIDE, MassIVE, and other archives
 tags:
-  - proteomics
-  - mass-spectrometry
-  - datasets
-  - proteomexchange
+- proteomics
+- mass-spectrometry
+- datasets
+- proteomexchange
 baseUrl: https://proteomecentral.proteomexchange.org/cgi
 tools:
   getDataset:
     description: Get proteomics dataset details by ProteomeXchange ID
     tags:
-      - dataset-info
-      - proteomics-data
+    - dataset-info
+    - proteomics-data
     method: GET
     path: /GetDataset
     params:
@@ -27,20 +27,21 @@ tools:
     response:
       format: json
       fields:
-        - title
-        - description
-        - species[].name
-        - instruments[].name
-        - keywords
-        - contacts[].terms
-        - publications
-        - identifiers
+      - title
+      - description
+      - species[].name
+      - instruments[].name
+      - keywords
+      - contacts[].terms
+      - publications
+      - identifiers
+    entity: dataset
 tests:
   getDataset:
-    - name: gets proteomics dataset
-      params:
-        ID: PXD000001
-        outputMode: json
-      assert:
-        - path: title
-        - path: description
+  - name: gets proteomics dataset
+    params:
+      ID: PXD000001
+      outputMode: json
+    assert:
+    - path: title
+    - path: description

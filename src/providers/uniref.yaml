@@ -2,17 +2,17 @@ name: uniref
 displayName: UniRef
 description: UniProt Reference Clusters — clustered sets of related protein sequences
 tags:
-  - protein
-  - sequence-clusters
-  - uniref
-  - uniprot
+- protein
+- sequence-clusters
+- uniref
+- uniprot
 baseUrl: https://rest.uniprot.org/uniref
 tools:
   search:
     description: Search UniRef clusters by keyword
     tags:
-      - cluster-search
-      - protein-search
+    - cluster-search
+    - protein-search
     method: GET
     path: /search
     params:
@@ -30,18 +30,19 @@ tools:
     response:
       format: json
       fields:
-        - results[].id
-        - results[].name
-        - results[].memberCount
-        - results[].entryType
-        - results[].commonTaxon.scientificName
-        - results[].representativeMember.organismName
-        - results[].representativeMember.proteinName
+      - results[].id
+      - results[].name
+      - results[].memberCount
+      - results[].entryType
+      - results[].commonTaxon.scientificName
+      - results[].representativeMember.organismName
+      - results[].representativeMember.proteinName
+    entity: protein
   getCluster:
     description: Get UniRef cluster details by cluster ID
     tags:
-      - cluster-info
-      - protein-cluster
+    - cluster-info
+    - protein-cluster
     method: GET
     path: /{clusterId}
     params:
@@ -52,28 +53,29 @@ tools:
     response:
       format: json
       fields:
-        - id
-        - name
-        - memberCount
-        - entryType
-        - commonTaxon.scientificName
-        - representativeMember.proteinName
-        - representativeMember.organismName
-        - representativeMember.sequenceLength
+      - id
+      - name
+      - memberCount
+      - entryType
+      - commonTaxon.scientificName
+      - representativeMember.proteinName
+      - representativeMember.organismName
+      - representativeMember.sequenceLength
+    entity: sequence
 tests:
   search:
-    - name: searches for insulin clusters
-      params:
-        query: insulin
-      assert:
-        - path: results
-          minLength: 1
-        - path: results.0.id
+  - name: searches for insulin clusters
+    params:
+      query: insulin
+    assert:
+    - path: results
+      minLength: 1
+    - path: results.0.id
   getCluster:
-    - name: gets insulin cluster by ID
-      params:
-        clusterId: UniRef90_P01308
-      assert:
-        - path: id
-          equals: UniRef90_P01308
-        - path: name
+  - name: gets insulin cluster by ID
+    params:
+      clusterId: UniRef90_P01308
+    assert:
+    - path: id
+      equals: UniRef90_P01308
+    - path: name

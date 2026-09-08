@@ -2,17 +2,17 @@ name: zenodo
 displayName: Zenodo
 description: Zenodo — open research data repository hosted by CERN for datasets, software, and publications
 tags:
-  - data-repository
-  - research-data
-  - open-access
-  - zenodo
+- data-repository
+- research-data
+- open-access
+- zenodo
 baseUrl: https://zenodo.org/api
 tools:
   searchRecords:
     description: Search Zenodo records (datasets, publications, software)
     tags:
-      - record-search
-      - data-search
+    - record-search
+    - data-search
     method: GET
     path: /records
     params:
@@ -34,18 +34,19 @@ tools:
     response:
       format: json
       fields:
-        - hits.total
-        - hits.hits[].id
-        - hits.hits[].doi
-        - hits.hits[].metadata.title
-        - hits.hits[].metadata.publication_date
-        - hits.hits[].metadata.resource_type.type
-        - hits.hits[].metadata.description
-  getRecord:
+      - hits.total
+      - hits.hits[].id
+      - hits.hits[].doi
+      - hits.hits[].metadata.title
+      - hits.hits[].metadata.publication_date
+      - hits.hits[].metadata.resource_type.type
+      - hits.hits[].metadata.description
+    entity: dataset
+  getDeposit:
     description: Get metadata for a specific Zenodo record by ID
     tags:
-      - record-info
-      - dataset-info
+    - record-info
+    - dataset-info
     method: GET
     path: /records/{recordId}
     params:
@@ -56,22 +57,23 @@ tools:
     response:
       format: json
       fields:
-        - id
-        - doi
-        - metadata.title
-        - metadata.description
-        - metadata.publication_date
-        - metadata.creators[].name
-        - metadata.resource_type.type
-        - files[].filename
-        - files[].size
+      - id
+      - doi
+      - metadata.title
+      - metadata.description
+      - metadata.publication_date
+      - metadata.creators[].name
+      - metadata.resource_type.type
+      - files[].filename
+      - files[].size
+    entity: dataset
 tests:
   searchRecords:
-    - name: searches for genomics datasets
-      params:
-        q: genomics
-        size: 3
-      assert:
-        - path: hits.total
-        - path: hits.hits
-          minLength: 1
+  - name: searches for genomics datasets
+    params:
+      q: genomics
+      size: 3
+    assert:
+    - path: hits.total
+    - path: hits.hits
+      minLength: 1

@@ -2,11 +2,11 @@ name: chemspider
 displayName: ChemSpider
 description: ChemSpider — RSC chemical compound search, structures, and properties database
 tags:
-  - chemistry
-  - compounds
-  - chemical-search
-  - chemspider
-  - rsc
+- chemistry
+- compounds
+- chemical-search
+- chemspider
+- rsc
 baseUrl: https://api.rsc.org/compounds/v1
 auth:
   type: apiKey
@@ -16,8 +16,8 @@ tools:
   searchByName:
     description: Search compounds by chemical name
     tags:
-      - name-search
-      - compound-search
+    - name-search
+    - compound-search
     method: POST
     path: /filter/name
     params:
@@ -31,11 +31,12 @@ tools:
         description: Sort order (recordId, massDefect, molecularWeight, referenceCount)
     response:
       format: json
+    entity: compound
   searchBySMILES:
     description: Search compounds by SMILES structure
     tags:
-      - smiles-search
-      - structure-search
+    - smiles-search
+    - structure-search
     method: POST
     path: /filter/smiles
     params:
@@ -45,11 +46,12 @@ tools:
         description: SMILES string (e.g. CC(=O)Oc1ccccc1C(=O)O for aspirin)
     response:
       format: json
+    entity: compound
   searchByFormula:
     description: Search compounds by molecular formula
     tags:
-      - formula-search
-      - compound-search
+    - formula-search
+    - compound-search
     method: POST
     path: /filter/formula
     params:
@@ -59,11 +61,12 @@ tools:
         description: Molecular formula (e.g. C9H8O4, C8H10N4O2)
     response:
       format: json
-  getRecord:
+    entity: compound
+  getCompound:
     description: Get detailed compound information by record ID
     tags:
-      - compound-info
-      - record-details
+    - compound-info
+    - record-details
     method: GET
     path: /records/{recordId}/details
     params:
@@ -73,10 +76,11 @@ tools:
         description: ChemSpider record ID
     response:
       format: json
+    entity: compound
 tests:
   searchByName:
-    - name: searches for aspirin
-      params:
-        name: aspirin
-      assert: []
-      allowError: true
+  - name: searches for aspirin
+    params:
+      name: aspirin
+    assert: []
+    allowError: true

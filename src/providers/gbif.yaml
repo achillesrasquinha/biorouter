@@ -2,18 +2,18 @@ name: gbif
 displayName: GBIF
 description: Global Biodiversity Information Facility — species occurrence and taxonomy data worldwide
 tags:
-  - biodiversity
-  - species
-  - occurrence
-  - gbif
-  - ecology
+- biodiversity
+- species
+- occurrence
+- gbif
+- ecology
 baseUrl: https://api.gbif.org/v1
 tools:
   searchSpecies:
     description: Search GBIF for species by name or keyword
     tags:
-      - species-search
-      - taxonomy-search
+    - species-search
+    - taxonomy-search
     method: GET
     path: /species/search
     params:
@@ -29,19 +29,20 @@ tools:
     response:
       format: json
       fields:
-        - "count"
-        - "results[].key"
-        - "results[].scientificName"
-        - "results[].canonicalName"
-        - "results[].rank"
-        - "results[].kingdom"
-        - "results[].phylum"
-        - "results[].family"
+      - count
+      - results[].key
+      - results[].scientificName
+      - results[].canonicalName
+      - results[].rank
+      - results[].kingdom
+      - results[].phylum
+      - results[].family
+    entity: organism
   getOccurrences:
     description: Search GBIF for species occurrence records by taxon key
     tags:
-      - occurrence-search
-      - distribution
+    - occurrence-search
+    - distribution
     method: GET
     path: /occurrence/search
     params:
@@ -56,19 +57,20 @@ tools:
     response:
       format: json
       fields:
-        - "count"
-        - "results[].key"
-        - "results[].species"
-        - "results[].country"
-        - "results[].decimalLatitude"
-        - "results[].decimalLongitude"
-        - "results[].eventDate"
-        - "results[].basisOfRecord"
+      - count
+      - results[].key
+      - results[].species
+      - results[].country
+      - results[].decimalLatitude
+      - results[].decimalLongitude
+      - results[].eventDate
+      - results[].basisOfRecord
+    entity: organism
   getSpecies:
     description: Get detailed species information by GBIF taxon key
     tags:
-      - species-info
-      - taxonomy-detail
+    - species-info
+    - taxonomy-detail
     method: GET
     path: /species/{key}
     params:
@@ -79,19 +81,21 @@ tools:
     response:
       format: json
       fields:
-        - "key"
-        - "scientificName"
-        - "canonicalName"
-        - "vernacularName"
-        - "rank"
-        - "kingdom"
-        - "phylum"
-        - "family"
+      - key
+      - species
+      - scientificName
+      - canonicalName
+      - vernacularName
+      - rank
+      - kingdom
+      - phylum
+      - family
+    entity: organism
   getDataset:
     description: Get dataset metadata by key
     tags:
-      - dataset-info
-      - dataset-metadata
+    - dataset-info
+    - dataset-metadata
     method: GET
     path: /dataset/{key}
     params:
@@ -102,16 +106,17 @@ tools:
     response:
       format: json
       fields:
-        - key
-        - title
-        - description
-        - type
-        - publishingOrganizationKey
-        - created
+      - key
+      - title
+      - description
+      - type
+      - publishingOrganizationKey
+      - created
+    entity: dataset
   searchDatasets:
     description: Search GBIF datasets by query
     tags:
-      - dataset-search
+    - dataset-search
     method: GET
     path: /dataset/search
     params:
@@ -130,15 +135,16 @@ tools:
     response:
       format: json
       fields:
-        - results[].key
-        - results[].title
-        - results[].description
-        - results[].type
+      - results[].key
+      - results[].title
+      - results[].description
+      - results[].type
+    entity: dataset
   getOccurrenceDetail:
     description: Get a single occurrence record by key
     tags:
-      - occurrence-detail
-      - occurrence-info
+    - occurrence-detail
+    - occurrence-info
     method: GET
     path: /occurrence/{key}
     params:
@@ -149,18 +155,19 @@ tools:
     response:
       format: json
       fields:
-        - key
-        - species
-        - decimalLatitude
-        - decimalLongitude
-        - eventDate
-        - country
-        - basisOfRecord
+      - key
+      - species
+      - decimalLatitude
+      - decimalLongitude
+      - eventDate
+      - country
+      - basisOfRecord
+    entity: organism
   searchOccurrencesByTaxon:
     description: Search occurrences with taxon and country filters
     tags:
-      - occurrence-search
-      - filtered-search
+    - occurrence-search
+    - filtered-search
     method: GET
     path: /occurrence/search
     params:
@@ -178,17 +185,18 @@ tools:
     response:
       format: json
       fields:
-        - results[].key
-        - results[].species
-        - results[].decimalLatitude
-        - results[].decimalLongitude
-        - results[].eventDate
-        - results[].country
+      - results[].key
+      - results[].species
+      - results[].decimalLatitude
+      - results[].decimalLongitude
+      - results[].eventDate
+      - results[].country
+    entity: organism
   getSpeciesVernacularNames:
     description: Get common/vernacular names for a species
     tags:
-      - vernacular-names
-      - common-names
+    - vernacular-names
+    - common-names
     method: GET
     path: /species/{key}/vernacularNames
     params:
@@ -199,73 +207,74 @@ tools:
     response:
       format: json
       fields:
-        - results[].vernacularName
-        - results[].language
-        - results[].source
+      - results[].vernacularName
+      - results[].language
+      - results[].source
+    entity: sequence
 tests:
   searchSpecies:
-    - name: searches for Panthera leo
-      params:
-        query: Panthera leo
-      assert:
-        - path: results
-          minLength: 1
-        - path: results.0.scientificName
+  - name: searches for Panthera leo
+    params:
+      query: Panthera leo
+    assert:
+    - path: results
+      minLength: 1
+    - path: results.0.scientificName
   getOccurrences:
-    - name: gets occurrence records for a taxon key
-      params:
-        taxonKey: 5219404
-      assert:
-        - path: results
-          minLength: 1
+  - name: gets occurrence records for a taxon key
+    params:
+      taxonKey: 5219404
+    assert:
+    - path: results
+      minLength: 1
   getSpecies:
-    - name: gets species detail by key
-      params:
-        key: 5219404
-      assert:
-        - path: species
-          equals: Panthera leo
+  - name: gets species detail by key
+    params:
+      key: 5219404
+    assert:
+    - path: species
+      equals: Panthera leo
   getDataset:
-    - name: gets dataset metadata by key
-      params:
-        key: 4fa7b334-ce0d-4e88-aaae-2e0c138d049e
-      assert:
-        - path: key
-          equals: 4fa7b334-ce0d-4e88-aaae-2e0c138d049e
-        - path: title
+  - name: gets dataset metadata by key
+    params:
+      key: 4fa7b334-ce0d-4e88-aaae-2e0c138d049e
+    assert:
+    - path: key
+      equals: 4fa7b334-ce0d-4e88-aaae-2e0c138d049e
+    - path: title
   searchDatasets:
-    - name: searches for occurrence datasets
-      params:
-        q: butterfly
-        type: OCCURRENCE
-        limit: 5
-      assert:
-        - path: results
-          minLength: 1
-        - path: results.0.key
+  - name: searches for occurrence datasets
+    params:
+      q: butterfly
+      type: OCCURRENCE
+      limit: 5
+    assert:
+    - path: results
+      minLength: 1
+    - path: results.0.key
   getOccurrenceDetail:
-    - name: gets a single occurrence record
-      params:
-        key: 1258202889
-      assert:
-        - path: key
-          equals: 1258202889
-        - path: species
+  - name: gets a single occurrence record
+    params:
+      key: 1258202889
+    assert:
+    - path: key
+      equals: 1258202889
+    - path: country
   searchOccurrencesByTaxon:
-    - name: searches occurrences by taxon with country filter
-      params:
-        taxonKey: 5219404
-        country: US
-        limit: 5
-      assert:
-        - path: results
-          minLength: 1
-        - path: results.0.species
+  - name: searches occurrences by taxon with country filter
+    params:
+      taxonKey: 5219404
+      country: US
+      limit: 5
+    assert:
+    - path: results
+      minLength: 1
+    - path: results.0.species
   getSpeciesVernacularNames:
-    - name: gets vernacular names for a species
-      params:
-        key: 5219404
-      assert:
-        - path: results
-          minLength: 1
-        - path: results.0.vernacularName
+  - name: gets vernacular names for a species
+    params:
+      key: 5219404
+    assert:
+    - path: results
+      minLength: 1
+    - path: results.0.vernacularName

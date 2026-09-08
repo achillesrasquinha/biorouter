@@ -2,17 +2,38 @@ name: ols
 displayName: OLS
 description: Ontology Lookup Service — search and browse biomedical ontologies (GO, EFO, HPO, etc.)
 tags:
-  - ontology
-  - terminology
-  - ols
-  - controlled-vocabulary
+- ontology
+- terminology
+- ols
+- controlled-vocabulary
 baseUrl: https://www.ebi.ac.uk/ols4/api
 tools:
+  listOntologies:
+    description: List available ontologies in OLS4
+    tags:
+    - ontology-list
+    - registry
+    method: GET
+    path: /ontologies
+    params:
+      page:
+        type: integer
+        default: 0
+      size:
+        type: integer
+        default: 20
+    response:
+      format: json
+      fields:
+      - _embedded.ontologies[].ontologyId
+      - _embedded.ontologies[].config.title
+      - _embedded.ontologies[].numberOfTerms
+    entity: ontology-term
   searchTerms:
     description: Search across ontologies for terms matching a query
     tags:
-      - term-search
-      - ontology-search
+    - term-search
+    - ontology-search
     method: GET
     path: /search
     params:
@@ -28,19 +49,20 @@ tools:
     response:
       format: json
       fields:
-        - response.numFound
-        - response.docs[].label
-        - response.docs[].iri
-        - response.docs[].obo_id
-        - response.docs[].ontology_name
-        - response.docs[].description
-        - response.docs[].short_form
-        - response.docs[].type
+      - response.numFound
+      - response.docs[].label
+      - response.docs[].iri
+      - response.docs[].obo_id
+      - response.docs[].ontology_name
+      - response.docs[].description
+      - response.docs[].short_form
+      - response.docs[].type
+    entity: ontology-term
   getOntology:
     description: Get metadata about a specific ontology
     tags:
-      - ontology-info
-      - ontology-metadata
+    - ontology-info
+    - ontology-metadata
     method: GET
     path: /ontologies/{id}
     params:
@@ -51,19 +73,20 @@ tools:
     response:
       format: json
       fields:
-        - ontologyId
-        - config.title
-        - config.description
-        - config.preferredPrefix
-        - config.homepage
-        - config.version
-        - numberOfTerms
-        - numberOfProperties
+      - ontologyId
+      - config.title
+      - config.description
+      - config.preferredPrefix
+      - config.homepage
+      - config.version
+      - numberOfTerms
+      - numberOfProperties
+    entity: ontology-term
   getTerm:
     description: Get detailed information about a specific ontology term
     tags:
-      - term-detail
-      - term-info
+    - term-detail
+    - term-info
     method: GET
     path: /ontologies/{ontologyId}/terms/{iri}
     params:
@@ -78,17 +101,18 @@ tools:
     response:
       format: json
       fields:
-        - label
-        - iri
-        - obo_id
-        - description
-        - ontology_name
-        - is_root
+      - label
+      - iri
+      - obo_id
+      - description
+      - ontology_name
+      - is_root
+    entity: ontology-term
   getTermChildren:
     description: Get child terms of a specific ontology term
     tags:
-      - term-children
-      - term-hierarchy
+    - term-children
+    - term-hierarchy
     method: GET
     path: /ontologies/{ontologyId}/terms/{iri}/children
     params:
@@ -103,14 +127,15 @@ tools:
     response:
       format: json
       fields:
-        - _embedded.terms[].label
-        - _embedded.terms[].obo_id
-        - _embedded.terms[].description
+      - _embedded.terms[].label
+      - _embedded.terms[].obo_id
+      - _embedded.terms[].description
+    entity: ontology-term
   getTermParents:
     description: Get parent terms of a specific ontology term
     tags:
-      - term-parents
-      - term-hierarchy
+    - term-parents
+    - term-hierarchy
     method: GET
     path: /ontologies/{ontologyId}/terms/{iri}/parents
     params:
@@ -125,47 +150,56 @@ tools:
     response:
       format: json
       fields:
-        - _embedded.terms[].label
-        - _embedded.terms[].obo_id
+      - _embedded.terms[].label
+      - _embedded.terms[].obo_id
+    entity: ontology-term
 tests:
   searchTerms:
-    - name: searches for apoptosis terms
-      params:
-        query: apoptosis
-      assert:
-        - path: response.docs
-          minLength: 1
-        - path: response.docs.0.iri
+  - name: searches for apoptosis terms
+    params:
+      query: apoptosis
+    assert:
+    - path: response.docs
+      minLength: 1
+    - path: response.docs.0.iri
   getOntology:
-    - name: gets GO ontology metadata
-      params:
-        id: go
-      assert:
-        - path: ontologyId
-          equals: go
-        - path: numberOfTerms
-          gt: 0
+  - name: gets GO ontology metadata
+    params:
+      id: go
+    assert:
+    - path: ontologyId
+      equals: go
+    - path: numberOfTerms
+      gt: 0
   getTerm:
-    - name: gets a specific GO term
-      params:
-        ontologyId: go
-        iri: http%253A%252F%252Fpurl.obolibrary.org%252Fobo%252FGO_0006915
-      assert:
-        - path: label
-        - path: obo_id
+  - name: gets a specific GO term
+    params:
+      ontologyId: go
+      iri: http%253A%252F%252Fpurl.obolibrary.org%252Fobo%252FGO_0006915
+    assert:
+    - path: label
+    - path: obo_id
   getTermChildren:
-    - name: gets children of a GO term
-      params:
-        ontologyId: go
-        iri: http%253A%252F%252Fpurl.obolibrary.org%252Fobo%252FGO_0006915
-      assert:
-        - path: _embedded.terms
-          minLength: 1
+  - name: gets children of a GO term
+    params:
+      ontologyId: go
+      iri: http%253A%252F%252Fpurl.obolibrary.org%252Fobo%252FGO_0006915
+    assert:
+    - path: _embedded.terms
+      minLength: 1
   getTermParents:
-    - name: gets parents of a GO term
-      params:
-        ontologyId: go
-        iri: http%253A%252F%252Fpurl.obolibrary.org%252Fobo%252FGO_0006915
-      assert:
-        - path: _embedded.terms
-          minLength: 1
+  - name: gets parents of a GO term
+    params:
+      ontologyId: go
+      iri: http%253A%252F%252Fpurl.obolibrary.org%252Fobo%252FGO_0006915
+    assert:
+    - path: _embedded.terms
+      minLength: 1
+  listOntologies:
+  - name: lists available ontologies
+    params:
+      page: 0
+      size: 2
+    assert:
+    - path: _embedded.ontologies
+      minLength: 1

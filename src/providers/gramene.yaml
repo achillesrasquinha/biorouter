@@ -1,13 +1,20 @@
 name: gramene
 displayName: Gramene
 description: Gramene — comparative plant genomics resource for crops and model species
-tags: [plant-genomics, crops, genes, pathways, comparative-genomics, gramene]
+tags:
+- plant-genomics
+- crops
+- genes
+- pathways
+- comparative-genomics
+- gramene
 baseUrl: https://data.gramene.org
-
 tools:
   searchGenes:
     description: Search Gramene for plant genes by keyword or name
-    tags: [gene-search, plant-gene]
+    tags:
+    - gene-search
+    - plant-gene
     method: GET
     path: /search
     params:
@@ -22,18 +29,20 @@ tools:
     response:
       format: json
       fields:
-        - response.numFound
-        - response.docs[].id
-        - response.docs[].name
-        - response.docs[].description
-        - response.docs[].taxon_id
-        - response.docs[].biotype
-        - response.docs[].system_name
-        - response.docs[].score
-
+      - response.numFound
+      - response.docs[].id
+      - response.docs[].name
+      - response.docs[].description
+      - response.docs[].taxon_id
+      - response.docs[].biotype
+      - response.docs[].system_name
+      - response.docs[].score
+    entity: gene
   getPathway:
     description: Get details of a plant metabolic or signaling pathway
-    tags: [pathway-detail, plant-pathway]
+    tags:
+    - pathway-detail
+    - plant-pathway
     method: GET
     path: /pathways/{id}
     params:
@@ -43,13 +52,15 @@ tools:
         description: Gramene pathway identifier
     response:
       format: json
-
+    entity: pathway
 tests:
   searchGenes:
-    - name: searches for WRKY transcription factors
-      params:
-        q: WRKY
-        category: genes
-      assert:
-        - minLength: 1
-      allowError: true
+  - name: searches for WRKY transcription factors
+    params:
+      q: WRKY
+      category: genes
+    assert:
+    - path: response.numFound
+      gt: 0
+    - path: response.docs
+      minLength: 1

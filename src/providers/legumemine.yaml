@@ -2,18 +2,18 @@ name: legumemine
 displayName: LegumeMine
 description: LegumeMine — InterMine for legume genomics covering soybean, common bean, and other legumes
 tags:
-  - legume
-  - plant
-  - soybean
-  - intermine
-  - agriculture
+- legume
+- plant
+- soybean
+- intermine
+- agriculture
 baseUrl: https://mines.legumeinfo.org/legumemine/service
 tools:
   search:
     description: Search LegumeMine for legume genes, proteins, and genomic features
     tags:
-      - legume-search
-      - gene-search
+    - legume-search
+    - gene-search
     method: GET
     path: /search
     params:
@@ -32,18 +32,19 @@ tools:
     response:
       format: json
       fields:
-        - totalHits
-        - results[].id
-        - results[].type
-        - results[].fields
+      - totalHits
+      - results[].id
+      - results[].type
+      - results[].fields
+    entity: gene
 tests:
   search:
-    - name: searches for soybean
-      params:
-        q: soybean
-        format: json
-        size: 3
-      assert:
-        - path: totalHits
-        - path: results
-          minLength: 1
+  - name: searches for soybean
+    params:
+      q: soybean
+      format: json
+      size: 3
+    assert:
+    - path: totalHits
+    - path: results
+      minLength: 1

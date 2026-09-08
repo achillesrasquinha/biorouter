@@ -2,10 +2,10 @@ name: orphanet
 displayName: Orphanet
 description: Orphanet — reference portal for rare diseases and orphan drugs
 tags:
-  - rare-disease
-  - orphanet
-  - clinical
-  - genetic-disease
+- rare-disease
+- orphanet
+- clinical
+- genetic-disease
 baseUrl: https://api.orphacode.org
 headers:
   apikey: test
@@ -13,8 +13,8 @@ tools:
   searchDisease:
     description: Search Orphanet for rare diseases by name
     tags:
-      - disease-search
-      - rare-disease-search
+    - disease-search
+    - rare-disease-search
     method: GET
     path: /EN/ClinicalEntity/ApproximateName/{query}
     params:
@@ -25,14 +25,15 @@ tools:
     response:
       format: json
       fields:
-        - '[].ORPHAcode'
-        - '[].Preferred term'
-        - '[].Date'
+      - '[].ORPHAcode'
+      - '[].Preferred term'
+      - '[].Date'
+    entity: disease
   getDisease:
     description: Get details of a rare disease by its ORPHAcode
     tags:
-      - disease-info
-      - rare-disease-info
+    - disease-info
+    - rare-disease-info
     method: GET
     path: /EN/ClinicalEntity/orphacode/{orphacode}/Name
     params:
@@ -43,21 +44,22 @@ tools:
     response:
       format: json
       fields:
-        - ORPHAcode
-        - Preferred term
-        - Date
+      - ORPHAcode
+      - Preferred term
+      - Date
+    entity: disease
 tests:
   searchDisease:
-    - name: searches for Marfan syndrome
-      params:
-        query: Marfan
-      assert:
-        - isArray: true
-        - path: 0.ORPHAcode
+  - name: searches for Marfan syndrome
+    params:
+      query: Marfan
+    assert:
+    - isArray: true
+    - path: 0.ORPHAcode
   getDisease:
-    - name: gets disease 558 (Marfan syndrome)
-      params:
-        orphacode: "558"
-      assert:
-        - path: ORPHAcode
-          equals: 558
+  - name: gets disease 558 (Marfan syndrome)
+    params:
+      orphacode: '558'
+    assert:
+    - path: ORPHAcode
+      equals: 558

@@ -1,0 +1,97 @@
+name: opsin
+displayName: OPSIN
+description: OPSIN — Open Parser for Systematic IUPAC Nomenclature, converts chemical names to structures
+tags:
+- chemistry
+- name-to-structure
+- iupac
+- opsin
+baseUrl: https://www.ebi.ac.uk/opsin/ws
+tools:
+  nameToSmiles:
+    description: Convert an IUPAC or common chemical name to a SMILES string
+    tags:
+    - name-to-smiles
+    - chemical-conversion
+    method: GET
+    path: /{name}.smi
+    params:
+      name:
+        type: string
+        required: true
+        description: Chemical name to convert (e.g. aspirin, 2-acetoxybenzoic acid, ethanol)
+    response:
+      format: text
+      fields:
+      - smiles
+    entity: compound
+  nameToInchi:
+    description: Convert an IUPAC or common chemical name to an InChI string
+    tags:
+    - name-to-inchi
+    - chemical-conversion
+    method: GET
+    path: /{name}.inchi
+    params:
+      name:
+        type: string
+        required: true
+        description: Chemical name to convert (e.g. aspirin, caffeine, glucose)
+    response:
+      format: text
+      fields:
+      - inchi
+    entity: compound
+  nameToInchiKey:
+    description: Convert an IUPAC or common chemical name to a Standard InChIKey
+    tags:
+    - name-to-inchikey
+    - chemical-conversion
+    method: GET
+    path: /{name}.stdinchikey
+    params:
+      name:
+        type: string
+        required: true
+        description: Chemical name to convert (e.g. aspirin, paracetamol, ibuprofen)
+    response:
+      format: text
+      fields:
+      - stdinchikey
+    entity: compound
+  nameToCml:
+    description: Convert an IUPAC or common chemical name to Chemical Markup Language (CML) XML
+    tags:
+    - name-to-cml
+    - chemical-conversion
+    method: GET
+    path: /{name}.cml
+    params:
+      name:
+        type: string
+        required: true
+        description: Chemical name to convert (e.g. benzene, methanol, acetic acid)
+    response:
+      format: xml
+      fields:
+      - cml
+    entity: compound
+tests:
+  nameToSmiles:
+  - name: converts ethanol to SMILES
+    params:
+      name: ethanol
+    assert:
+    - minLength: 1
+  nameToInchi:
+  - name: converts ethanol to InChI
+    params:
+      name: ethanol
+    assert:
+    - minLength: 1
+  nameToInchiKey:
+  - name: converts ethanol to InChIKey
+    params:
+      name: ethanol
+    assert:
+    - minLength: 1

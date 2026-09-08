@@ -2,19 +2,19 @@ name: comptox
 displayName: CompTox
 description: EPA CompTox Chemicals Dashboard for toxicology and chemical safety
 tags:
-  - toxicology
-  - chemical
-  - epa
-  - safety
-  - environmental
-  - comptox
+- toxicology
+- chemical
+- epa
+- safety
+- environmental
+- comptox
 baseUrl: https://comptox.epa.gov/dashboard-api
 tools:
   searchChemical:
     description: Search chemicals by name prefix in CompTox
     tags:
-      - chemical-search
-      - comptox-search
+    - chemical-search
+    - comptox-search
     method: GET
     path: /ccdapp1/search/chemical/start-with/{query}
     params:
@@ -25,17 +25,18 @@ tools:
     response:
       format: json
       fields:
-        - "[].dtxsid"
-        - "[].dtxcid"
-        - "[].searchWord"
-        - "[].searchMatch"
-        - "[].rank"
-        - "[].hasStructureImage"
+      - '[].dtxsid'
+      - '[].dtxcid'
+      - '[].searchWord'
+      - '[].searchMatch'
+      - '[].rank'
+      - '[].hasStructureImage'
+    entity: compound
   searchContain:
     description: Search chemicals by name substring in CompTox
     tags:
-      - chemical-search
-      - comptox-contain
+    - chemical-search
+    - comptox-contain
     method: GET
     path: /ccdapp1/search/chemical/contain/{query}
     params:
@@ -46,17 +47,18 @@ tools:
     response:
       format: json
       fields:
-        - "[].dtxsid"
-        - "[].dtxcid"
-        - "[].searchWord"
-        - "[].searchMatch"
-        - "[].rank"
-        - "[].hasStructureImage"
+      - '[].dtxsid'
+      - '[].dtxcid'
+      - '[].searchWord'
+      - '[].searchMatch'
+      - '[].rank'
+      - '[].hasStructureImage'
+    entity: compound
   getChemicalDetails:
     description: Get detailed chemical information by DTXSID
     tags:
-      - chemical-detail
-      - comptox-detail
+    - chemical-detail
+    - comptox-detail
     method: GET
     path: /ccdapp1/search/chemical/equal/{dtxsid}
     params:
@@ -67,15 +69,16 @@ tools:
     response:
       format: json
       fields:
-        - "[].dtxsid"
-        - "[].preferredName"
-        - "[].casrn"
-        - "[].molecularFormula"
+      - '[].dtxsid'
+      - '[].preferredName'
+      - '[].casrn'
+      - '[].molecularFormula'
+    entity: compound
   searchByName:
     description: Search chemicals by exact name in CompTox
     tags:
-      - chemical-search
-      - comptox-name-search
+    - chemical-search
+    - comptox-name-search
     method: GET
     path: /ccdapp1/search/chemical/equal/{name}
     params:
@@ -86,37 +89,38 @@ tools:
     response:
       format: json
       fields:
-        - "[].dtxsid"
-        - "[].dtxcid"
-        - "[].searchWord"
-        - "[].searchMatch"
-        - "[].rank"
+      - '[].dtxsid'
+      - '[].dtxcid'
+      - '[].searchWord'
+      - '[].searchMatch'
+      - '[].rank'
+    entity: compound
 tests:
   searchChemical:
-    - name: searches for bisphenol chemicals
-      params:
-        query: bisphenol
-      assert:
-        - {}
-        - isArray: true
+  - name: searches for bisphenol chemicals
+    params:
+      query: bisphenol
+    assert:
+    - {}
+    - isArray: true
   getChemicalDetails:
-    - name: gets chemical details for DTXSID7020182
-      params:
-        dtxsid: DTXSID7020182
-      assert:
-        - {}
-        - isArray: true
+  - name: gets chemical details for DTXSID7020182
+    params:
+      dtxsid: DTXSID7020182
+    assert:
+    - {}
+    - isArray: true
   searchByName:
-    - name: searches for Bisphenol A by name
-      params:
-        name: Bisphenol A
-      assert:
-        - {}
-        - isArray: true
+  - name: searches for Bisphenol A by name
+    params:
+      name: Bisphenol A
+    assert:
+    - {}
+    - isArray: true
   searchContain:
-    - name: searches for phthalate chemicals by substring
-      params:
-        query: phthalate
-      assert:
-        - {}
-        - isArray: true
+  - name: searches for phthalate chemicals by substring
+    params:
+      query: phthalate
+    assert:
+    - {}
+    - isArray: true

@@ -2,17 +2,17 @@ name: rnacentral
 displayName: RNAcentral
 description: RNAcentral — comprehensive non-coding RNA sequence database
 tags:
-  - rna
-  - noncoding-rna
-  - sequences
-  - rnacentral
+- rna
+- noncoding-rna
+- sequences
+- rnacentral
 baseUrl: https://rnacentral.org/api/v1
 tools:
   search:
     description: Search RNAcentral for non-coding RNA sequences by keyword
     tags:
-      - rna-search
-      - sequence-search
+    - rna-search
+    - sequence-search
     method: GET
     path: /rna/
     params:
@@ -31,17 +31,18 @@ tools:
     response:
       format: json
       fields:
-        - results[].rnacentral_id
-        - results[].description
-        - results[].rna_type
-        - results[].length
-        - results[].count_distinct_organisms
-        - results[].distinct_databases
+      - results[].rnacentral_id
+      - results[].description
+      - results[].rna_type
+      - results[].length
+      - results[].count_distinct_organisms
+      - results[].distinct_databases
+    entity: sequence
   getEntry:
     description: Get a specific RNA entry by its URS identifier
     tags:
-      - rna-info
-      - sequence-info
+    - rna-info
+    - sequence-info
     method: GET
     path: /rna/{upi}
     params:
@@ -56,29 +57,30 @@ tools:
     response:
       format: json
       fields:
-        - rnacentral_id
-        - description
-        - rna_type
-        - sequence
-        - length
-        - is_active
-        - count_distinct_organisms
-        - distinct_databases
+      - rnacentral_id
+      - description
+      - rna_type
+      - sequence
+      - length
+      - is_active
+      - count_distinct_organisms
+      - distinct_databases
+    entity: dataset
 tests:
   search:
-    - name: searches for BRCA1 non-coding RNA
-      params:
-        query: BRCA1
-        page_size: 5
-      assert:
-        - path: results
-          minLength: 1
-        - path: results.0.rnacentral_id
+  - name: searches for BRCA1 non-coding RNA
+    params:
+      query: BRCA1
+      page_size: 5
+    assert:
+    - path: results
+      minLength: 1
+    - path: results.0.rnacentral_id
   getEntry:
-    - name: gets a specific RNA entry by URS identifier
-      params:
-        upi: URS0000301B08
-      assert:
-        - path: rnacentral_id
-          equals: URS0000301B08
-        - path: sequence
+  - name: gets a specific RNA entry by URS identifier
+    params:
+      upi: URS0000301B08
+    assert:
+    - path: rnacentral_id
+      equals: URS0000301B08
+    - path: sequence

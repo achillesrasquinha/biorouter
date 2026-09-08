@@ -1,0 +1,59 @@
+name: identifiers-org
+displayName: Identifiers.org
+description: Identifiers.org — CURIE resolution service for persistent identification of life science data
+tags:
+- identifier
+- curie
+- resolution
+- identifiers-org
+baseUrl: https://resolver.api.identifiers.org
+tools:
+  resolve:
+    description: Resolve a compact identifier (CURIE) to its provider URLs and metadata
+    tags:
+    - curie-resolution
+    - identifier-lookup
+    method: GET
+    path: /{curie}
+    params:
+      curie:
+        type: string
+        required: true
+        description: Compact identifier in CURIE format (e.g. uniprot:P04637, taxonomy:9606, go:0006915)
+    response:
+      format: json
+      fields:
+      - payload.resolvedResources[].compactIdentifierResolvedUrl
+      - payload.resolvedResources[].resourcePrefix
+      - payload.resolvedResources[].description
+      - payload.resolvedResources[].institution.name
+      - payload.resolvedResources[].official
+    entity: identifier
+  getNamespace:
+    description: Search for namespace information by prefix or keyword query
+    tags:
+    - namespace-search
+    - prefix-lookup
+    method: GET
+    path: /resolve?query={query}
+    params:
+      query:
+        type: string
+        required: true
+        description: Namespace prefix or keyword to search (e.g. uniprot, chebi, ensembl)
+        mapsTo: query
+    response:
+      format: json
+      fields:
+      - payload.resolvedResources[].compactIdentifierResolvedUrl
+      - payload.resolvedResources[].resourcePrefix
+      - payload.resolvedResources[].description
+    entity: identifier
+tests:
+  resolve:
+  - name: resolves UniProt P04637 (TP53) CURIE
+    params:
+      curie: uniprot:P04637
+    assert:
+    - path: payload.resolvedResources
+      minLength: 1

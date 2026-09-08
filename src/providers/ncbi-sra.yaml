@@ -2,19 +2,19 @@ name: ncbi-sra
 displayName: NCBI SRA
 description: Sequence Read Archive — raw sequencing data repository
 tags:
-  - sequencing
-  - sra
-  - raw-data
-  - ncbi
-  - ngs
-  - rnaseq
+- sequencing
+- sra
+- raw-data
+- ncbi
+- ngs
+- rnaseq
 baseUrl: https://eutils.ncbi.nlm.nih.gov/entrez/eutils
 tools:
   search:
     description: Search SRA studies by keyword
     tags:
-      - sra-search
-      - sequencing-search
+    - sra-search
+    - sequencing-search
     method: GET
     path: /esearch.fcgi
     params:
@@ -34,14 +34,15 @@ tools:
     response:
       format: json
       fields:
-        - esearchresult.count
-        - esearchresult.idlist
-        - esearchresult.querytranslation
+      - esearchresult.count
+      - esearchresult.idlist
+      - esearchresult.querytranslation
+    entity: dataset
   getSummary:
     description: Get SRA record summary by ID
     tags:
-      - sra-summary
-      - sequencing-detail
+    - sra-summary
+    - sequencing-detail
     method: GET
     path: /esummary.fcgi
     params:
@@ -57,13 +58,14 @@ tools:
         default: json
     response:
       format: json
+    entity: dataset
 tests:
   search:
-    - name: searches SRA for cancer RNA-seq
-      params:
-        db: sra
-        term: cancer RNA-seq
-      assert:
-        - path: esearchresult
-        - path: esearchresult.idlist
-          minLength: 1
+  - name: searches SRA for cancer RNA-seq
+    params:
+      db: sra
+      term: cancer RNA-seq
+    assert:
+    - path: esearchresult
+    - path: esearchresult.idlist
+      minLength: 1

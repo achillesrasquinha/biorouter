@@ -1,0 +1,687 @@
+description: Profile an organism — taxonomy, genome, model organism resources, ecology, and phylogenetics
+tags:
+- organism
+- profile
+- taxonomy
+- species
+- ecology
+- biorouter
+input:
+  query:
+    type: string
+    required: true
+    description: Species name, NCBI Taxon ID, common name, or model organism identifier (e.g. "Homo sapiens", "E. coli K-12",
+      "zebrafish", "9606", "Drosophila melanogaster")
+phases:
+- name: resolve
+  parallel: false
+  calls:
+  - source: ncbi-taxonomy
+    tool: search
+    params:
+      query: '{input.query}'
+      maxResults: 10
+    extract:
+      _id_list: esearchresult.idlist
+  - source: ncbi-taxonomy
+    tool: getSummary
+    params:
+      id: '{resolved._id_list[0]}'
+    skip_if: '!resolved._id_list'
+    pick_best:
+      array: taxonomy_nodes
+      match_field: organism.sci_name
+      against: input.query
+      as: best_taxon
+    extract:
+      taxon_id: best_taxon.taxonomy.tax_id
+      scientific_name: best_taxon.organism.sci_name
+      common_name: best_taxon.organism.common_name
+      lineage: best_taxon.taxonomy.lineage
+      rank: best_taxon.taxonomy.rank
+  - source: catalogue-of-life
+    tool: searchSpecies
+    params:
+      query: '{input.query}'
+      limit: 5
+    pick_best:
+      array: result
+      match_field: usage.name.scientificName
+      against: input.query
+      as: best_col
+    extract:
+      col_id: best_col.usage.id
+      col_name: best_col.usage.name.scientificName
+      col_status: best_col.usage.status
+      kingdom: best_col.usage.name.kingdom
+      col_authorship: best_col.usage.name.authorship
+  - source: ncbi-datasets
+    tool: searchTaxonomy
+    params:
+      taxon: '{input.query}'
+    pick_best:
+      array: taxonomy_nodes
+      match_field: taxonomy.organism_name
+      against: input.query
+      as: best_ncbi_ds
+    extract:
+      ncbi_ds_taxon_id: best_ncbi_ds.taxonomy.tax_id
+      ncbi_ds_name: best_ncbi_ds.taxonomy.organism_name
+      ncbi_ds_common: best_ncbi_ds.taxonomy.common_name
+- name: fetch
+  parallel: true
+  calls:
+  - source: ncbi-taxonomy
+    tool: getSummary
+    params:
+      id: '{resolved.taxon_id}'
+    skip_if: '!resolved.taxon_id'
+    provides:
+    - taxonomy
+  - source: catalogue-of-life
+    tool: getSpecies
+    params:
+      id: '{resolved.col_id}'
+    skip_if: '!resolved.col_id'
+    provides:
+    - taxonomy
+  - source: agr
+    tool: searchAutocomplete
+    params:
+      q: '{input.query}'
+    provides:
+    - modelOrganism
+  - source: flybase
+    tool: search
+    params:
+      query: '{input.query}'
+    provides:
+    - modelOrganism
+  - source: zfin
+    tool: searchGenes
+    params:
+      q: '{input.query}'
+    provides:
+    - modelOrganism
+  - source: wormbase
+    tool: searchGene
+    params:
+      query: '{input.query}'
+    provides:
+    - modelOrganism
+  - source: impc
+    tool: searchGenes
+    params:
+      q: '{input.query}'
+    provides:
+    - modelOrganism
+  - source: bv-brc
+    tool: searchGenomes
+    params:
+      term: '{input.query}'
+    provides:
+    - pathogens
+  - source: nextstrain
+    tool: getAvailableDatasets
+    provides:
+    - pathogens
+  - source: gbif
+    tool: searchSpecies
+    params:
+      query: '{input.query}'
+    provides:
+    - ecology
+  - source: iucn
+    tool: searchSpecies
+    params:
+      query: '{input.query}'
+    provides:
+    - ecology
+  - source: inaturalist
+    tool: searchTaxa
+    params:
+      query: '{input.query}'
+    provides:
+    - ecology
+  - source: opentreeoflife
+    tool: searchTaxa
+    params:
+      names:
+      - '{input.query}'
+    provides:
+    - phylogenetics
+  - source: timetree
+    tool: getTimeline
+    params:
+      taxon: '{input.query}'
+    provides:
+    - phylogenetics
+  - source: gramene
+    tool: searchGenes
+    params:
+      q: '{input.query}'
+    provides:
+    - plants
+  - source: bold
+    tool: searchSpecimen
+    params:
+      name: '{input.query}'
+    provides:
+    - ecology
+  - source: fishbase
+    tool: searchSpecies
+    params:
+      genus: '{input.query}'
+    provides:
+    - ecology
+  - source: worms
+    tool: searchByName
+    params:
+      name: '{input.query}'
+    provides:
+    - taxonomy
+  - source: itis
+    tool: searchByName
+    params:
+      name: '{input.query}'
+    provides:
+    - taxonomy
+  - source: obis
+    tool: searchOccurrences
+    params:
+      name: '{input.query}'
+      size: 10
+    provides:
+    - ecology
+  - source: gtdb
+    tool: search
+    params:
+      search: '{input.query}'
+    provides:
+    - taxonomy
+  - source: mgnify
+    tool: searchStudies
+    params:
+      query: '{input.query}'
+    provides:
+    - metagenomics
+  - source: natureserve
+    tool: searchSpecies
+    params:
+      scientificTaxonomy: '{input.query}'
+    provides:
+    - ecology
+  - source: rgd
+    tool: searchGenes
+    params:
+      query: '{input.query}'
+    provides:
+    - modelOrganism
+  - source: mgi
+    tool: search
+    params:
+      query: '{input.query}'
+      limit: 10
+    provides:
+    - modelOrganism
+  # --- Supplementary calls (keyword-search tools compatible with species names) ---
+  - source: bold
+    tool: searchSequences
+    params:
+      name: '{input.query}'
+    provides:
+    - ecology
+  - source: bv-brc
+    tool: searchTaxonomy
+    params:
+      name: '{input.query}'
+    provides:
+    - pathogens
+  - source: catalogue-of-life
+    tool: getClassification
+    params:
+      id: '{resolved.col_id}'
+    skip_if: '!resolved.col_id'
+    provides:
+    - taxonomy
+  - source: catalogue-of-life
+    tool: searchByHigherTaxon
+    params:
+      query: '{input.query}'
+      rank: family
+    provides:
+    - taxonomy
+  - source: gbif
+    tool: searchDatasets
+    params:
+      q: '{input.query}'
+    provides:
+    - ecology
+  - source: impc
+    tool: searchPhenotypes
+    params:
+      q: '{input.query}'
+    provides:
+    - modelOrganism
+  - source: inaturalist
+    tool: searchObservations
+    params:
+      query: '{input.query}'
+    provides:
+    - ecology
+  - source: itis
+    tool: searchByCommonName
+    params:
+      name: '{input.query}'
+    provides:
+    - taxonomy
+  - source: iucn
+    tool: getConservationActions
+    params:
+      name: '{resolved.scientific_name}'
+    skip_if: '!resolved.scientific_name'
+    provides:
+    - ecology
+  - source: iucn
+    tool: getCountryOccurrences
+    params:
+      name: '{resolved.scientific_name}'
+    skip_if: '!resolved.scientific_name'
+    provides:
+    - ecology
+  - source: iucn
+    tool: getSpecies
+    params:
+      name: '{resolved.scientific_name}'
+    skip_if: '!resolved.scientific_name'
+    provides:
+    - ecology
+  - source: iucn
+    tool: getSpeciesNarrative
+    params:
+      name: '{resolved.scientific_name}'
+    skip_if: '!resolved.scientific_name'
+    provides:
+    - ecology
+  - source: iucn
+    tool: getThreats
+    params:
+      name: '{resolved.scientific_name}'
+    skip_if: '!resolved.scientific_name'
+    provides:
+    - ecology
+  - source: mgi
+    tool: searchAlleles
+    params:
+      query: '{input.query}'
+    provides:
+    - modelOrganism
+  - source: mgi
+    tool: searchPhenotypes
+    params:
+      query: '{input.query}'
+    provides:
+    - modelOrganism
+  - source: obis
+    tool: searchTaxa
+    params:
+      name: '{input.query}'
+    provides:
+    - ecology
+  - source: rgd
+    tool: searchStrains
+    params:
+      query: '{input.query}'
+    provides:
+    - modelOrganism
+  - source: worms
+    tool: searchByVernacular
+    params:
+      name: '{input.query}'
+    provides:
+    - ecology
+output:
+  identity:
+    scientificName:
+      sources:
+      - source: ncbi-taxonomy
+        call: search
+        path: resolved.scientific_name
+        rank: 1
+      - source: catalogue-of-life
+        call: searchSpecies
+        path: resolved.col_name
+        rank: 2
+      - source: ncbi-datasets
+        call: searchTaxonomy
+        path: resolved.ncbi_ds_name
+        rank: 3
+      reason: Canonical scientific name resolved across NCBI, Catalogue of Life, and NCBI Datasets
+    commonName:
+      from: resolved.common_name
+      fallback: resolved.ncbi_ds_common
+    taxonId:
+      from: resolved.taxon_id
+    kingdom:
+      from: resolved.kingdom
+    rank:
+      from: resolved.rank
+    lineage:
+      from: resolved.lineage
+    ids:
+      from: resolved
+      fields:
+      - taxon_id
+      - col_id
+      - ncbi_ds_taxon_id
+  taxonomy:
+    ncbiTaxonomy:
+      sources:
+      - source: ncbi-taxonomy
+        call: getSummary
+        path: $passthrough
+        rank: 1
+      reason: NCBI Taxonomy full record including lineage, genetic code, and division
+    catalogueOfLife:
+      sources:
+      - source: catalogue-of-life
+        call: getSpecies
+        path: $passthrough
+        rank: 1
+      reason: Catalogue of Life canonical classification with accepted name status and authorship
+    colStatus:
+      from: resolved.col_status
+      reason: Taxonomic name status (accepted, synonym, etc.) from Catalogue of Life
+    worms:
+      sources:
+      - source: worms
+        call: searchByName
+        path: $passthrough
+        rank: 1
+      reason: WoRMS authoritative marine species classification including AphiaID and nomenclature status
+    itis:
+      sources:
+      - source: itis
+        call: searchByName
+        path: $passthrough
+        rank: 1
+      reason: ITIS taxonomic records including TSN identifiers for plants, animals, fungi, and microbes
+    gtdb:
+      sources:
+      - source: gtdb
+        call: search
+        path: $passthrough
+        rank: 1
+      reason: GTDB genome-based bacterial and archaeal taxonomy — only populated for prokaryote queries
+    colClassification:
+      sources:
+      - source: catalogue-of-life
+        call: getClassification
+        path: $passthrough
+        rank: 1
+      reason: Catalogue of Life full taxonomic classification hierarchy from kingdom to species
+    colHigherTaxon:
+      sources:
+      - source: catalogue-of-life
+        call: searchByHigherTaxon
+        path: $passthrough
+        rank: 1
+      reason: Catalogue of Life higher taxon search results at family rank
+    itsByCommonName:
+      sources:
+      - source: itis
+        call: searchByCommonName
+        path: $passthrough
+        rank: 1
+      reason: ITIS taxa matched by common or vernacular name
+  modelOrganism:
+    agrGenes:
+      sources:
+      - source: agr
+        call: searchAutocomplete
+        path: $passthrough
+        rank: 1
+      reason: Alliance of Genome Resources gene matches across model organisms
+    flybase:
+      sources:
+      - source: flybase
+        call: search
+        path: $passthrough
+        rank: 1
+      reason: FlyBase Drosophila gene and allele data — only populated for fruit fly queries
+    zfin:
+      sources:
+      - source: zfin
+        call: searchGenes
+        path: $passthrough
+        rank: 1
+      reason: ZFIN zebrafish gene and phenotype data — only populated for Danio rerio queries
+    wormbase:
+      sources:
+      - source: wormbase
+        call: searchGene
+        path: $passthrough
+        rank: 1
+      reason: WormBase C. elegans gene and phenotype data — only populated for nematode queries
+    impc:
+      sources:
+      - source: impc
+        call: searchGenes
+        path: $passthrough
+        rank: 1
+      reason: IMPC mouse gene knockouts and associated phenotypes from systematic phenotyping
+    rgd:
+      sources:
+      - source: rgd
+        call: searchGenes
+        path: $passthrough
+        rank: 1
+      reason: Rat Genome Database gene matches — only populated for rat gene or organism queries
+    mgi:
+      sources:
+      - source: mgi
+        call: search
+        path: $passthrough
+        rank: 1
+      reason: Mouse Genome Informatics marker/gene data — only populated for mouse gene or organism queries
+    impcPhenotypes:
+      sources:
+      - source: impc
+        call: searchPhenotypes
+        path: $passthrough
+        rank: 1
+      reason: IMPC genotype-phenotype associations for mouse knockout lines
+    mgiAlleles:
+      sources:
+      - source: mgi
+        call: searchAlleles
+        path: $passthrough
+        rank: 1
+      reason: MGI mouse allele records with allele types and associated markers
+    mgiPhenotypes:
+      sources:
+      - source: mgi
+        call: searchPhenotypes
+        path: $passthrough
+        rank: 1
+      reason: MGI gene expression data from the Gene Expression Database (GXD)
+    rgdStrains:
+      sources:
+      - source: rgd
+        call: searchStrains
+        path: $passthrough
+        rank: 1
+      reason: Rat Genome Database strain records with disease and phenotype associations
+  pathogens:
+    genomics:
+      sources:
+      - source: bv-brc
+        call: searchGenomes
+        path: $passthrough
+        rank: 1
+      reason: BV-BRC pathogen genome assemblies with AMR annotations and host information
+    evolution:
+      sources:
+      - source: nextstrain
+        call: getAvailableDatasets
+        path: $passthrough
+        rank: 1
+      reason: Nextstrain real-time pathogen evolution and epidemiological tracking datasets
+    bvbrcTaxonomy:
+      sources:
+      - source: bv-brc
+        call: searchTaxonomy
+        path: $passthrough
+        rank: 1
+      reason: BV-BRC bacterial and viral taxonomy search results
+  ecology:
+    gbifSpecies:
+      sources:
+      - source: gbif
+        call: searchSpecies
+        path: $passthrough
+        rank: 1
+      reason: GBIF species occurrence backbone — global distribution and observation data
+    conservationStatus:
+      sources:
+      - source: iucn
+        call: searchSpecies
+        path: $passthrough
+        rank: 1
+      reason: IUCN Red List conservation status — threat level, population trends, and assessment
+    inaturalistTaxa:
+      sources:
+      - source: inaturalist
+        call: searchTaxa
+        path: $passthrough
+        rank: 1
+      reason: iNaturalist community taxon observations — geographic distribution and citizen science data
+    obisOccurrences:
+      sources:
+      - source: obis
+        call: searchOccurrences
+        path: $passthrough
+        rank: 1
+      reason: OBIS marine species occurrence records with coordinates, depth, and observation dates
+    natureserve:
+      sources:
+      - source: natureserve
+        call: searchSpecies
+        path: $passthrough
+        rank: 1
+      reason: NatureServe conservation status ranks and biodiversity data across the Americas
+    boldSpecimens:
+      sources:
+      - source: bold
+        call: searchSpecimen
+        path: $passthrough
+        rank: 1
+      reason: BOLD DNA barcode specimen records for species identification and biodiversity assessment
+    fishbase:
+      sources:
+      - source: fishbase
+        call: searchSpecies
+        path: $passthrough
+        rank: 1
+      reason: FishBase fish species biology, ecology, and taxonomy — only populated for fish queries
+    boldSequences:
+      sources:
+      - source: bold
+        call: searchSequences
+        path: $passthrough
+        rank: 1
+      reason: BOLD DNA barcode sequences for species-level molecular identification
+    gbifDatasets:
+      sources:
+      - source: gbif
+        call: searchDatasets
+        path: $passthrough
+        rank: 1
+      reason: GBIF dataset search results for occurrence and checklist datasets
+    inaturalistObservations:
+      sources:
+      - source: inaturalist
+        call: searchObservations
+        path: $passthrough
+        rank: 1
+      reason: iNaturalist biodiversity observations with species, date, and location data
+    iucnConservationActions:
+      sources:
+      - source: iucn
+        call: getConservationActions
+        path: $passthrough
+        rank: 1
+      reason: IUCN Red List conservation measures and protection actions for a species
+    iucnCountryOccurrences:
+      sources:
+      - source: iucn
+        call: getCountryOccurrences
+        path: $passthrough
+        rank: 1
+      reason: IUCN Red List country-level occurrence data with presence and origin status
+    iucnSpeciesDetail:
+      sources:
+      - source: iucn
+        call: getSpecies
+        path: $passthrough
+        rank: 1
+      reason: IUCN Red List detailed conservation status with population trend and common name
+    iucnNarrative:
+      sources:
+      - source: iucn
+        call: getSpeciesNarrative
+        path: $passthrough
+        rank: 1
+      reason: IUCN Red List species narrative including habitat, threats, and population description
+    iucnThreats:
+      sources:
+      - source: iucn
+        call: getThreats
+        path: $passthrough
+        rank: 1
+      reason: IUCN Red List threat assessment with timing, scope, and severity
+    obisTaxa:
+      sources:
+      - source: obis
+        call: searchTaxa
+        path: $passthrough
+        rank: 1
+      reason: OBIS marine taxa checklist search with taxonomic classification and record counts
+    wormsVernacular:
+      sources:
+      - source: worms
+        call: searchByVernacular
+        path: $passthrough
+        rank: 1
+      reason: WoRMS marine species records matched by common or vernacular name
+  phylogenetics:
+    treePlacement:
+      sources:
+      - source: opentreeoflife
+        call: searchTaxa
+        path: $passthrough
+        rank: 1
+      reason: Open Tree of Life name resolution and placement in the synthetic tree of life
+    divergenceTimes:
+      sources:
+      - source: timetree
+        call: getTimeline
+        path: $passthrough
+        rank: 1
+      reason: TimeTree molecular divergence time estimates from published studies
+  metagenomics:
+    mgnifyStudies:
+      sources:
+      - source: mgnify
+        call: searchStudies
+        path: $passthrough
+        rank: 1
+      reason: MGnify metagenomics studies associated with this organism — microbiome and environmental samples
+  plants:
+    cropGenomics:
+      sources:
+      - source: gramene
+        call: searchGenes
+        path: $passthrough
+        rank: 1
+      reason: Gramene plant comparative genomics — only populated for plant species queries

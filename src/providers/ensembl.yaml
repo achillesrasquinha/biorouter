@@ -2,12 +2,12 @@ name: ensembl
 displayName: Ensembl
 description: Genome browser and annotation database
 tags:
-  - gene
-  - genome
-  - annotation
-  - sequence
-  - ensembl
-  - variant
+- gene
+- genome
+- annotation
+- sequence
+- ensembl
+- variant
 baseUrl: https://rest.ensembl.org
 headers:
   Content-Type: application/json
@@ -17,8 +17,8 @@ tools:
   lookupSymbol:
     description: Look up a gene by symbol and species
     tags:
-      - gene-lookup
-      - symbol
+    - gene-lookup
+    - symbol
     method: GET
     path: /lookup/symbol/{species}/{symbol}
     params:
@@ -33,20 +33,21 @@ tools:
     response:
       format: json
       fields:
-        - "id"
-        - "display_name"
-        - "description"
-        - "biotype"
-        - "species"
-        - "seq_region_name"
-        - "start"
-        - "end"
+      - id
+      - display_name
+      - description
+      - biotype
+      - species
+      - seq_region_name
+      - start
+      - end
+    entity: identifier
   getSequence:
     description: Get sequence for an Ensembl stable ID
     tags:
-      - sequence-fetch
-      - nucleotide
-      - protein
+    - sequence-fetch
+    - nucleotide
+    - protein
     method: GET
     path: /sequence/id/{id}
     params:
@@ -57,20 +58,21 @@ tools:
     response:
       format: json
       fields:
-        - "id"
-        - "desc"
-        - "molecule"
-        - "query"
-        - "seq"
-        - "version"
+      - id
+      - desc
+      - molecule
+      - query
+      - seq
+      - version
+    entity: sequence
   getVariantConsequences:
     description: Get variant consequences for a variant ID
     tags:
-      - variant
-      - consequence
-      - vep
+    - variant
+    - consequence
+    - vep
     method: GET
-    path: /vep/human/id/{id}/consequences
+    path: /vep/human/id/{id}
     params:
       id:
         type: string
@@ -79,15 +81,15 @@ tools:
     response:
       format: json
       fields:
-        - "transcript_consequences[].gene_symbol"
-        - "transcript_consequences[].consequence_terms"
-        - "transcript_consequences[].impact"
-        - "transcript_consequences[].biotype"
+      - '[].transcript_consequences'
+      - '[].most_severe_consequence'
+      - '[].id'
+    entity: variant
   lookupId:
     description: Lookup any Ensembl ID to get summary information
     tags:
-      - lookup
-      - ensembl-id
+    - lookup
+    - ensembl-id
     method: GET
     path: /lookup/id/{id}
     params:
@@ -98,21 +100,22 @@ tools:
     response:
       format: json
       fields:
-        - "id"
-        - "display_name"
-        - "description"
-        - "biotype"
-        - "species"
-        - "object_type"
-        - "seq_region_name"
-        - "start"
-        - "end"
-        - "strand"
+      - id
+      - display_name
+      - description
+      - biotype
+      - species
+      - object_type
+      - seq_region_name
+      - start
+      - end
+      - strand
+    entity: identifier
   getHomologs:
     description: Get homologs for a gene by symbol
     tags:
-      - homology
-      - comparative-genomics
+    - homology
+    - comparative-genomics
     method: GET
     path: /homology/symbol/{species}/{symbol}
     params:
@@ -127,15 +130,16 @@ tools:
     response:
       format: json
       fields:
-        - "data[].homologies[].source.species"
-        - "data[].homologies[].target.species"
-        - "data[].homologies[].target.id"
-        - "data[].homologies[].type"
+      - data[].homologies[].source.species
+      - data[].homologies[].target.species
+      - data[].homologies[].target.id
+      - data[].homologies[].type
+    entity: gene
   getVariants:
     description: Get known variants overlapping an Ensembl region
     tags:
-      - variant
-      - overlap
+    - variant
+    - overlap
     method: GET
     path: /overlap/id/{id}?feature=variation
     params:
@@ -146,16 +150,17 @@ tools:
     response:
       format: json
       fields:
-        - "[].id"
-        - "[].consequence_type"
-        - "[].start"
-        - "[].end"
-        - "[].alleles"
+      - '[].id'
+      - '[].consequence_type'
+      - '[].start'
+      - '[].end'
+      - '[].alleles'
+    entity: variant
   getRegulatory:
     description: Get regulatory features overlapping an Ensembl region
     tags:
-      - regulatory
-      - overlap
+    - regulatory
+    - overlap
     method: GET
     path: /overlap/id/{id}?feature=regulatory
     params:
@@ -166,16 +171,17 @@ tools:
     response:
       format: json
       fields:
-        - "[].id"
-        - "[].feature_type"
-        - "[].description"
-        - "[].start"
-        - "[].end"
+      - '[].id'
+      - '[].feature_type'
+      - '[].description'
+      - '[].start'
+      - '[].end'
+    entity: gene
   getXrefs:
     description: Get cross-references for an Ensembl ID
     tags:
-      - cross-reference
-      - xref
+    - cross-reference
+    - xref
     method: GET
     path: /xrefs/id/{id}
     params:
@@ -186,15 +192,16 @@ tools:
     response:
       format: json
       fields:
-        - "[].dbname"
-        - "[].display_id"
-        - "[].primary_id"
-        - "[].description"
+      - '[].dbname'
+      - '[].display_id'
+      - '[].primary_id'
+      - '[].description'
+    entity: identifier
   getAssemblyInfo:
     description: Get assembly information for a species
     tags:
-      - assembly
-      - genome-info
+    - assembly
+    - genome-info
     method: GET
     path: /info/assembly/{species}
     params:
@@ -205,16 +212,17 @@ tools:
     response:
       format: json
       fields:
-        - "assembly_name"
-        - "assembly_date"
-        - "karyotype"
-        - "top_level_region[].name"
-        - "top_level_region[].length"
+      - assembly_name
+      - assembly_date
+      - karyotype
+      - top_level_region[].name
+      - top_level_region[].length
+    entity: structure
   mapCoordinates:
     description: Map coordinates between genome assemblies
     tags:
-      - coordinate-mapping
-      - assembly
+    - coordinate-mapping
+    - assembly
     method: GET
     path: /map/{species}/{asm_one}/{region}/{asm_two}
     params:
@@ -237,14 +245,15 @@ tools:
     response:
       format: json
       fields:
-        - "mappings[].mapped.seq_region_name"
-        - "mappings[].mapped.start"
-        - "mappings[].mapped.end"
+      - mappings[].mapped.seq_region_name
+      - mappings[].mapped.start
+      - mappings[].mapped.end
+    entity: identifier
   searchArchive:
     description: Get archive info for retired or old Ensembl IDs
     tags:
-      - archive
-      - id-history
+    - archive
+    - id-history
     method: GET
     path: /archive/id/{id}
     params:
@@ -255,16 +264,17 @@ tools:
     response:
       format: json
       fields:
-        - "id"
-        - "is_current"
-        - "release"
-        - "assembly"
-        - "latest"
+      - id
+      - is_current
+      - release
+      - assembly
+      - latest
+    entity: identifier
   getComparaTree:
     description: Get gene tree for a gene symbol
     tags:
-      - gene-tree
-      - comparative-genomics
+    - gene-tree
+    - comparative-genomics
     method: GET
     path: /genetree/member/symbol/{species}/{symbol}
     params:
@@ -279,13 +289,14 @@ tools:
     response:
       format: json
       fields:
-        - "tree[].taxonomy.scientific_name"
-        - "tree[].id"
+      - tree
+      - id
+    entity: gene
   getOntologyById:
     description: Get ontology term information by ID
     tags:
-      - ontology
-      - go-term
+    - ontology
+    - go-term
     method: GET
     path: /ontology/id/{id}
     params:
@@ -296,105 +307,211 @@ tools:
     response:
       format: json
       fields:
-        - "accession"
-        - "name"
-        - "namespace"
-        - "definition"
-        - "subsets"
+      - accession
+      - name
+      - namespace
+      - definition
+      - subsets
+    entity: ontology-term
+  getOverlapRegion:
+    description: Get genes, transcripts, or variants overlapping a genomic region
+    tags:
+    - region-overlap
+    - gene-locus
+    method: GET
+    path: /overlap/region/{species}/{region}
+    params:
+      species:
+        type: string
+        default: homo_sapiens
+        description: Species name
+      region:
+        type: string
+        required: true
+        description: Genomic region (e.g. 7:140424943-140624564)
+      feature:
+        type: string
+        default: gene
+        description: Feature type (gene, transcript, variation, regulatory)
+    response:
+      format: json
+      fields:
+      - '[].id'
+      - '[].external_name'
+      - '[].biotype'
+      - '[].start'
+      - '[].end'
+      - '[].strand'
+      - '[].description'
+    entity: gene
+  variantRecoder:
+    description: Convert variant notation between formats (rs ID to HGVS, SPDI, etc.)
+    tags:
+    - variant-notation
+    - variant-conversion
+    method: GET
+    path: /variant_recoder/{species}/{id}
+    params:
+      species:
+        type: string
+        default: homo_sapiens
+        description: Species name
+      id:
+        type: string
+        required: true
+        description: Variant ID or HGVS notation (e.g. rs699)
+    response:
+      format: json
+      fields:
+      - '[].id'
+      - '[].spdi'
+      - '[].hgvsg'
+      - '[].hgvsc'
+      - '[].hgvsp'
+    entity: variant
+  getPhenotype:
+    description: Get phenotype associations for a gene
+    tags:
+    - phenotype
+    - gwas
+    method: GET
+    path: /phenotype/gene/{species}/{gene}
+    params:
+      species:
+        type: string
+        default: homo_sapiens
+        description: Species name
+      gene:
+        type: string
+        required: true
+        description: Gene symbol (e.g. BRCA2)
+    response:
+      format: json
+      fields:
+      - '[].description'
+      - '[].source'
+      - '[].attributes.associated_gene'
+      - '[].ontology_accessions'
+    entity: disease
 tests:
   lookupSymbol:
-    - name: looks up BRCA2 gene
-      params:
-        symbol: BRCA2
-        species: homo_sapiens
-      assert:
-        - path: id
-        - path: display_name
-          equals: BRCA2
+  - name: looks up BRCA2 gene
+    params:
+      symbol: BRCA2
+      species: homo_sapiens
+    assert:
+    - path: id
+    - path: display_name
+      equals: BRCA2
   getSequence:
-    - name: gets sequence for an Ensembl ID
-      params:
-        id: ENSG00000139618
-      assert:
-        - path: seq
-        - path: id
-          equals: ENSG00000139618
+  - name: gets sequence for an Ensembl ID
+    params:
+      id: ENSG00000139618
+    assert:
+    - path: seq
+    - path: id
+      equals: ENSG00000139618
   getVariantConsequences:
-    - name: gets variant consequences for rs699
-      params:
-        id: rs699
-      assert:
-        - path: transcript_consequences
+  - name: gets variant consequences for rs699
+    params:
+      id: rs699
+    assert:
+    - minLength: 1
+    - path: 0.transcript_consequences
   lookupId:
-    - name: looks up ENSG00000139618
-      params:
-        id: ENSG00000139618
-      assert:
-        - path: id
-          equals: ENSG00000139618
-        - path: display_name
-        - path: species
+  - name: looks up ENSG00000139618
+    params:
+      id: ENSG00000139618
+    assert:
+    - path: id
+      equals: ENSG00000139618
+    - path: display_name
+    - path: species
   getHomologs:
-    - name: gets homologs for BRCA2
-      params:
-        symbol: BRCA2
-        species: human
-      assert:
-        - path: data
+  - name: gets homologs for BRCA2
+    params:
+      symbol: BRCA2
+      species: human
+    assert:
+    - path: data
   getVariants:
-    - name: gets variants overlapping ENSG00000139618
-      params:
-        id: ENSG00000139618
-      assert:
-        - path: "[].id"
+  - name: gets variants overlapping ENSG00000139618
+    params:
+      id: ENSG00000139618
+    assert:
+    - minLength: 1
+    - path: 0.id
   getRegulatory:
-    - name: gets regulatory features for ENSG00000139618
-      params:
-        id: ENSG00000139618
-      assert:
-        - path: "[]"
+  - name: gets regulatory features for ENSG00000139618
+    params:
+      id: ENSG00000139618
+    assert:
+    - minLength: 1
   getXrefs:
-    - name: gets cross-references for ENSG00000139618
-      params:
-        id: ENSG00000139618
-      assert:
-        - path: "[].dbname"
-        - path: "[].display_id"
+  - name: gets cross-references for ENSG00000139618
+    params:
+      id: ENSG00000139618
+    assert:
+    - minLength: 1
+    - path: 0.dbname
+    - path: 0.display_id
   getAssemblyInfo:
-    - name: gets assembly info for homo_sapiens
-      params:
-        species: homo_sapiens
-      assert:
-        - path: assembly_name
-        - path: karyotype
+  - name: gets assembly info for homo_sapiens
+    params:
+      species: homo_sapiens
+    assert:
+    - path: assembly_name
+    - path: karyotype
   mapCoordinates:
-    - name: maps coordinates from GRCh37 to GRCh38
-      params:
-        species: human
-        asm_one: GRCh37
-        region: "X:1000000..1000100:1"
-        asm_two: GRCh38
-      assert:
-        - path: mappings
+  - name: maps coordinates from GRCh37 to GRCh38
+    params:
+      species: human
+      asm_one: GRCh37
+      region: X:1000000..1000100:1
+      asm_two: GRCh38
+    assert:
+    - path: mappings
   searchArchive:
-    - name: gets archive info for ENSG00000139618
-      params:
-        id: ENSG00000139618
-      assert:
-        - path: id
-          equals: ENSG00000139618
-        - path: is_current
+  - name: gets archive info for ENSG00000139618
+    params:
+      id: ENSG00000139618
+    assert:
+    - path: id
+      equals: ENSG00000139618
+    - path: is_current
   getComparaTree:
-    - name: gets gene tree for BRCA2
-      params:
-        symbol: BRCA2
-        species: homo_sapiens
-      assert:
-        - path: tree
+  - name: gets gene tree for BRCA2
+    params:
+      symbol: BRCA2
+      species: homo_sapiens
+    assert:
+    - path: tree
   getOntologyById:
-    - name: gets ontology info for GO:0005524
-      params:
-        id: "GO:0005524"
-      assert:
-        - path: accession
-        - path: name
+  - name: gets ontology info for GO:0005524
+    params:
+      id: GO:0005524
+    assert:
+    - path: accession
+    - path: name
+  getOverlapRegion:
+  - name: gets genes in BRAF locus
+    params:
+      species: homo_sapiens
+      region: 7:140424943-140624564
+      feature: gene
+    assert:
+    - minLength: 1
+  variantRecoder:
+  - name: recodes rs699 to HGVS/SPDI
+    params:
+      species: homo_sapiens
+      id: rs699
+    assert:
+    - minLength: 1
+  getPhenotype:
+  - name: gets phenotype associations for BRCA2
+    params:
+      species: homo_sapiens
+      gene: BRCA2
+    assert:
+    - minLength: 1

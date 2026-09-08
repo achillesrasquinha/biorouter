@@ -2,27 +2,28 @@ name: hostdb
 displayName: HostDB
 description: HostDB — VEuPathDB resource for host response to pathogens (human, mouse, macaque)
 tags:
-  - host-response
-  - pathogen
-  - veupathdb
-  - genomics
+- host-response
+- pathogen
+- veupathdb
+- genomics
 baseUrl: https://hostdb.org/hostdb/service
 tools:
   listRecordTypes:
     description: List available record types in HostDB
     tags:
-      - record-types
-      - metadata
+    - record-types
+    - metadata
     method: GET
     path: /record-types
     params: {}
     response:
       format: json
+    entity: dataset
   search:
     description: Search HostDB for genes and host-pathogen interaction data
     tags:
-      - gene-search
-      - host-pathogen
+    - gene-search
+    - host-pathogen
     method: GET
     path: /search
     params:
@@ -40,9 +41,10 @@ tools:
         description: Number of results
     response:
       format: json
+    entity: gene
 tests:
   listRecordTypes:
-    - name: lists record types
-      params: {}
-      assert:
-        - minLength: 1
+  - name: lists record types
+    params: {}
+    assert:
+    - minLength: 1

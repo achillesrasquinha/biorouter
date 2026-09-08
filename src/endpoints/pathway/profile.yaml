@@ -1,0 +1,377 @@
+description: Profile a biological pathway — reactions, participants, regulation, and cross-database annotations
+tags:
+- pathway
+- profile
+- reactions
+- signaling
+- metabolism
+- biorouter
+input:
+  query:
+    type: string
+    required: true
+    description: Pathway name, Reactome ID, KEGG pathway ID, or GO term
+phases:
+- name: resolve
+  parallel: false
+  calls:
+  - source: reactome
+    tool: search
+    params:
+      query: '{input.query}'
+      species: Homo sapiens
+    pick_best:
+      array: results[0].entries
+      match_field: name
+      against: input.query
+      as: best_reactome
+    extract:
+      reactome_id: best_reactome.stId
+      reactome_name: best_reactome.name
+      summation: best_reactome.summation
+  - source: kegg
+    tool: searchPathways
+    params:
+      query: '{input.query}'
+    pick_best:
+      array: $passthrough
+      match_field: description
+      against: input.query
+      as: best_kegg
+    extract:
+      kegg_id: best_kegg.id
+      kegg_name: best_kegg.description
+  - source: quickgo
+    tool: search
+    params:
+      query: '{input.query}'
+      limit: 10
+    pick_best:
+      array: results
+      match_field: name
+      against: input.query
+      as: best_go
+    extract:
+      go_id: best_go.id
+      go_name: best_go.name
+      go_definition: best_go.definition.text
+      go_aspect: best_go.aspect
+- name: fetch
+  parallel: true
+  calls:
+  - source: reactome
+    tool: getPathway
+    params:
+      pathwayId: '{resolved.reactome_id}'
+    skip_if: '!resolved.reactome_id'
+    provides:
+    - curatedReactions
+  - source: reactome
+    tool: getPathwayDetail
+    params:
+      id: '{resolved.reactome_id}'
+    skip_if: '!resolved.reactome_id'
+    provides:
+    - curatedReactions
+  - source: kegg
+    tool: getPathway
+    params:
+      pathwayId: '{resolved.kegg_id}'
+    skip_if: '!resolved.kegg_id'
+    provides:
+    - metabolicMaps
+  - source: kegg
+    tool: getLinked
+    params:
+      targetDb: compound
+      sourceId: '{resolved.kegg_id}'
+    skip_if: '!resolved.kegg_id'
+    provides:
+    - metabolicMaps
+  - source: geneontology
+    tool: getTerm
+    params:
+      go_id: '{resolved.go_id}'
+    skip_if: '!resolved.go_id'
+    provides:
+    - goAnnotations
+  - source: quickgo
+    tool: getTerm
+    params:
+      goId: '{resolved.go_id}'
+    skip_if: '!resolved.go_id'
+    provides:
+    - goAnnotations
+  - source: ndex
+    tool: search
+    params:
+      searchString: '{input.query}'
+      size: 5
+    provides:
+    - networkModels
+  - source: monarch
+    tool: search
+    params:
+      query: '{input.query}'
+      limit: 5
+    provides:
+    - knowledgeGraph
+  - source: opentargets
+    tool: searchDisease
+    params:
+      queryString: '{input.query}'
+      size: 5
+    provides:
+    - diseaseContext
+  - source: europepmc
+    tool: search
+    params:
+      query: '{input.query}'
+      pageSize: 10
+    provides:
+    - literature
+  - source: pathway-commons
+    tool: search
+    params:
+      q: '{input.query}'
+      type: Pathway
+    provides:
+    - integratedPathways
+  - source: wikipathways
+    tool: getPathway
+    params:
+      pwId: '{input.query}'
+    skip_if: '!input.query'
+    allowError: true
+    provides:
+    - communityPathways
+  - source: wikipathways
+    tool: getDataNodes
+    params:
+      pwId: '{input.query}'
+    skip_if: '!input.query'
+    allowError: true
+    provides:
+    - communityPathways
+  - source: signor
+    tool: searchPathway
+    params:
+      pathway: '{input.query}'
+      format: json
+    provides:
+    - signalingCascades
+  - source: signor
+    tool: getInteractions
+    params:
+      entityA: '{input.query}'
+      format: json
+    provides:
+    - signalingCascades
+  - source: quickgo
+    tool: getTermAncestors
+    params:
+      goId: '{resolved.go_id}'
+    skip_if: '!resolved.go_id'
+    provides:
+    - goAnnotations
+  - source: quickgo
+    tool: getTermChildren
+    params:
+      goId: '{resolved.go_id}'
+    skip_if: '!resolved.go_id'
+    provides:
+    - goAnnotations
+  - source: quickgo
+    tool: searchAnnotations
+    params:
+      goId: '{resolved.go_id}'
+      limit: 10
+    skip_if: '!resolved.go_id'
+    provides:
+    - goAnnotations
+output:
+  identity:
+    name:
+      from: resolved.reactome_name
+      fallback: resolved.kegg_name
+    definition:
+      from: resolved.summation
+      fallback: resolved.go_definition
+      reason: Primary pathway description and biological context
+    ids:
+      from: resolved
+      fields:
+      - reactome_id
+      - kegg_id
+      - go_id
+    goAspect:
+      from: resolved.go_aspect
+      reason: Gene Ontology aspect (biological_process, molecular_function, cellular_component)
+  curatedReactions:
+    pathwayInfo:
+      sources:
+      - source: reactome
+        call: getPathway
+        path: $passthrough
+        rank: 1
+      reason: Reactome curated pathway annotation including species, GO biological process, and literature references
+    containedEvents:
+      sources:
+      - source: reactome
+        call: getPathwayDetail
+        path: $passthrough
+        rank: 1
+      reason: Reactome sub-pathways and reactions contained in this pathway
+    literatureReferences:
+      sources:
+      - source: reactome
+        call: getPathway
+        path: literatureReference
+        rank: 1
+      reason: Key publications describing this pathway from Reactome curation
+  metabolicMaps:
+    pathwayEntry:
+      sources:
+      - source: kegg
+        call: getPathway
+        path: $passthrough
+        rank: 1
+      reason: KEGG pathway entry with genes, compounds, and pathway class
+    associatedCompounds:
+      sources:
+      - source: kegg
+        call: getLinked
+        path: $passthrough
+        rank: 1
+      reason: Chemical compounds participating in this KEGG pathway
+  goAnnotations:
+    goTerm:
+      sources:
+      - source: geneontology
+        call: getTerm
+        path: $passthrough
+        rank: 1
+      - source: quickgo
+        call: getTerm
+        path: results[0]
+        rank: 2
+      reason: Gene Ontology term with definition, synonyms, and alternative IDs
+    synonyms:
+      sources:
+      - source: geneontology
+        call: getTerm
+        path: synonyms
+        rank: 1
+      - source: quickgo
+        call: getTerm
+        path: results[0].synonyms
+        rank: 2
+    goAncestors:
+      sources:
+      - source: quickgo
+        call: getTermAncestors
+        path: results
+        rank: 1
+      reason: QuickGO ancestor terms in the GO hierarchy for this term
+    goChildren:
+      sources:
+      - source: quickgo
+        call: getTermChildren
+        path: results
+        rank: 1
+      reason: QuickGO child terms in the GO hierarchy for this term
+    goFunctionalAnnotations:
+      sources:
+      - source: quickgo
+        call: searchAnnotations
+        path: results
+        rank: 1
+      reason: QuickGO functional annotations linking gene products to this GO term
+  networkModels:
+    ndexNetworks:
+      sources:
+      - source: ndex
+        call: search
+        path: networks
+        rank: 1
+      reason: NDEx biological network models related to this pathway
+    networkCount:
+      sources:
+      - source: ndex
+        call: search
+        path: numFound
+        rank: 1
+  knowledgeGraph:
+    monarchEntities:
+      sources:
+      - source: monarch
+        call: search
+        path: items
+        rank: 1
+      reason: Monarch Initiative knowledge graph entities linking pathways, genes, and diseases
+  diseaseContext:
+    associatedDiseases:
+      sources:
+      - source: opentargets
+        call: searchDisease
+        path: search.hits
+        rank: 1
+      reason: Open Targets disease associations — diseases linked to this pathway context
+  literature:
+    recentPublications:
+      sources:
+      - source: europepmc
+        call: search
+        path: resultList.result
+        rank: 1
+      reason: Recent biomedical literature from Europe PMC mentioning this pathway
+    publicationCount:
+      sources:
+      - source: europepmc
+        call: search
+        path: hitCount
+        rank: 1
+  integratedPathways:
+    pathways:
+      sources:
+      - source: pathway-commons
+        call: search
+        path: searchHit
+        rank: 1
+      reason: Pathway Commons aggregated pathway data from 22 databases
+    hitCount:
+      sources:
+      - source: pathway-commons
+        call: search
+        path: numHits
+        rank: 1
+  communityPathways:
+    pathwayGraph:
+      sources:
+      - source: wikipathways
+        call: getPathway
+        path: $passthrough
+        rank: 1
+      reason: WikiPathways community-curated pathway graph — nodes, edges, and annotations
+    dataNodes:
+      sources:
+      - source: wikipathways
+        call: getDataNodes
+        path: $passthrough
+        rank: 1
+      reason: WikiPathways gene/protein/metabolite data nodes participating in this pathway
+  signalingCascades:
+    signalingPathway:
+      sources:
+      - source: signor
+        call: searchPathway
+        path: $passthrough
+        rank: 1
+      reason: SIGNOR signaling pathway — causal relationships in signal transduction
+    signalingInteractions:
+      sources:
+      - source: signor
+        call: getInteractions
+        path: $passthrough
+        rank: 1
+      reason: SIGNOR signaling interactions — directed causal interactions with mechanism and effect

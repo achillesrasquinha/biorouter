@@ -2,18 +2,18 @@ name: immport
 displayName: ImmPort
 description: Immunology Database and Analysis Portal — shared immunology data
 tags:
-  - immunology
-  - immune
-  - immport
-  - nih
-  - clinical-data
+- immunology
+- immune
+- immport
+- nih
+- clinical-data
 baseUrl: https://www.immport.org/shared/api
 tools:
   searchStudies:
     description: Search immunology studies
     tags:
-      - study-search
-      - immunology-search
+    - study-search
+    - immunology-search
     method: GET
     path: /data/query/study
     params:
@@ -23,11 +23,12 @@ tools:
         description: Search term e.g. 'influenza vaccine'
     response:
       format: json
+    entity: dataset
   getStudy:
     description: Get study details by study accession
     tags:
-      - study-detail
-      - study-info
+    - study-detail
+    - study-info
     method: GET
     path: /data/query/study/{studyAccession}
     params:
@@ -37,9 +38,10 @@ tools:
         description: Study accession e.g. 'SDY1'
     response:
       format: json
+    entity: dataset
 tests:
   searchStudies:
-    - name: searches for influenza studies
-      params:
-        term: influenza
-      assert: []
+  - name: searches for influenza studies
+    params:
+      term: influenza
+    assert: []

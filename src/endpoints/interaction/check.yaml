@@ -1,0 +1,315 @@
+description: Check molecular interactions — PPI evidence, signaling, complexes, and drug-gene links for two entities
+tags:
+- interaction
+- check
+- ppi
+- signaling
+- drug-gene
+- biorouter
+input:
+  query:
+    type: string
+    required: true
+    description: Two entity names separated by space (e.g. "TP53 MDM2" or "aspirin TP53")
+phases:
+- name: resolve
+  parallel: false
+  calls:
+  - source: mygene
+    tool: search
+    params:
+      query: '{input.query}'
+      species: human
+      size: 10
+    extract:
+      symbols: hits[].symbol
+      entrez_ids: hits[]._id
+      names: hits[].name
+  - source: uniprot
+    tool: search
+    params:
+      query: '{input.query}'
+      size: 10
+    extract:
+      uniprot_acs: results[].primaryAccession
+      uniprot_genes: results[].genes[0].geneName.value
+- name: fetch
+  parallel: true
+  calls:
+  - source: string
+    tool: getInteractions
+    params:
+      identifiers: '{input.query}'
+      limit: 100
+    provides:
+    - ppiEvidence
+  - source: string
+    tool: getInteractionPartners
+    params:
+      identifiers: '{input.query}'
+      limit: 50
+    provides:
+    - ppiEvidence
+  - source: intact
+    tool: search
+    params:
+      query: '{input.query}'
+      pageSize: 50
+    provides:
+    - ppiEvidence
+  - source: intact
+    tool: findInteractor
+    params:
+      query: '{input.query}'
+      pageSize: 20
+    provides:
+    - ppiEvidence
+  - source: omnipath
+    tool: getInteractions
+    params:
+      partners: '{input.query}'
+      limit: 100
+    provides:
+    - signalingEvidence
+  - source: omnipath
+    tool: getEnzSubstrate
+    params:
+      partners: '{input.query}'
+      limit: 50
+    provides:
+    - signalingEvidence
+  - source: omnipath
+    tool: getComplexes
+    params:
+      proteins: '{input.query}'
+    provides:
+    - complexEvidence
+  - source: signor
+    tool: getInteractions
+    params:
+      entityA: '{input.query}'
+    provides:
+    - signalingEvidence
+  - source: biogrid
+    tool: searchInteractions
+    params:
+      searchNames: '{input.query}'
+      searchLimit: 100
+    provides:
+    - ppiEvidence
+  - source: dgidb
+    tool: search
+    params:
+      names:
+      - '{input.query}'
+    provides:
+    - drugGeneEvidence
+  - source: complex-portal
+    tool: search
+    params:
+      query: '{input.query}'
+    provides:
+    - complexEvidence
+  - source: stitch
+    tool: resolveIdentifier
+    params:
+      query: '{input.query}'
+    provides:
+    - chemicalProteinEvidence
+  - source: stitch
+    tool: getInteractions
+    params:
+      chemical: '{resolved.entity_a}'
+    provides:
+    - chemicalProteinEvidence
+  - source: bindingdb
+    tool: searchByTarget
+    params:
+      target: '{input.query}'
+    provides:
+    - bindingEvidence
+  - source: pathway-commons
+    tool: search
+    params:
+      q: '{input.query}'
+      type: Pathway
+    provides:
+    - pathwayEvidence
+  - source: pathway-commons
+    tool: graph
+    params:
+      source: '{input.query}'
+      kind: neighborhood
+      format: EXTENDED_BINARY_SIF
+    provides:
+    - pathwayEvidence
+  - source: europepmc
+    tool: search
+    params:
+      query: '{input.query} AND (interaction OR binding OR complex OR partner)'
+      pageSize: 10
+    provides:
+    - literature
+  - source: string
+    tool: getHomologs
+    params:
+      identifiers: '{input.query}'
+      species: 9606
+    provides:
+    - homologyEvidence
+output:
+  queryParsed:
+    entitiesFound:
+      from: resolved
+      fields:
+      - symbols
+      - names
+  ppiEvidence:
+    stringNetwork:
+      sources:
+      - source: string
+        call: getInteractions
+        path: $passthrough
+        rank: 1
+      reason: STRING protein-protein interaction network — combined confidence scores from experiments, databases, text mining
+    stringPartners:
+      sources:
+      - source: string
+        call: getInteractionPartners
+        path: $passthrough
+        rank: 1
+      reason: STRING interaction partners with detailed score breakdowns (neighborhood, fusion, cooccurrence, etc.)
+    intactInteractions:
+      sources:
+      - source: intact
+        call: search
+        path: content
+        rank: 1
+      reason: IntAct curated molecular interactions — experimentally validated with detection methods and MI-scores
+    intactInteractors:
+      sources:
+      - source: intact
+        call: findInteractor
+        path: content
+        rank: 1
+      reason: IntAct interactor details — protein info with interaction counts
+    biogridInteractions:
+      sources:
+      - source: biogrid
+        call: searchInteractions
+        path: $passthrough
+        rank: 1
+      reason: BioGRID protein and genetic interactions — comprehensive interactome with publication evidence
+  signalingEvidence:
+    omnipathSignaling:
+      sources:
+      - source: omnipath
+        call: getInteractions
+        path: $passthrough
+        rank: 1
+      reason: OmniPath signaling network — directed interactions with stimulation/inhibition, consensus direction
+    omnipathEnzymeSubstrate:
+      sources:
+      - source: omnipath
+        call: getEnzSubstrate
+        path: $passthrough
+        rank: 1
+      reason: OmniPath enzyme-substrate relationships — phosphorylation sites, PTM types, residue positions
+    signorCausal:
+      sources:
+      - source: signor
+        call: getInteractions
+        path: $passthrough
+        rank: 1
+      reason: SIGNOR causal signaling interactions — manually curated cause-effect relationships in signal transduction
+  complexEvidence:
+    complexPortal:
+      sources:
+      - source: complex-portal
+        call: search
+        path: elements
+        rank: 1
+      reason: Complex Portal — curated stable macromolecular complexes with stoichiometry and 3D structures
+    omnipathComplexes:
+      sources:
+      - source: omnipath
+        call: getComplexes
+        path: $passthrough
+        rank: 1
+      reason: OmniPath protein complex memberships — integrated from CORUM, ComplexPortal, and other databases
+  drugGeneEvidence:
+    dgidbInteractions:
+      sources:
+      - source: dgidb
+        call: search
+        path: genes.nodes
+        rank: 1
+      reason: DGIdb drug-gene interactions — druggable genome annotations with interaction types and evidence
+  chemicalProteinEvidence:
+    stitchIdentifiers:
+      sources:
+      - source: stitch
+        call: resolveIdentifier
+        path: $passthrough
+        rank: 1
+      reason: STITCH chemical identifier resolution — maps chemical names to internal IDs for chemical-protein lookups
+    stitchInteractions:
+      sources:
+      - source: stitch
+        call: getInteractions
+        path: $passthrough
+        rank: 1
+      reason: STITCH chemical-protein interactions with combined confidence scores
+  bindingEvidence:
+    bindingdbAffinities:
+      sources:
+      - source: bindingdb
+        call: searchByTarget
+        path: $passthrough
+        rank: 1
+      reason: BindingDB measured binding affinities between proteins and small molecules — Kd, Ki, IC50 values
+  pathwayEvidence:
+    pathwayCommonsPathways:
+      sources:
+      - source: pathway-commons
+        call: search
+        path: searchHit
+        rank: 1
+      reason: Pathway Commons integrated pathway data from Reactome, Pathway Interaction Database, and other sources
+    pathwayCommonsGraph:
+      sources:
+      - source: pathway-commons
+        call: graph
+        path: $passthrough
+        rank: 1
+      reason: Pathway Commons interaction neighborhood graph — BioPAX network with interaction types and data sources
+    pathwayCount:
+      sources:
+      - source: pathway-commons
+        call: search
+        path: numHits
+        rank: 1
+      reason: Total number of pathways found in Pathway Commons
+  literature:
+    interactionPublications:
+      sources:
+      - source: europepmc
+        call: search
+        path: resultList.result
+        rank: 1
+      reason: Literature co-mentioning both entities in interaction/binding context — PubMed and preprints
+    publicationCount:
+      sources:
+      - source: europepmc
+        call: search
+        path: hitCount
+        rank: 1
+      reason: Total number of publications mentioning query entities with interaction keywords
+  homologyEvidence:
+    stringHomologs:
+      sources:
+      - source: string
+        call: getHomologs
+        path: $passthrough
+        rank: 1
+      reason: STRING protein homologs across species with bitscore similarity

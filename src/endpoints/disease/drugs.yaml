@@ -1,0 +1,345 @@
+description: Find drugs for a disease — approved treatments, clinical candidates, and drug-gene interactions
+tags:
+- disease
+- drugs
+- treatment
+- clinical
+- pharmacology
+- biorouter
+input:
+  query:
+    type: string
+    required: true
+    description: Disease name, MONDO ID, or DOID
+phases:
+- name: resolve
+  parallel: false
+  calls:
+  - source: mydisease
+    tool: search
+    params:
+      query: '{input.query}'
+      size: 10
+    pick_best:
+      array: hits
+      match_field: mondo.label
+      against: input.query
+      as: best_hit
+    extract:
+      mondo_id: best_hit._id
+      name: best_hit.mondo.label
+      xrefs: best_hit.mondo.xrefs
+    provides: []
+  - source: opentargets
+    tool: searchDisease
+    params:
+      queryString: '{input.query}'
+      size: 5
+    pick_best:
+      array: search.hits
+      match_field: name
+      against: input.query
+      as: best_ot
+    extract:
+      efo_id: best_ot.id
+      ot_name: best_ot.name
+    provides: []
+- name: fetch
+  parallel: true
+  calls:
+  - source: opentargets
+    tool: getDiseaseDrugs
+    params:
+      efoId: '{resolved.efo_id}'
+    skip_if: '!resolved.efo_id'
+    provides:
+    - drugs
+  - source: mydisease
+    tool: getDisease
+    params:
+      diseaseId: '{resolved.mondo_id}'
+    skip_if: '!resolved.mondo_id'
+    provides:
+    - chemicalAssociations
+  - source: clinicaltrials
+    tool: search
+    params:
+      query: '{input.query}'
+      pageSize: 10
+    provides:
+    - trials
+  - source: opentargets
+    tool: getDiseaseTargets
+    params:
+      efoId: '{resolved.efo_id}'
+      size: 10
+    skip_if: '!resolved.efo_id'
+    provides:
+    - geneTargets
+  - source: openfda
+    tool: searchDrugs
+    params:
+      query: '{input.query}'
+      limit: 10
+    provides:
+    - fdaApproved
+  - source: civic
+    tool: searchAssertions
+    params:
+      diseaseName: '{input.query}'
+      first: 10
+    provides:
+    - clinicalAssertions
+  - source: europepmc
+    tool: search
+    params:
+      query: '{input.query} treatment therapy drug'
+      pageSize: 5
+    provides:
+    - literature
+  - source: civic
+    tool: searchTherapies
+    params:
+      name: '{input.query}'
+      first: 10
+    provides:
+    - clinicalAssertions
+  - source: openfda
+    tool: searchEvents
+    params:
+      query: '{input.query}'
+      limit: 5
+    provides:
+    - safety
+  - source: drugcentral
+    tool: search
+    params:
+      query: '{input.query}'
+    provides:
+    - drugIndications
+  - source: dailymed
+    tool: searchDrugs
+    params:
+      name: '{input.query}'
+    provides:
+    - drugLabeling
+  - source: pharmgkb
+    tool: searchDrugs
+    params:
+      name: eq.{input.query}
+    provides:
+    - pharmacogenomics
+  - source: dgidb
+    tool: search
+    params:
+      names:
+      - '{input.query}'
+    provides:
+    - drugGeneInteractions
+  - source: chembl
+    tool: search
+    params:
+      query: '{input.query}'
+    provides:
+    - bioactiveCompounds
+  - source: kegg
+    tool: searchDrugs
+    params:
+      query: '{input.query}'
+    provides:
+    - metabolicDrugs
+  - source: pharos
+    tool: searchTargets
+    params:
+      term: '{input.query}'
+      top: 10
+    provides:
+    - geneTargets
+  - source: disgenet
+    tool: searchDisease
+    params:
+      query: '{input.query}'
+    provides:
+    - diseaseGeneAssociations
+  - source: opentargets
+    tool: searchDrug
+    params:
+      queryString: '{input.query}'
+      size: 10
+    provides:
+    - drugs
+  - source: opentargets
+    tool: searchTarget
+    params:
+      queryString: '{input.query}'
+    provides:
+    - geneTargets
+output:
+  identity:
+    name:
+      from: resolved.name
+    ids:
+      from: resolved
+      fields:
+      - mondo_id
+      - efo_id
+  drugs:
+    drugCount:
+      sources:
+      - source: opentargets
+        call: getDiseaseDrugs
+        path: disease.drugAndClinicalCandidates.count
+        rank: 1
+    clinicalCandidates:
+      sources:
+      - source: opentargets
+        call: getDiseaseDrugs
+        path: disease.drugAndClinicalCandidates.rows
+        rank: 1
+      reason: Drugs with clinical evidence — includes clinical stage, mechanism, and target gene
+    drugSearch:
+      sources:
+      - source: opentargets
+        call: searchDrug
+        path: search.hits
+        rank: 2
+      reason: Open Targets drug search — discover drugs by keyword with descriptions and entity types
+  fdaApproved:
+    drugLabels:
+      sources:
+      - source: openfda
+        call: searchDrugs
+        path: results
+        rank: 1
+      reason: FDA-approved drug labels mentioning this disease in indications
+  clinicalAssertions:
+    civicAssertions:
+      sources:
+      - source: civic
+        call: searchAssertions
+        path: assertions
+        rank: 1
+      reason: CIViC clinical assertions — curated variant-drug-disease evidence for precision medicine
+    civicTherapies:
+      sources:
+      - source: civic
+        call: searchTherapies
+        path: therapies
+        rank: 1
+      reason: CIViC therapy entries matching this disease name
+  chemicalAssociations:
+    ctdChemicals:
+      sources:
+      - source: mydisease
+        call: getDisease
+        path: ctd.chemical_related_to_disease
+        rank: 1
+      reason: CTD literature-mined chemical-disease associations with direct evidence annotations
+  geneTargets:
+    topTargets:
+      sources:
+      - source: opentargets
+        call: getDiseaseTargets
+        path: disease.associatedTargets
+        rank: 1
+      reason: Top gene targets — useful for identifying druggable targets for this disease
+    druggableGenome:
+      sources:
+      - source: pharos
+        call: searchTargets
+        path: targets.targets
+        rank: 2
+      reason: Pharos druggable genome targets — therapeutic opportunities
+    targetSearch:
+      sources:
+      - source: opentargets
+        call: searchTarget
+        path: search.hits
+        rank: 3
+      reason: Open Targets target search — find druggable gene targets by keyword
+  safety:
+    adverseEvents:
+      sources:
+      - source: openfda
+        call: searchEvents
+        path: results
+        rank: 1
+      reason: FDA adverse event reports related to treatments for this disease
+  literature:
+    treatmentPublications:
+      sources:
+      - source: europepmc
+        call: search
+        path: resultList.result
+        rank: 1
+      reason: Recent publications on treatments for this disease from Europe PMC
+    publicationCount:
+      sources:
+      - source: europepmc
+        call: search
+        path: hitCount
+        rank: 1
+  trials:
+    activeTrials:
+      sources:
+      - source: clinicaltrials
+        call: search
+        path: $passthrough
+        rank: 1
+      reason: Current clinical trials for this disease from ClinicalTrials.gov
+  drugIndications:
+    drugInfo:
+      sources:
+      - source: drugcentral
+        call: search
+        path: $passthrough
+        rank: 1
+      reason: DrugCentral drug information — indications, mechanisms, and interactions
+  drugLabeling:
+    drugLabels:
+      sources:
+      - source: dailymed
+        call: searchDrugs
+        path: data
+        rank: 1
+      reason: DailyMed FDA drug labels — prescribing information and SPL documents
+  pharmacogenomics:
+    pharmacogenomics:
+      sources:
+      - source: pharmgkb
+        call: searchDrugs
+        path: $passthrough
+        rank: 1
+      reason: PharmGKB pharmacogenomics data — drug-gene pairs and clinical guidelines
+  drugGeneInteractions:
+    drugGeneInteractions:
+      sources:
+      - source: dgidb
+        call: search
+        path: genes.nodes
+        rank: 1
+      reason: DGIdb drug-gene interactions — druggable genome targets
+  bioactiveCompounds:
+    molecules:
+      sources:
+      - source: chembl
+        call: search
+        path: molecules
+        rank: 1
+      reason: ChEMBL bioactive molecules — drug-like small molecules with bioactivity data
+  metabolicDrugs:
+    drugs:
+      sources:
+      - source: kegg
+        call: searchDrugs
+        path: $passthrough
+        rank: 1
+      reason: KEGG drug database — drug metabolism and pathway information
+  diseaseGeneAssociations:
+    diseaseGenes:
+      sources:
+      - source: disgenet
+        call: searchDisease
+        path: payload
+        rank: 1
+      reason: DisGeNET disease-gene associations — potential drug targets

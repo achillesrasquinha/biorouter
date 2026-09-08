@@ -1,18 +1,23 @@
 name: natureserve
 displayName: NatureServe
 description: NatureServe Explorer — conservation status and biodiversity data for species across the Americas
-tags: [conservation, biodiversity, endangered-species, ecology, natureserve]
+tags:
+- conservation
+- biodiversity
+- endangered-species
+- ecology
+- natureserve
 baseUrl: https://explorer.natureserve.org/api/data
-
 auth:
   type: apiKey
   param: token
   env: LS_NATURESERVE_API_KEY
-
 tools:
   searchSpecies:
     description: Search NatureServe for species by scientific taxonomy
-    tags: [species-search, conservation-search]
+    tags:
+    - species-search
+    - conservation-search
     method: GET
     path: /speciesSearch
     params:
@@ -23,19 +28,21 @@ tools:
     response:
       format: json
       fields:
-        - results[].elementGlobalId
-        - results[].uniqueId
-        - results[].scientificName
-        - results[].primaryCommonName
-        - results[].roundedGRank
-        - results[].nsxUrl
-        - results[].elcode
-        - results[].nations[].nationCode
-        - results[].nations[].roundedNRank
-
+      - results[].elementGlobalId
+      - results[].uniqueId
+      - results[].scientificName
+      - results[].primaryCommonName
+      - results[].roundedGRank
+      - results[].nsxUrl
+      - results[].elcode
+      - results[].nations[].nationCode
+      - results[].nations[].roundedNRank
+    entity: organism
   getSpecies:
     description: Get detailed conservation data for a species by its global element ID
-    tags: [species-detail, conservation-status]
+    tags:
+    - species-detail
+    - conservation-status
     method: GET
     path: /species/{elementGlobalId}
     params:
@@ -46,27 +53,27 @@ tools:
     response:
       format: json
       fields:
-        - elementGlobalId
-        - scientificName
-        - primaryCommonName
-        - roundedGRank
-        - classificationStatus
-        - speciesGlobal
-        - nations[].nationCode
-        - nations[].roundedNRank
-
+      - elementGlobalId
+      - scientificName
+      - primaryCommonName
+      - roundedGRank
+      - classificationStatus
+      - speciesGlobal
+      - nations[].nationCode
+      - nations[].roundedNRank
+    entity: organism
 tests:
   searchSpecies:
-    - name: searches for monarch butterfly
-      params:
-        scientificTaxonomy: Danaus plexippus
-      assert:
-        - minLength: 1
-      allowError: true
+  - name: searches for monarch butterfly
+    params:
+      scientificTaxonomy: Danaus plexippus
+    assert:
+    - minLength: 1
+    allowError: true
   getSpecies:
-    - name: gets species detail by element ID
-      params:
-        elementGlobalId: ELEMENT_GLOBAL.2.100925
-      assert:
-        - minLength: 1
-      allowError: true
+  - name: gets species detail by element ID
+    params:
+      elementGlobalId: ELEMENT_GLOBAL.2.100925
+    assert:
+    - minLength: 1
+    allowError: true

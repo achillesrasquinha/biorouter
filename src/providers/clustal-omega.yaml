@@ -2,19 +2,18 @@ name: clustal-omega
 displayName: Clustal Omega
 description: EBI Clustal Omega multiple sequence alignment service
 tags:
-  - alignment
-  - multiple-sequence-alignment
-  - clustal
-  - ebi
-  - phylogenetics
+- alignment
+- multiple-sequence-alignment
+- clustal
+- ebi
+- phylogenetics
 baseUrl: https://www.ebi.ac.uk/Tools/services/rest/clustalo
-
 tools:
-  submit:
+  submitAlignment:
     description: Submit a multiple sequence alignment job to Clustal Omega
     tags:
-      - alignment-submit
-      - msa-submit
+    - alignment-submit
+    - msa-submit
     method: POST
     path: /run
     params:
@@ -32,11 +31,12 @@ tools:
         description: Output format (e.g. clustal_num, fasta, msf, phylip)
     response:
       format: lines
+    entity: sequence
   getStatus:
     description: Check the status of a submitted Clustal Omega job
     tags:
-      - job-status
-      - alignment-status
+    - job-status
+    - alignment-status
     method: GET
     path: /status/{jobId}
     params:
@@ -46,11 +46,12 @@ tools:
         description: Job ID returned from the submit step
     response:
       format: lines
+    entity: sequence
   getResult:
     description: Retrieve the alignment result of a completed Clustal Omega job
     tags:
-      - alignment-result
-      - msa-result
+    - alignment-result
+    - msa-result
     method: GET
     path: /result/{jobId}/aln-clustal_num
     params:
@@ -60,28 +61,34 @@ tools:
         description: Job ID returned from the submit step
     response:
       format: lines
-
+    entity: sequence
 tests:
-  submit:
-    - name: submits a small alignment job
-      params:
-        email: test@example.com
-        sequence: ">seq1\nMKTAYIAKQRQISFVKSHFSRQLE\n>seq2\nMKTAYIAKQRQISFVKSHFSRQLD"
-        outfmt: clustal_num
-      assert:
-        - isNonEmpty: true
-      allowError: true
+  submitAlignment:
+  - name: submits a small alignment job
+    params:
+      email: test@example.com
+      sequence: '>seq1
+
+        MKTAYIAKQRQISFVKSHFSRQLE
+
+        >seq2
+
+        MKTAYIAKQRQISFVKSHFSRQLD'
+      outfmt: clustal_num
+    assert:
+    - isNonEmpty: true
+    allowError: true
   getStatus:
-    - name: checks status of a placeholder job
-      params:
-        jobId: clustalo-placeholder-id
-      assert:
-        - isNonEmpty: true
-      allowError: true
+  - name: checks status of a placeholder job
+    params:
+      jobId: clustalo-placeholder-id
+    assert:
+    - isNonEmpty: true
+    allowError: true
   getResult:
-    - name: retrieves result for a placeholder job
-      params:
-        jobId: clustalo-placeholder-id
-      assert:
-        - isNonEmpty: true
-      allowError: true
+  - name: retrieves result for a placeholder job
+    params:
+      jobId: clustalo-placeholder-id
+    assert:
+    - isNonEmpty: true
+    allowError: true

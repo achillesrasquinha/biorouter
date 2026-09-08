@@ -2,17 +2,17 @@ name: doaj
 displayName: DOAJ
 description: DOAJ — Directory of Open Access Journals, indexing quality open access research
 tags:
-  - open-access
-  - journals
-  - articles
-  - scholarly
+- open-access
+- journals
+- articles
+- scholarly
 baseUrl: https://doaj.org/api
 tools:
   searchArticles:
     description: Search for open access articles across all indexed journals
     tags:
-      - article-search
-      - open-access
+    - article-search
+    - open-access
     method: GET
     path: /search/articles/{query}
     params:
@@ -31,16 +31,17 @@ tools:
     response:
       format: json
       fields:
-        - total
-        - results[].bibjson.title
-        - results[].bibjson.journal.title
-        - results[].bibjson.identifier[].id
-        - results[].bibjson.keywords
+      - total
+      - results[].bibjson.title
+      - results[].bibjson.journal.title
+      - results[].bibjson.identifier[].id
+      - results[].bibjson.keywords
+    entity: publication
   searchJournals:
     description: Search for open access journals by title or subject
     tags:
-      - journal-search
-      - open-access
+    - journal-search
+    - open-access
     method: GET
     path: /search/journals/{query}
     params:
@@ -55,17 +56,18 @@ tools:
     response:
       format: json
       fields:
-        - total
-        - results[].bibjson.title
-        - results[].bibjson.publisher.name
-        - results[].bibjson.subject[].term
+      - total
+      - results[].bibjson.title
+      - results[].bibjson.publisher.name
+      - results[].bibjson.subject[].term
+    entity: sequence
 tests:
   searchArticles:
-    - name: searches for BRCA1 articles
-      params:
-        query: BRCA1
-        pageSize: 2
-      assert:
-        - path: total
-        - path: results
-          minLength: 1
+  - name: searches for BRCA1 articles
+    params:
+      query: BRCA1
+      pageSize: 2
+    assert:
+    - path: total
+    - path: results
+      minLength: 1

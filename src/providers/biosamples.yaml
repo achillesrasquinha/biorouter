@@ -2,18 +2,18 @@ name: biosamples
 displayName: BioSamples
 description: EBI BioSamples database — biological sample metadata and attributes
 tags:
-  - sample
-  - metadata
-  - biobank
-  - specimen
-  - biosamples
+- sample
+- metadata
+- biobank
+- specimen
+- biosamples
 baseUrl: https://www.ebi.ac.uk/biosamples
 tools:
   search:
     description: Search BioSamples for biological samples by keyword
     tags:
-      - sample-search
-      - specimen-search
+    - sample-search
+    - specimen-search
     method: GET
     path: /samples
     params:
@@ -29,17 +29,18 @@ tools:
     response:
       format: json
       fields:
-        - _embedded.samples[].accession
-        - _embedded.samples[].name
-        - _embedded.samples[].taxId
-        - _embedded.samples[].status
-        - _embedded.samples[].release
-        - _embedded.samples[].characteristics
+      - _embedded.samples[].accession
+      - _embedded.samples[].name
+      - _embedded.samples[].taxId
+      - _embedded.samples[].status
+      - _embedded.samples[].release
+      - _embedded.samples[].characteristics
+    entity: sample
   getSample:
     description: Get a specific BioSample by accession
     tags:
-      - sample-info
-      - specimen-info
+    - sample-info
+    - specimen-info
     method: GET
     path: /samples/{accession}
     params:
@@ -50,26 +51,27 @@ tools:
     response:
       format: json
       fields:
-        - accession
-        - name
-        - taxId
-        - status
-        - release
-        - characteristics
+      - accession
+      - name
+      - taxId
+      - status
+      - release
+      - characteristics
+    entity: sample
 tests:
   search:
-    - name: searches for human liver samples
-      params:
-        query: human liver
-      assert:
-        - path: _embedded.samples
-          minLength: 1
-        - path: _embedded.samples.0.accession
+  - name: searches for human liver samples
+    params:
+      query: human liver
+    assert:
+    - path: _embedded.samples
+      minLength: 1
+    - path: _embedded.samples.0.accession
   getSample:
-    - name: gets sample by accession SAMD00065372
-      params:
-        accession: SAMD00065372
-      assert:
-        - path: accession
-          equals: SAMD00065372
-        - path: characteristics
+  - name: gets sample by accession SAMD00065372
+    params:
+      accession: SAMD00065372
+    assert:
+    - path: accession
+      equals: SAMD00065372
+    - path: characteristics

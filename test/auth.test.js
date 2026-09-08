@@ -1,6 +1,6 @@
 import { describe, it, beforeEach, afterEach } from "node:test";
 import assert from "node:assert/strict";
-import { resolveAuth } from "../src/lib/http/auth.js";
+import { resolveAuth } from "../src/request.js";
 
 describe("resolveAuth", () => {
   const saved = {};

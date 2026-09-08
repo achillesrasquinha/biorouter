@@ -2,27 +2,28 @@ name: obo-foundry
 displayName: OBO Foundry
 description: OBO Foundry — registry of 267 interoperable biomedical ontologies (GO, HPO, ChEBI, etc.)
 tags:
-  - ontology
-  - registry
-  - biomedical
-  - obo
-  - standards
+- ontology
+- registry
+- biomedical
+- obo
+- standards
 baseUrl: https://obofoundry.org/registry
 tools:
   listOntologies:
     description: List all OBO Foundry registered ontologies with metadata
     tags:
-      - ontology-list
-      - registry
+    - ontology-list
+    - registry
     method: GET
     path: /ontologies.jsonld
     params: {}
     response:
       format: json
+    entity: ontology-term
 tests:
   listOntologies:
-    - name: lists all registered ontologies
-      params: {}
-      assert:
-        - path: ontologies
-          minLength: 1
+  - name: lists all registered ontologies
+    params: {}
+    assert:
+    - path: ontologies
+      minLength: 1

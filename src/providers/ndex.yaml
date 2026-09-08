@@ -2,18 +2,18 @@ name: ndex
 displayName: NDEx
 description: NDEx Network Data Exchange for biological network models
 tags:
-  - networks
-  - pathways
-  - signaling
-  - protein-interactions
-  - systems-biology
+- networks
+- pathways
+- signaling
+- protein-interactions
+- systems-biology
 baseUrl: https://www.ndexbio.org/v2
 tools:
   search:
     description: Search for biological networks by keyword
     tags:
-      - network-search
-      - pathway-search
+    - network-search
+    - pathway-search
     method: POST
     path: /search/network
     params:
@@ -32,19 +32,20 @@ tools:
     response:
       format: json
       fields:
-        - numFound
-        - networks[].externalId
-        - networks[].name
-        - networks[].description
-        - networks[].owner
-        - networks[].nodeCount
-        - networks[].edgeCount
-        - networks[].visibility
+      - numFound
+      - networks[].externalId
+      - networks[].name
+      - networks[].description
+      - networks[].owner
+      - networks[].nodeCount
+      - networks[].edgeCount
+      - networks[].visibility
+    entity: dataset
   getNetwork:
     description: Get network summary by NDEx UUID
     tags:
-      - network-info
-      - network-summary
+    - network-info
+    - network-summary
     method: GET
     path: /network/{networkId}/summary
     params:
@@ -55,30 +56,31 @@ tools:
     response:
       format: json
       fields:
-        - externalId
-        - name
-        - description
-        - owner
-        - version
-        - nodeCount
-        - edgeCount
-        - visibility
+      - externalId
+      - name
+      - description
+      - owner
+      - version
+      - nodeCount
+      - edgeCount
+      - visibility
+    entity: network
 tests:
   search:
-    - name: searches networks for EGFR signaling
-      params:
-        searchString: EGFR signaling
-        size: 5
-      assert:
-        - {}
-        - path: networks
-          minLength: 1
-    - name: gets a network summary by UUID
-      params:
-        searchString: NCI pathway
-        size: 1
-      assert:
-        - {}
-        - anyOf:
-            - name
-            - externalId
+  - name: searches networks for EGFR signaling
+    params:
+      searchString: EGFR signaling
+      size: 5
+    assert:
+    - path: numFound
+      gt: 0
+    - path: networks
+      minLength: 1
+  - name: searches networks for NCI pathway
+    params:
+      searchString: NCI pathway
+      size: 1
+    assert:
+    - path: networks
+      minLength: 1
+    - path: networks.0.name

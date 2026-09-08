@@ -2,19 +2,19 @@ name: clinical-tables
 displayName: NLM Clinical Tables
 description: NLM Clinical Tables — autocomplete and lookup for ICD-10, LOINC, RxTerms, SNOMED, and conditions
 tags:
-  - clinical
-  - icd
-  - loinc
-  - rxterms
-  - terminology
-  - nlm
+- clinical
+- icd
+- loinc
+- rxterms
+- terminology
+- nlm
 baseUrl: https://clinicaltables.nlm.nih.gov/api
 tools:
   searchConditions:
     description: Search for medical conditions and diseases
     tags:
-      - condition-search
-      - disease-search
+    - condition-search
+    - disease-search
     method: GET
     path: /conditions/v3/search
     params:
@@ -28,11 +28,12 @@ tools:
         description: Maximum results
     response:
       format: json
+    entity: disease
   searchICD10:
     description: Search ICD-10-CM codes by name or code
     tags:
-      - icd10
-      - diagnosis-code
+    - icd10
+    - diagnosis-code
     method: GET
     path: /icd10cm/v3/search
     params:
@@ -50,11 +51,12 @@ tools:
         description: Maximum results
     response:
       format: json
+    entity: ontology-term
   searchLOINC:
     description: Search LOINC laboratory test codes
     tags:
-      - loinc
-      - lab-test
+    - loinc
+    - lab-test
     method: GET
     path: /loinc_items/v3/search
     params:
@@ -68,11 +70,12 @@ tools:
         description: Maximum results
     response:
       format: json
+    entity: ontology-term
   searchRxTerms:
     description: Search for drug names and formulations
     tags:
-      - drug-search
-      - rxterms
+    - drug-search
+    - rxterms
     method: GET
     path: /rxterms/v3/search
     params:
@@ -86,19 +89,20 @@ tools:
         description: Maximum results
     response:
       format: json
+    entity: ontology-term
 tests:
   searchConditions:
-    - name: searches for diabetes conditions
-      params:
-        terms: diabetes
-        maxList: 5
-      assert:
-        - minLength: 2
+  - name: searches for diabetes conditions
+    params:
+      terms: diabetes
+      maxList: 5
+    assert:
+    - minLength: 2
   searchICD10:
-    - name: searches for diabetes ICD-10 codes
-      params:
-        sf: code,name
-        terms: diabetes
-        maxList: 5
-      assert:
-        - minLength: 2
+  - name: searches for diabetes ICD-10 codes
+    params:
+      sf: code,name
+      terms: diabetes
+      maxList: 5
+    assert:
+    - minLength: 2

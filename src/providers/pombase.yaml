@@ -2,54 +2,99 @@ name: pombase
 displayName: PomBase
 description: PomBase — Schizosaccharomyces pombe genome database for fission yeast genetics and genomics
 tags:
-  - model-organism
-  - yeast
-  - fission-yeast
-  - pombase
-  - s-pombe
+- yeast
+- model-organism
+- fission-yeast
+- pombase
 baseUrl: https://www.pombase.org/api/v1/dataset/latest
 tools:
   getGene:
     description: Get detailed gene information by systematic ID
     tags:
-      - gene-info
-      - fission-yeast
+    - gene-info
+    - fission-yeast
     method: GET
-    path: /data/gene/{id}
+    path: /data/gene/{systematicId}
     params:
-      id:
+      systematicId:
         type: string
         required: true
-        description: Systematic gene ID (e.g. SPBC11B10.09 for cdc2, SPAC1F7.01c for rpl3001)
+        description: Systematic gene ID (e.g. "SPBC11B10.09" for cdc2, "SPAC1F7.01c" for rpl3001)
     response:
       format: json
       fields:
-        - uniquename
-        - name
-        - product
-        - taxonid
-        - deletion_viability
-        - uniprot_identifier
-        - interpro_matches[].id
-        - interpro_matches[].name
-  getGeneSummaries:
-    description: Get summary list of all S. pombe genes
+      - uniquename
+      - name
+      - product
+      - taxonid
+      - deletion_viability
+      - uniprot_identifier
+      - interpro_matches[].id
+      - interpro_matches[].name
+    entity: gene
+  searchGenes:
+    description: Search PomBase for fission yeast genes by keyword
     tags:
-      - gene-list
-      - fission-yeast
+    - gene-search
+    - fission-yeast
     method: GET
-    path: /data/gene_summaries
-    params: {}
+    path: /search/gene/
+    params:
+      query:
+        type: string
+        required: true
+        mapsTo: q
+        description: Search term for S. pombe genes (e.g. "cdc2", "wee1")
     response:
       format: json
+      fields:
+      - matches[].uniquename
+      - matches[].name
+      - matches[].product
+    entity: gene
+  getGenotype:
+    description: Get genotype details by genotype ID
+    tags:
+    - genotype-info
+    - fission-yeast
+    method: GET
+    path: /data/genotype/{genotypeId}
+    params:
+      genotypeId:
+        type: string
+        required: true
+        description: PomBase genotype identifier
+    response:
+      format: json
+      fields:
+      - display_name
+      - loci[].gene.uniquename
+      - loci[].gene.name
+      - loci[].expressed_alleles[].allele.name
+      - loci[].expressed_alleles[].allele.allele_type
+    entity: gene
 tests:
   getGene:
-    - name: gets cdc2 gene details
-      params:
-        id: SPBC11B10.09
-      assert:
-        - path: uniquename
-          equals: SPBC11B10.09
-        - path: name
-          equals: cdc2
-        - path: product
+  - name: gets cdc2 gene details
+    params:
+      systematicId: SPBC11B10.09
+    assert:
+    - path: uniquename
+      equals: SPBC11B10.09
+    - path: name
+      equals: cdc2
+    - path: product
+  searchGenes:
+  - name: searches for cdc2 gene
+    params:
+      query: cdc2
+    assert:
+    - {}
+    allowError: true
+  getGenotype:
+  - name: gets a genotype record
+    params:
+      genotypeId: e674656a-b83b-4e42-9a7c-85cec0bfcc80-genotype-2
+    assert:
+    - path: display_name
+    allowError: true

@@ -2,18 +2,18 @@ name: gdc
 displayName: GDC
 description: NCI Genomic Data Commons — cancer genomics data from TCGA and other programs
 tags:
-  - cancer
-  - genomics
-  - tcga
-  - gdc
-  - tumor
+- cancer
+- genomics
+- tcga
+- gdc
+- tumor
 baseUrl: https://api.gdc.cancer.gov
 tools:
   searchCases:
     description: Search cancer cases in the Genomic Data Commons
     tags:
-      - case-search
-      - cancer-cases
+    - case-search
+    - cancer-cases
     method: GET
     path: /cases
     params:
@@ -31,16 +31,17 @@ tools:
     response:
       format: json
       fields:
-        - "data.hits[].case_id"
-        - "data.hits[].primary_site"
-        - "data.hits[].disease_type"
-        - "data.pagination.total"
-        - "data.pagination.count"
+      - data.hits[].case_id
+      - data.hits[].primary_site
+      - data.hits[].disease_type
+      - data.pagination.total
+      - data.pagination.count
+    entity: sample
   searchGenes:
     description: Search genes in the Genomic Data Commons
     tags:
-      - gene-search
-      - cancer-genes
+    - gene-search
+    - cancer-genes
     method: GET
     path: /genes
     params:
@@ -55,16 +56,17 @@ tools:
     response:
       format: json
       fields:
-        - "data.hits[].gene_id"
-        - "data.hits[].symbol"
-        - "data.hits[].biotype"
-        - "data.hits[].description"
-        - "data.pagination.total"
+      - data.hits[].gene_id
+      - data.hits[].symbol
+      - data.hits[].biotype
+      - data.hits[].description
+      - data.pagination.total
+    entity: gene
   searchProjects:
     description: Search cancer research projects in GDC
     tags:
-      - project-search
-      - cancer-projects
+    - project-search
+    - cancer-projects
     method: GET
     path: /projects
     params:
@@ -79,33 +81,156 @@ tools:
     response:
       format: json
       fields:
-        - "data.hits[].project_id"
-        - "data.hits[].name"
-        - "data.hits[].primary_site"
-        - "data.hits[].disease_type"
-        - "data.pagination.total"
+      - data.hits[].project_id
+      - data.hits[].name
+      - data.hits[].primary_site
+      - data.hits[].disease_type
+      - data.pagination.total
+    entity: dataset
+  searchFiles:
+    description: Search data files in GDC (BAM, VCF, MAF, etc.)
+    tags:
+    - file-search
+    - data-files
+    method: GET
+    path: /files
+    params:
+      filters:
+        type: string
+        description: JSON-encoded filter
+      fields:
+        type: string
+        default: file_id,file_name,data_format,data_type,experimental_strategy,file_size
+      size:
+        type: integer
+        default: 10
+    response:
+      format: json
+      fields:
+      - data.hits[].file_id
+      - data.hits[].file_name
+      - data.hits[].data_format
+      - data.pagination.total
+    entity: dataset
+  searchMutations:
+    description: Search somatic mutations (SSMs) in GDC
+    tags:
+    - mutation-search
+    - somatic-mutation
+    method: GET
+    path: /ssms
+    params:
+      filters:
+        type: string
+        description: JSON-encoded filter
+      fields:
+        type: string
+        default: ssm_id,genomic_dna_change
+      size:
+        type: integer
+        default: 10
+    response:
+      format: json
+      fields:
+      - data.hits[].ssm_id
+      - data.hits[].genomic_dna_change
+      - data.pagination.total
+    entity: variant
+  searchAnnotations:
+    description: Search GDC annotations (data quality notes)
+    tags:
+    - annotations
+    - data-quality
+    method: GET
+    path: /annotations
+    params:
+      fields:
+        type: string
+        default: annotation_id,category,classification,entity_type
+      size:
+        type: integer
+        default: 10
+    response:
+      format: json
+      fields:
+      - data.hits[].annotation_id
+      - data.hits[].category
+      - data.pagination.total
+    entity: annotation
+  searchCNVs:
+    description: Search copy number variations in GDC
+    tags:
+    - cnv-search
+    - copy-number
+    method: GET
+    path: /cnvs
+    params:
+      filters:
+        type: string
+        description: JSON-encoded filter
+      fields:
+        type: string
+        default: cnv_id,cnv_change
+      size:
+        type: integer
+        default: 10
+    response:
+      format: json
+      fields:
+      - data.hits[].cnv_id
+      - data.hits[].cnv_change
+      - data.pagination.total
+    entity: variant
 tests:
   searchCases:
-    - name: searches for cancer cases
-      params:
-        size: 3
-      assert:
-        - path: data.hits
-          minLength: 1
-        - path: data.hits.0.case_id
+  - name: searches for cancer cases
+    params:
+      size: 3
+    assert:
+    - path: data.hits
+      minLength: 1
+    - path: data.hits.0.case_id
   searchProjects:
-    - name: lists cancer research projects
-      params:
-        size: 3
-      assert:
-        - path: data.hits
-          minLength: 1
-        - path: data.hits.0.project_id
+  - name: lists cancer research projects
+    params:
+      size: 3
+    assert:
+    - path: data.hits
+      minLength: 1
+    - path: data.hits.0.project_id
   searchGenes:
-    - name: searches for genes
-      params:
-        size: 3
-      assert:
-        - path: data.hits
-          minLength: 1
-        - path: data.hits.0.gene_id
+  - name: searches for genes
+    params:
+      size: 3
+    assert:
+    - path: data.hits
+      minLength: 1
+    - path: data.hits.0.gene_id
+  searchFiles:
+  - name: searches for data files
+    params:
+      size: 3
+    assert:
+    - path: data.hits
+      minLength: 1
+  searchMutations:
+  - name: searches for somatic mutations
+    params:
+      size: 3
+    assert:
+    - path: data.hits
+      minLength: 1
+  searchAnnotations:
+  - name: searches for annotations
+    params:
+      size: 3
+    assert:
+    - path: data.hits
+      minLength: 1
+  searchCNVs:
+  - name: searches for copy number variations
+    params:
+      size: 3
+    assert:
+    - path: data.hits
+      minLength: 1

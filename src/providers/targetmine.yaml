@@ -2,17 +2,17 @@ name: targetmine
 displayName: TargetMine
 description: TargetMine — integrated data warehouse for drug target prioritization and biomarker discovery
 tags:
-  - drug-targets
-  - biomarkers
-  - intermine
-  - targetmine
+- drug-targets
+- biomarkers
+- intermine
+- targetmine
 baseUrl: https://targetmine.mizuguchilab.org/targetmine/service
 tools:
   search:
     description: Search TargetMine for genes, drugs, diseases, and pathways
     tags:
-      - target-search
-      - drug-target
+    - target-search
+    - drug-target
     method: GET
     path: /search
     params:
@@ -31,18 +31,19 @@ tools:
     response:
       format: json
       fields:
-        - totalHits
-        - results[].id
-        - results[].type
-        - results[].fields
+      - totalHits
+      - results[].id
+      - results[].type
+      - results[].fields
+    entity: gene
 tests:
   search:
-    - name: searches for TP53
-      params:
-        q: TP53
-        format: json
-        size: 3
-      assert:
-        - path: totalHits
-        - path: results
-          minLength: 1
+  - name: searches for TP53
+    params:
+      q: TP53
+      format: json
+      size: 3
+    assert:
+    - path: totalHits
+    - path: results
+      minLength: 1

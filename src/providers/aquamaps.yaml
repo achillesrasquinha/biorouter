@@ -1,13 +1,20 @@
 name: aquamaps
 displayName: AquaMaps
 description: AquaMaps — predicted species distribution maps for marine and freshwater organisms
-tags: [marine, aquatic, species-distribution, ecology, biodiversity, freshwater]
+tags:
+- marine
+- aquatic
+- species-distribution
+- ecology
+- biodiversity
+- freshwater
 baseUrl: https://aquamaps.org/webservice
-
 tools:
   searchSpecies:
     description: Search AquaMaps for aquatic species by name
-    tags: [species-search, aquatic-search]
+    tags:
+    - species-search
+    - aquatic-search
     method: GET
     path: /api/species
     params:
@@ -17,10 +24,12 @@ tools:
         description: Species name to search (e.g. "Thunnus thynnus", "shark")
     response:
       format: json
-
+    entity: organism
   getDistribution:
     description: Get predicted distribution map data for a species
-    tags: [distribution-map, species-range]
+    tags:
+    - distribution-map
+    - species-range
     method: GET
     path: /api/distribution/{speciesId}
     params:
@@ -30,12 +39,12 @@ tools:
         description: AquaMaps species identifier
     response:
       format: json
-
+    entity: organism
 tests:
   searchSpecies:
-    - name: searches for bluefin tuna
-      params:
-        q: Thunnus thynnus
-      assert:
-        - minLength: 1
-      allowError: true
+  - name: searches for bluefin tuna
+    params:
+      q: Thunnus thynnus
+    assert:
+    - minLength: 1
+    allowError: true

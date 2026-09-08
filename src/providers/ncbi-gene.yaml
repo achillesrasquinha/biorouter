@@ -2,18 +2,18 @@ name: ncbi-gene
 displayName: NCBI Gene
 description: Gene-specific information from NCBI Entrez Gene database
 tags:
-  - gene
-  - ncbi
-  - entrez
-  - gene-function
-  - gene-expression
+- gene
+- ncbi
+- entrez
+- gene-function
+- gene-expression
 baseUrl: https://eutils.ncbi.nlm.nih.gov/entrez/eutils
 tools:
   search:
     description: Search NCBI Gene database for genes by keyword
     tags:
-      - gene-search
-      - entrez-search
+    - gene-search
+    - entrez-search
     method: GET
     path: /esearch.fcgi
     params:
@@ -35,14 +35,15 @@ tools:
     response:
       format: json
       fields:
-        - esearchresult.count
-        - esearchresult.idlist
-        - esearchresult.querytranslation
+      - esearchresult.count
+      - esearchresult.idlist
+      - esearchresult.querytranslation
+    entity: gene
   getSummary:
     description: Get gene summary information by NCBI Gene ID
     tags:
-      - gene-info
-      - gene-summary
+    - gene-info
+    - gene-summary
     method: GET
     path: /esummary.fcgi
     params:
@@ -58,17 +59,18 @@ tools:
         default: json
     response:
       format: json
+    entity: gene
 tests:
   search:
-    - name: searches for BRCA1 gene
-      params:
-        query: BRCA1
-      assert:
-        - path: esearchresult.idlist
-          minLength: 1
+  - name: searches for BRCA1 gene
+    params:
+      query: BRCA1
+    assert:
+    - path: esearchresult.idlist
+      minLength: 1
   getSummary:
-    - name: gets gene summary for BRCA1 by ID
-      params:
-        id: "672"
-      assert:
-        - path: result.672
+  - name: gets gene summary for BRCA1 by ID
+    params:
+      id: '672'
+    assert:
+    - path: result.672

@@ -1,0 +1,470 @@
+description: Map protein interactions — PPIs, signaling, complexes, drug targets, and binding affinities
+tags:
+- protein
+- interactions
+- ppi
+- network
+- signaling
+- biorouter
+input:
+  query:
+    type: string
+    required: true
+    description: Gene symbol, UniProt accession, or protein name
+phases:
+- name: resolve
+  parallel: false
+  calls:
+  - source: mygene
+    tool: search
+    params:
+      query: '{input.query}'
+      species: human
+      size: 5
+    pick_best:
+      array: hits
+      match_field: symbol
+      against: input.query
+      as: best_hit
+    extract:
+      entrez_id: best_hit._id
+      symbol: best_hit.symbol
+      name: best_hit.name
+  - source: uniprot
+    tool: search
+    params:
+      query: '{input.query} AND organism_id:9606'
+      size: 3
+    pick_best:
+      array: results
+      match_field: genes[0].geneName.value
+      against: input.query
+      as: best_uniprot
+    extract:
+      uniprot_ac: best_uniprot.primaryAccession
+  - source: ensembl
+    tool: lookupSymbol
+    params:
+      symbol: '{input.query}'
+    skip_if: '!input.query'
+    extract:
+      ensembl_id: id
+- name: fetch
+  parallel: true
+  calls:
+  - source: string
+    tool: getInteractionPartners
+    params:
+      identifiers: '{resolved.symbol}'
+      limit: 25
+    skip_if: '!resolved.symbol'
+    provides:
+    - ppiNetwork
+  - source: string
+    tool: getEnrichment
+    params:
+      identifiers: '{resolved.symbol}'
+    skip_if: '!resolved.symbol'
+    provides:
+    - ppiNetwork
+  - source: intact
+    tool: search
+    params:
+      query: '{resolved.uniprot_ac}'
+      pageSize: 15
+    skip_if: '!resolved.uniprot_ac'
+    provides:
+    - curatedInteractions
+  - source: intact
+    tool: getComplex
+    params:
+      query: '{resolved.symbol}'
+    skip_if: '!resolved.symbol'
+    provides:
+    - complexes
+  - source: complex-portal
+    tool: search
+    params:
+      query: '{resolved.symbol}'
+    skip_if: '!resolved.symbol'
+    provides:
+    - complexes
+  - source: omnipath
+    tool: getInteractions
+    params:
+      partners: '{resolved.symbol}'
+      limit: 25
+    skip_if: '!resolved.symbol'
+    provides:
+    - signaling
+  - source: omnipath
+    tool: getEnzSubstrate
+    params:
+      partners: '{resolved.symbol}'
+      limit: 25
+    skip_if: '!resolved.symbol'
+    provides:
+    - enzymeSubstrate
+  - source: omnipath
+    tool: getComplexes
+    params:
+      proteins: '{resolved.symbol}'
+    skip_if: '!resolved.symbol'
+    provides:
+    - complexes
+  - source: signor
+    tool: getInteractions
+    params:
+      entityA: '{resolved.symbol}'
+    skip_if: '!resolved.symbol'
+    provides:
+    - signaling
+  - source: dgidb
+    tool: search
+    params:
+      names:
+      - '{resolved.symbol}'
+    skip_if: '!resolved.symbol'
+    provides:
+    - drugInteractions
+  - source: opentargets
+    tool: getDrugs
+    params:
+      ensemblId: '{resolved.ensembl_id}'
+    skip_if: '!resolved.ensembl_id'
+    provides:
+    - drugInteractions
+  - source: pharos
+    tool: getTarget
+    params:
+      uniprot: '{resolved.uniprot_ac}'
+    skip_if: '!resolved.uniprot_ac'
+    provides:
+    - targetDruggability
+  - source: europepmc
+    tool: search
+    params:
+      query: '{input.query} protein interaction binding partner'
+      pageSize: 5
+    provides:
+    - literature
+  - source: biogrid
+    tool: searchInteractions
+    params:
+      searchNames: '{resolved.symbol}'
+      searchLimit: 25
+    skip_if: '!resolved.symbol'
+    provides:
+    - highthroughputPpi
+  - source: iptmnet
+    tool: getSubstrates
+    params:
+      id: '{resolved.uniprot_ac}'
+    skip_if: '!resolved.uniprot_ac'
+    provides:
+    - ptmSubstrates
+  - source: genemania
+    tool: search
+    params:
+      query: '{resolved.symbol}'
+      organism: H_sapiens
+    skip_if: '!resolved.symbol'
+    provides:
+    - predictedNetworks
+  - source: pathway-commons
+    tool: graph
+    params:
+      source: '{resolved.symbol}'
+      kind: neighborhood
+      format: EXTENDED_BINARY_SIF
+    skip_if: '!resolved.symbol'
+    provides:
+    - pathwayInteractions
+  - source: stitch
+    tool: resolveIdentifier
+    params:
+      query: '{resolved.symbol}'
+      species: 9606
+    skip_if: '!resolved.symbol'
+    provides:
+    - chemicalInteractions
+  - source: bindingdb
+    tool: searchByTarget
+    params:
+      target: '{resolved.symbol}'
+    skip_if: '!resolved.symbol'
+    provides:
+    - bindingAffinities
+  - source: elm
+    tool: getInstances
+    params:
+      q: '{resolved.uniprot_ac}'
+    skip_if: '!resolved.uniprot_ac'
+    provides:
+    - interactionMotifs
+  - source: ensembl
+    tool: getPhenotype
+    params:
+      gene: '{resolved.symbol}'
+    skip_if: '!resolved.symbol'
+    provides:
+    - phenotypeAssociations
+  - source: ensembl
+    tool: getXrefs
+    params:
+      id: '{resolved.ensembl_id}'
+    skip_if: '!resolved.ensembl_id'
+    provides:
+    - crossReferences
+  - source: intact
+    tool: getInteractorDetails
+    params:
+      ac: '{resolved.uniprot_ac}'
+    skip_if: '!resolved.uniprot_ac'
+    provides:
+    - interactorInfo
+  - source: opentargets
+    tool: getTargetInteractions
+    params:
+      ensemblId: '{resolved.ensembl_id}'
+    skip_if: '!resolved.ensembl_id'
+    provides:
+    - targetInteractions
+  - source: string
+    tool: getNetwork
+    params:
+      identifiers: '{resolved.symbol}'
+    skip_if: '!resolved.symbol'
+    provides:
+    - detailedNetwork
+output:
+  identity:
+    symbol:
+      from: resolved.symbol
+    name:
+      from: resolved.name
+    ids:
+      from: resolved
+      fields:
+      - entrez_id
+      - uniprot_ac
+      - ensembl_id
+  ppiNetwork:
+    stringPartners:
+      sources:
+      - source: string
+        call: getInteractionPartners
+        path: $passthrough
+        rank: 1
+      reason: STRING protein-protein interactions — combined score from experiments, coexpression, text mining, databases
+    functionalEnrichment:
+      sources:
+      - source: string
+        call: getEnrichment
+        path: $passthrough
+        rank: 1
+      reason: STRING functional enrichment — GO terms, KEGG pathways, Reactome pathways enriched in the interaction network
+  curatedInteractions:
+    intactInteractions:
+      sources:
+      - source: intact
+        call: search
+        path: content
+        rank: 1
+      reason: IntAct curated molecular interactions — experimentally validated with MI-score confidence
+  complexes:
+    complexPortal:
+      sources:
+      - source: complex-portal
+        call: search
+        path: elements
+        rank: 1
+      reason: Complex Portal — curated stable macromolecular complexes with stoichiometry
+    intactComplexes:
+      sources:
+      - source: intact
+        call: getComplex
+        path: elements
+        rank: 1
+      reason: IntAct Complex Portal integration
+    omnipathComplexes:
+      sources:
+      - source: omnipath
+        call: getComplexes
+        path: $passthrough
+        rank: 1
+      reason: OmniPath protein complex memberships — integrated from multiple databases
+  signaling:
+    omnipathSignaling:
+      sources:
+      - source: omnipath
+        call: getInteractions
+        path: $passthrough
+        rank: 1
+      reason: OmniPath directed signaling interactions — stimulation/inhibition, consensus direction
+    signorCausal:
+      sources:
+      - source: signor
+        call: getInteractions
+        path: $passthrough
+        rank: 1
+      reason: SIGNOR causal signaling interactions — curated cause-effect relationships in signal transduction
+  enzymeSubstrate:
+    ptmRelationships:
+      sources:
+      - source: omnipath
+        call: getEnzSubstrate
+        path: $passthrough
+        rank: 1
+      reason: OmniPath enzyme-substrate relationships — phosphorylation sites, modification types, residue positions
+  drugInteractions:
+    dgidbInteractions:
+      sources:
+      - source: dgidb
+        call: search
+        path: genes.nodes
+        rank: 1
+      reason: DGIdb drug-gene interactions — drugs targeting this protein with interaction types
+    targetDrugs:
+      sources:
+      - source: opentargets
+        call: getDrugs
+        path: target.drugAndClinicalCandidates
+        rank: 1
+      reason: Open Targets drugs and clinical candidates — drug type, mechanism of action, clinical stage
+    pharosLigands:
+      sources:
+      - source: pharos
+        call: getTarget
+        path: target.ligands
+        rank: 1
+      reason: Pharos ligands — small molecules and biologics interacting with this target
+  targetDruggability:
+    tdl:
+      sources:
+      - source: pharos
+        call: getTarget
+        path: target.tdl
+        rank: 1
+    novelty:
+      sources:
+      - source: pharos
+        call: getTarget
+        path: target.novelty
+        rank: 1
+    associatedDiseases:
+      sources:
+      - source: pharos
+        call: getTarget
+        path: target.diseases
+        rank: 1
+  literature:
+    interactionPublications:
+      sources:
+      - source: europepmc
+        call: search
+        path: resultList.result
+        rank: 1
+      reason: Recent literature on this protein's interactions and binding partners
+    publicationCount:
+      sources:
+      - source: europepmc
+        call: search
+        path: hitCount
+        rank: 1
+  highthroughputPpi:
+    biogridInteractions:
+      sources:
+      - source: biogrid
+        call: searchInteractions
+        path: $passthrough
+        rank: 1
+      reason: BioGRID curated protein-protein and genetic interactions — experimentally validated with evidence codes
+  ptmSubstrates:
+    iptmnetSubstrates:
+      sources:
+      - source: iptmnet
+        call: getSubstrates
+        path: $passthrough
+        rank: 1
+      reason: iPTMnet enzyme-substrate relationships — PTM sites this protein modifies or is modified at
+  predictedNetworks:
+    genemaniaNetwork:
+      sources:
+      - source: genemania
+        call: search
+        path: $passthrough
+        rank: 1
+      reason: GeneMANIA predicted gene networks — coexpression, genetic interactions, shared protein domains, pathways
+  pathwayInteractions:
+    pathwayCommonsGraph:
+      sources:
+      - source: pathway-commons
+        call: graph
+        path: $passthrough
+        rank: 1
+      reason: Pathway Commons interaction neighborhood — aggregated from Reactome, BioCyc, HPRD, PhosphoSitePlus
+  chemicalInteractions:
+    stitchChemicals:
+      sources:
+      - source: stitch
+        call: resolveIdentifier
+        path: $passthrough
+        rank: 1
+      reason: STITCH chemical-protein interactions — small molecule binding partners and drug targets
+  bindingAffinities:
+    bindingdbLigands:
+      sources:
+      - source: bindingdb
+        call: searchByTarget
+        path: $passthrough
+        rank: 1
+      reason: BindingDB measured binding affinities — Ki, Kd, IC50 values for protein-ligand interactions
+  interactionMotifs:
+    elmInteractionMotifs:
+      sources:
+      - source: elm
+        call: getInstances
+        path: $passthrough
+        rank: 1
+      reason: ELM linear motifs mediating protein interactions — SH3, PDZ, WW domain binding sites, docking motifs
+  phenotypeAssociations:
+    ensemblPhenotypes:
+      sources:
+      - source: ensembl
+        call: getPhenotype
+        path: $passthrough
+        rank: 1
+      reason: Ensembl phenotype associations — GWAS and clinical phenotypes linked to the gene
+  crossReferences:
+    ensemblXrefs:
+      sources:
+      - source: ensembl
+        call: getXrefs
+        path: $passthrough
+        rank: 1
+      reason: Ensembl cross-references — links to external databases (UniProt, HGNC, RefSeq, etc.)
+  interactorInfo:
+    intactInteractorDetails:
+      sources:
+      - source: intact
+        call: getInteractorDetails
+        path: content
+        rank: 1
+      reason: IntAct interactor details — protein identity, species, interaction count, and cross-references
+  targetInteractions:
+    opentargetsPpi:
+      sources:
+      - source: opentargets
+        call: getTargetInteractions
+        path: target.interactions
+        rank: 1
+      reason: Open Targets protein interactions — curated PPIs with source database and confidence scores
+  detailedNetwork:
+    stringDetailedNetwork:
+      sources:
+      - source: string
+        call: getNetwork
+        path: $passthrough
+        rank: 1
+      reason: STRING detailed network — interaction partners with individual score channels (experimental, coexpression, text mining)

@@ -2,19 +2,18 @@ name: clingen
 displayName: ClinGen
 description: Clinical Genome Resource — gene-disease validity and dosage sensitivity curation
 tags:
-  - gene-disease
-  - clinical
-  - validity
-  - dosage-sensitivity
-  - clingen
+- gene-disease
+- clinical
+- validity
+- dosage-sensitivity
+- clingen
 baseUrl: https://search.clinicalgenome.org/kb/rest
-
 tools:
   searchGenes:
     description: Search ClinGen knowledge base for genes by name or symbol
     tags:
-      - gene-search
-      - clingen-search
+    - gene-search
+    - clingen-search
     method: GET
     path: /genes
     params:
@@ -24,11 +23,12 @@ tools:
         description: Gene symbol or name to search (e.g. BRCA1, TP53)
     response:
       format: json
+    entity: gene
   getGeneValidity:
     description: Get gene-disease validity classifications for a gene
     tags:
-      - gene-validity
-      - gene-disease
+    - gene-validity
+    - gene-disease
     method: GET
     path: /gene-validity
     params:
@@ -38,11 +38,12 @@ tools:
         description: Gene symbol (e.g. BRCA1)
     response:
       format: json
+    entity: gene
   getDosageSensitivity:
     description: Get dosage sensitivity classifications for a gene
     tags:
-      - dosage-sensitivity
-      - haploinsufficiency
+    - dosage-sensitivity
+    - haploinsufficiency
     method: GET
     path: /gene-dosage
     params:
@@ -52,26 +53,26 @@ tools:
         description: Gene symbol or name to search (e.g. BRCA1)
     response:
       format: json
-
+    entity: gene
 tests:
   searchGenes:
-    - name: searches for BRCA1 gene
-      params:
-        search: BRCA1
-      assert:
-        - minLength: 1
-      allowError: true
+  - name: searches for BRCA1 gene
+    params:
+      search: BRCA1
+    assert:
+    - minLength: 1
+    allowError: true
   getGeneValidity:
-    - name: gets gene-disease validity for BRCA1
-      params:
-        gene: BRCA1
-      assert:
-        - minLength: 1
-      allowError: true
+  - name: gets gene-disease validity for BRCA1
+    params:
+      gene: BRCA1
+    assert:
+    - minLength: 1
+    allowError: true
   getDosageSensitivity:
-    - name: gets dosage sensitivity for BRCA1
-      params:
-        search: BRCA1
-      assert:
-        - minLength: 1
-      allowError: true
+  - name: gets dosage sensitivity for BRCA1
+    params:
+      search: BRCA1
+    assert:
+    - minLength: 1
+    allowError: true

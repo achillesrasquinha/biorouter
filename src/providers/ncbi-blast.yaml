@@ -2,19 +2,18 @@ name: ncbi-blast
 displayName: NCBI BLAST
 description: NCBI BLAST sequence similarity search — submit queries and retrieve alignment results
 tags:
-  - sequence-search
-  - alignment
-  - blast
-  - ncbi
-  - homology
+- sequence-search
+- alignment
+- blast
+- ncbi
+- homology
 baseUrl: https://blast.ncbi.nlm.nih.gov/blast/Blast.cgi
-
 tools:
-  submit:
+  submitBlast:
     description: Submit a BLAST search job (returns a Request ID for polling results)
     tags:
-      - blast-submit
-      - sequence-search
+    - blast-submit
+    - sequence-search
     method: GET
     path: /
     params:
@@ -39,11 +38,12 @@ tools:
         description: BLAST program (blastn, blastp, blastx, tblastn, tblastx)
     response:
       format: lines
-  getResults:
+    entity: sequence
+  getBlastResults:
     description: Retrieve results of a previously submitted BLAST job by Request ID (RID)
     tags:
-      - blast-results
-      - alignment-results
+    - blast-results
+    - alignment-results
     method: GET
     path: /
     params:
@@ -63,34 +63,34 @@ tools:
     response:
       format: json
       fields:
-        - BlastOutput2[].report.program
-        - BlastOutput2[].report.params.expect
-        - BlastOutput2[].report.results.search.query_title
-        - BlastOutput2[].report.results.search.query_len
-        - BlastOutput2[].report.results.search.hits[].description[].accession
-        - BlastOutput2[].report.results.search.hits[].description[].title
-        - BlastOutput2[].report.results.search.hits[].hsps[].bit_score
-        - BlastOutput2[].report.results.search.hits[].hsps[].evalue
-        - BlastOutput2[].report.results.search.hits[].hsps[].identity
-        - BlastOutput2[].report.results.search.hits[].hsps[].align_len
-
+      - BlastOutput2[].report.program
+      - BlastOutput2[].report.params.expect
+      - BlastOutput2[].report.results.search.query_title
+      - BlastOutput2[].report.results.search.query_len
+      - BlastOutput2[].report.results.search.hits[].description[].accession
+      - BlastOutput2[].report.results.search.hits[].description[].title
+      - BlastOutput2[].report.results.search.hits[].hsps[].bit_score
+      - BlastOutput2[].report.results.search.hits[].hsps[].evalue
+      - BlastOutput2[].report.results.search.hits[].hsps[].identity
+      - BlastOutput2[].report.results.search.hits[].hsps[].align_len
+    entity: sequence
 tests:
-  submit:
-    - name: submits a short nucleotide BLAST search
-      params:
-        CMD: Put
-        QUERY: ATGCGATCGATCGATCGATCGATCGATCGATCGATCGATCG
-        DATABASE: nt
-        PROGRAM: blastn
-      assert:
-        - minLength: 1
-      allowError: true
-  getResults:
-    - name: attempts to retrieve results for a placeholder RID
-      params:
-        CMD: Get
-        RID: PLACEHOLDER_RID
-        FORMAT_TYPE: JSON2
-      assert:
-        - minLength: 1
-      allowError: true
+  submitBlast:
+  - name: submits a short nucleotide BLAST search
+    params:
+      CMD: Put
+      QUERY: ATGCGATCGATCGATCGATCGATCGATCGATCGATCGATCG
+      DATABASE: nt
+      PROGRAM: blastn
+    assert:
+    - minLength: 1
+    allowError: true
+  getBlastResults:
+  - name: attempts to retrieve results for a placeholder RID
+    params:
+      CMD: Get
+      RID: PLACEHOLDER_RID
+      FORMAT_TYPE: JSON2
+    assert:
+    - minLength: 1
+    allowError: true

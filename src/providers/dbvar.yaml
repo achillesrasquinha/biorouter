@@ -2,19 +2,18 @@ name: dbvar
 displayName: dbVar
 description: NCBI dbVar — database of genomic structural variants (CNVs, insertions, deletions, inversions)
 tags:
-  - structural-variants
-  - cnv
-  - genomics
-  - ncbi
-  - copy-number
+- structural-variants
+- cnv
+- genomics
+- ncbi
+- copy-number
 baseUrl: https://eutils.ncbi.nlm.nih.gov/entrez/eutils
-
 tools:
   search:
     description: Search dbVar for structural variants by query term
     tags:
-      - variant-search
-      - structural-variant-search
+    - variant-search
+    - structural-variant-search
     method: GET
     path: /esearch.fcgi
     params:
@@ -37,16 +36,16 @@ tools:
     response:
       format: json
       fields:
-        - esearchresult.count
-        - esearchresult.retmax
-        - esearchresult.idlist
-        - esearchresult.querytranslation
-
+      - esearchresult.count
+      - esearchresult.retmax
+      - esearchresult.idlist
+      - esearchresult.querytranslation
+    entity: variant
   getSummary:
     description: Get summary information for dbVar structural variants by ID
     tags:
-      - variant-summary
-      - variant-detail
+    - variant-summary
+    - variant-detail
     method: GET
     path: /esummary.fcgi
     params:
@@ -64,19 +63,19 @@ tools:
         description: Return mode
     response:
       format: json
-
+    entity: variant
 tests:
   search:
-    - name: searches for BRCA1 structural variants
-      params:
-        term: BRCA1
-      assert:
-        - {}
-      allowError: true
+  - name: searches for BRCA1 structural variants
+    params:
+      term: BRCA1
+    assert:
+    - {}
+    allowError: true
   getSummary:
-    - name: gets variant summary by ID
-      params:
-        id: "nsv530705"
-      assert:
-        - {}
-      allowError: true
+  - name: gets variant summary by ID
+    params:
+      id: nsv530705
+    assert:
+    - {}
+    allowError: true

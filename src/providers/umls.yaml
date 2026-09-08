@@ -1,22 +1,26 @@
 name: umls
 displayName: UMLS
 description: Unified Medical Language System — biomedical concepts, terminology crosswalk, and semantic network
-tags: [medical-terminology, umls, controlled-vocabulary, nlm, crosswalk]
+tags:
+- medical-terminology
+- umls
+- controlled-vocabulary
+- nlm
+- crosswalk
 baseUrl: https://uts-ws.nlm.nih.gov/rest
-
 auth:
   type: apiKey
   param: apiKey
   env: LS_UMLS_API_KEY
   required: true
-
 rateLimit:
   requestsPerSecond: 8
-
 tools:
   searchConcepts:
     description: Search UMLS Metathesaurus concepts by term
-    tags: [concept-search, terminology-search]
+    tags:
+    - concept-search
+    - terminology-search
     method: GET
     path: /search/current
     params:
@@ -40,14 +44,16 @@ tools:
     response:
       format: json
       fields:
-        - result.results[].ui
-        - result.results[].name
-        - result.results[].rootSource
-        - result.results[].uri
-
+      - result.results[].ui
+      - result.results[].name
+      - result.results[].rootSource
+      - result.results[].uri
+    entity: ontology-term
   getConcept:
     description: Get concept details by UMLS Concept Unique Identifier (CUI)
-    tags: [concept-info, concept-details]
+    tags:
+    - concept-info
+    - concept-details
     method: GET
     path: /content/current/CUI/{cui}
     params:
@@ -58,15 +64,17 @@ tools:
     response:
       format: json
       fields:
-        - result.ui
-        - result.name
-        - result.semanticTypes[].name
-        - result.atomCount
-        - result.definitions[].value
-
+      - result.ui
+      - result.name
+      - result.semanticTypes[].name
+      - result.atomCount
+      - result.definitions[].value
+    entity: ontology-term
   getRelations:
     description: Get related concepts for a given CUI
-    tags: [concept-relations, related-concepts]
+    tags:
+    - concept-relations
+    - related-concepts
     method: GET
     path: /content/current/CUI/{cui}/relations
     params:
@@ -80,15 +88,18 @@ tools:
     response:
       format: json
       fields:
-        - result[].relatedIdName
-        - result[].relationLabel
-        - result[].additionalRelationLabel
-        - result[].ui
-        - result[].rootSource
-
+      - result[].relatedIdName
+      - result[].relationLabel
+      - result[].additionalRelationLabel
+      - result[].ui
+      - result[].rootSource
+    entity: ontology-term
   crosswalk:
     description: Get atoms (alternative names and source mappings) for a concept
-    tags: [crosswalk, terminology-mapping, source-atoms]
+    tags:
+    - crosswalk
+    - terminology-mapping
+    - source-atoms
     method: GET
     path: /content/current/CUI/{cui}/atoms
     params:
@@ -109,28 +120,28 @@ tools:
     response:
       format: json
       fields:
-        - result[].name
-        - result[].rootSource
-        - result[].termType
-        - result[].ui
-        - result[].sourceConcept
-
+      - result[].name
+      - result[].rootSource
+      - result[].termType
+      - result[].ui
+      - result[].sourceConcept
+    entity: ontology-term
 tests:
   searchConcepts:
-    - name: searches for diabetes
-      params:
-        query: diabetes
-      assert:
-        - path: result.results
-          minLength: 1
-        - path: result.results.0.ui
-      allowError: true
+  - name: searches for diabetes
+    params:
+      query: diabetes
+    assert:
+    - path: result.results
+      minLength: 1
+    - path: result.results.0.ui
+    allowError: true
   getConcept:
-    - name: gets diabetes mellitus concept
-      params:
-        cui: C0011849
-      assert:
-        - path: result.ui
-          equals: C0011849
-        - path: result.name
-      allowError: true
+  - name: gets diabetes mellitus concept
+    params:
+      cui: C0011849
+    assert:
+    - path: result.ui
+      equals: C0011849
+    - path: result.name
+    allowError: true

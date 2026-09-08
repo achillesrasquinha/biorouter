@@ -2,18 +2,18 @@ name: flybase
 displayName: FlyBase
 description: FlyBase — Drosophila melanogaster genomics, genetics, and molecular biology
 tags:
-  - drosophila
-  - genomics
-  - genetics
-  - model-organism
-  - flybase
+- drosophila
+- genomics
+- genetics
+- model-organism
+- flybase
 baseUrl: https://api.flybase.org/api/v1.0
 tools:
   search:
     description: Search FlyBase for genes, alleles, or other features by keyword
     tags:
-      - gene-search
-      - flybase-search
+    - gene-search
+    - flybase-search
     method: GET
     path: /search/{query}
     params:
@@ -23,11 +23,12 @@ tools:
         description: Search term (e.g. "notch", "wingless")
     response:
       format: json
+    entity: gene
   getGene:
     description: Get detailed gene information by FlyBase gene ID (FBgn)
     tags:
-      - gene-detail
-      - gene-info
+    - gene-detail
+    - gene-info
     method: GET
     path: /gene/{fbgn_id}
     params:
@@ -37,11 +38,12 @@ tools:
         description: FlyBase gene ID (e.g. "FBgn0004647" for Notch)
     response:
       format: json
+    entity: gene
   getAlleles:
     description: Get alleles associated with a FlyBase gene
     tags:
-      - allele-list
-      - gene-alleles
+    - allele-list
+    - gene-alleles
     method: GET
     path: /gene/{fbgn_id}/alleles
     params:
@@ -51,25 +53,26 @@ tools:
         description: FlyBase gene ID (e.g. "FBgn0004647")
     response:
       format: json
+    entity: variant
 tests:
   search:
-    - name: searches for Notch gene
-      params:
-        query: notch
-      assert:
-        - {}
-      allowError: true
+  - name: searches for Notch gene
+    params:
+      query: notch
+    assert:
+    - {}
+    allowError: true
   getGene:
-    - name: gets gene details for Notch
-      params:
-        fbgn_id: FBgn0004647
-      assert:
-        - {}
-      allowError: true
+  - name: gets gene details for Notch
+    params:
+      fbgn_id: FBgn0004647
+    assert:
+    - {}
+    allowError: true
   getAlleles:
-    - name: gets alleles for Notch gene
-      params:
-        fbgn_id: FBgn0004647
-      assert:
-        - {}
-      allowError: true
+  - name: gets alleles for Notch gene
+    params:
+      fbgn_id: FBgn0004647
+    assert:
+    - {}
+    allowError: true

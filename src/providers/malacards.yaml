@@ -2,18 +2,18 @@ name: malacards
 displayName: MalaCards
 description: MalaCards — human disease database integrating gene, variant, and pathway data
 tags:
-  - diseases
-  - disease-genes
-  - disease-variants
-  - human-disease
-  - disease-database
+- diseases
+- disease-genes
+- disease-variants
+- human-disease
+- disease-database
 baseUrl: https://www.malacards.org/api/v2
 tools:
   searchDiseases:
     description: Search for diseases by name or keyword
     tags:
-      - disease-search
-      - disease-lookup
+    - disease-search
+    - disease-lookup
     method: GET
     path: /search
     params:
@@ -23,11 +23,12 @@ tools:
         description: Disease name or keyword (e.g. "diabetes", "Alzheimer", "cardiomyopathy")
     response:
       format: json
+    entity: disease
   getDisease:
     description: Get detailed disease information by MalaCards slug
     tags:
-      - disease-info
-      - disease-details
+    - disease-info
+    - disease-details
     method: GET
     path: /disease/{slug}
     params:
@@ -37,18 +38,19 @@ tools:
         description: MalaCards disease slug (e.g. "type_2_diabetes_mellitus", "alzheimer_disease")
     response:
       format: json
+    entity: disease
 tests:
   searchDiseases:
-    - name: searches for diabetes
-      params:
-        query: diabetes
-      assert:
-        - minLength: 1
-      allowError: true
+  - name: searches for diabetes
+    params:
+      query: diabetes
+    assert:
+    - minLength: 1
+    allowError: true
   getDisease:
-    - name: gets Alzheimer disease details
-      params:
-        slug: alzheimer_disease
-      assert:
-        - minLength: 1
-      allowError: true
+  - name: gets Alzheimer disease details
+    params:
+      slug: alzheimer_disease
+    assert:
+    - minLength: 1
+    allowError: true

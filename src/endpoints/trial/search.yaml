@@ -1,0 +1,286 @@
+description: Search clinical trials — interventional studies, drug development, and precision medicine evidence
+tags:
+- trial
+- search
+- clinical
+- drug-development
+- evidence
+- biorouter
+input:
+  query:
+    type: string
+    required: true
+    description: Drug name, disease name, gene target, or free text search term
+phases:
+- name: resolve
+  parallel: false
+  calls:
+  - source: mychem
+    tool: search
+    params:
+      query: '{input.query}'
+      size: 5
+    pick_best:
+      array: hits
+      match_field: chembl.pref_name
+      against: input.query
+      as: best_drug
+    extract:
+      drug_id: best_drug._id
+      drug_name: best_drug.chembl.pref_name
+  - source: mydisease
+    tool: search
+    params:
+      query: '{input.query}'
+      size: 5
+    pick_best:
+      array: hits
+      match_field: mondo.label
+      against: input.query
+      as: best_disease
+    extract:
+      disease_id: best_disease._id
+      disease_name: best_disease.mondo.label
+  - source: opentargets
+    tool: searchDisease
+    params:
+      queryString: '{input.query}'
+      size: 5
+    pick_best:
+      array: search.hits
+      match_field: name
+      against: input.query
+      as: best_ot_disease
+    extract:
+      efo_id: best_ot_disease.id
+      ot_disease_name: best_ot_disease.name
+- name: fetch
+  parallel: true
+  calls:
+  - source: clinicaltrials
+    tool: search
+    params:
+      query: '{input.query}'
+      pageSize: 10
+    provides:
+    - trials
+  - source: eu-clinical-trials
+    tool: searchTrials
+    params:
+      query: '{input.query}'
+    provides:
+    - trials
+  - source: opentargets
+    tool: getDiseaseDrugs
+    params:
+      efoId: '{resolved.efo_id}'
+    skip_if: '!resolved.efo_id'
+    provides:
+    - drugDevelopment
+  - source: civic
+    tool: searchTherapies
+    params:
+      name: '{input.query}'
+      first: 10
+    provides:
+    - precisionMedicine
+  - source: civic
+    tool: searchAssertions
+    params:
+      diseaseName: '{input.query}'
+      first: 10
+    provides:
+    - precisionMedicine
+  - source: openfda
+    tool: searchDrugs
+    params:
+      query: '{input.query}'
+      limit: 10
+    provides:
+    - drugDevelopment
+  - source: dailymed
+    tool: searchDrugs
+    params:
+      name: '{input.query}'
+    provides:
+    - drugDevelopment
+  - source: drugcentral
+    tool: search
+    params:
+      query: '{input.query}'
+    provides:
+    - drugDevelopment
+  - source: pharmgkb
+    tool: searchDrugs
+    params:
+      name: '{input.query}'
+    provides:
+    - pharmacogenomics
+  - source: europepmc
+    tool: search
+    params:
+      query: '{input.query} clinical trial'
+      pageSize: 10
+    provides:
+    - literature
+  - source: opentargets
+    tool: getDiseaseTargets
+    params:
+      efoId: '{resolved.efo_id}'
+      size: 10
+    skip_if: '!resolved.efo_id'
+    provides:
+    - targets
+  - source: openfda
+    tool: searchEvents
+    params:
+      query: '{input.query}'
+      limit: 5
+    provides:
+    - safety
+  - source: isrctn
+    tool: search
+    params:
+      query: '{input.query}'
+      pageSize: 10
+    provides:
+    - internationalTrials
+  - source: oncokb
+    tool: searchByGene
+    params:
+      gene: '{input.query}'
+    provides:
+    - cancerActionability
+output:
+  identity:
+    query:
+      from: input.query
+    resolved:
+      from: resolved
+      fields:
+      - drug_name
+      - disease_name
+      - ot_disease_name
+  trials:
+    usClinicalTrials:
+      sources:
+      - source: clinicaltrials
+        call: search
+        path: $passthrough
+        rank: 1
+      reason: ClinicalTrials.gov — the primary global registry for clinical studies
+    euClinicalTrials:
+      sources:
+      - source: eu-clinical-trials
+        call: searchTrials
+        path: $passthrough
+        rank: 2
+      reason: EU Clinical Trials Register — European Union registry for clinical studies
+  drugDevelopment:
+    clinicalCandidates:
+      sources:
+      - source: opentargets
+        call: getDiseaseDrugs
+        path: disease.drugAndClinicalCandidates
+        rank: 1
+      reason: Drugs in clinical development with trial stage information from Open Targets
+    fdaApprovedDrugs:
+      sources:
+      - source: openfda
+        call: searchDrugs
+        path: results
+        rank: 1
+      - source: dailymed
+        call: searchDrugs
+        path: data
+        rank: 2
+      reason: FDA-approved drugs with labeled indications — shows completed trial successes
+    dailymedLabels:
+      sources:
+      - source: dailymed
+        call: searchDrugs
+        path: $passthrough
+        rank: 1
+      reason: DailyMed FDA drug labels with prescribing information and structured product labeling (SPL)
+    drugcentralInfo:
+      sources:
+      - source: drugcentral
+        call: search
+        path: $passthrough
+        rank: 1
+      reason: DrugCentral drug information with indications, mechanisms of action, and repurposing opportunities
+  precisionMedicine:
+    civicTherapies:
+      sources:
+      - source: civic
+        call: searchTherapies
+        path: therapies
+        rank: 1
+      reason: CIViC cancer precision medicine therapies — variant-specific clinical evidence
+    civicAssertions:
+      sources:
+      - source: civic
+        call: searchAssertions
+        path: assertions
+        rank: 1
+      reason: CIViC clinical assertions — curated therapeutic evidence for molecular profiles
+  pharmacogenomics:
+    pgxDrugs:
+      sources:
+      - source: pharmgkb
+        call: searchDrugs
+        path: $passthrough
+        rank: 1
+      reason: PharmGKB pharmacogenomics data — drug-gene interactions affecting trial design
+  targets:
+    diseaseTargets:
+      sources:
+      - source: opentargets
+        call: getDiseaseTargets
+        path: disease.associatedTargets
+        rank: 1
+      reason: Top gene targets for this disease — indicates potential trial targets
+  safety:
+    adverseEvents:
+      sources:
+      - source: openfda
+        call: searchEvents
+        path: results
+        rank: 1
+      reason: FDA adverse event reports — real-world safety data from post-market surveillance
+  literature:
+    publications:
+      sources:
+      - source: europepmc
+        call: search
+        path: resultList.result
+        rank: 1
+      reason: Published clinical trial reports and meta-analyses from Europe PMC
+    publicationCount:
+      sources:
+      - source: europepmc
+        call: search
+        path: hitCount
+        rank: 1
+  internationalTrials:
+    internationalTrials:
+      sources:
+      - source: isrctn
+        call: search
+        path: items
+        rank: 1
+      reason: ISRCTN international clinical trial registry — trials from the UK and worldwide
+    totalCount:
+      sources:
+      - source: isrctn
+        call: search
+        path: totalCount
+        rank: 1
+  cancerActionability:
+    annotatedVariants:
+      sources:
+      - source: oncokb
+        call: searchByGene
+        path: $passthrough
+        rank: 1
+      reason: OncoKB annotated cancer variants — oncogenicity, mutation effects, and therapeutic sensitivity/resistance levels

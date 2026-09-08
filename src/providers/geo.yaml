@@ -2,18 +2,18 @@ name: geo
 displayName: Gene Expression Omnibus
 description: Repository of high-throughput gene expression and genomics datasets
 tags:
-  - gene-expression
-  - microarray
-  - rna-seq
-  - ncbi
-  - transcriptomics
+- gene-expression
+- microarray
+- rna-seq
+- ncbi
+- transcriptomics
 baseUrl: https://eutils.ncbi.nlm.nih.gov/entrez/eutils
 tools:
   search:
     description: Search GEO for gene expression datasets
     tags:
-      - expression-search
-      - dataset-search
+    - expression-search
+    - dataset-search
     method: GET
     path: /esearch.fcgi
     params:
@@ -35,14 +35,15 @@ tools:
     response:
       format: json
       fields:
-        - "esearchresult.count"
-        - "esearchresult.idlist"
-        - "esearchresult.querytranslation"
+      - esearchresult.count
+      - esearchresult.idlist
+      - esearchresult.querytranslation
+    entity: gene
   getSummary:
     description: Get GEO dataset summary by GDS ID
     tags:
-      - dataset-info
-      - expression-info
+    - dataset-info
+    - expression-info
     method: GET
     path: /esummary.fcgi
     params:
@@ -58,26 +59,18 @@ tools:
         default: json
     response:
       format: json
-      fields:
-        - "result.*.accession"
-        - "result.*.title"
-        - "result.*.summary"
-        - "result.*.taxon"
-        - "result.*.gdstype"
-        - "result.*.n_samples"
-        - "result.*.pdat"
-        - "result.*.pubmedids"
+    entity: dataset
 tests:
   search:
-    - name: searches for breast cancer RNA-seq datasets
-      params:
-        query: breast cancer RNA-seq
-      assert:
-        - path: esearchresult.idlist
-          minLength: 1
+  - name: searches for breast cancer RNA-seq datasets
+    params:
+      query: breast cancer RNA-seq
+    assert:
+    - path: esearchresult.idlist
+      minLength: 1
   getSummary:
-    - name: gets GEO dataset summary by ID
-      params:
-        id: "200053801"
-      assert:
-        - path: result.200053801
+  - name: gets GEO dataset summary by ID
+    params:
+      id: '200053801'
+    assert:
+    - path: result.200053801

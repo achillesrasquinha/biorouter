@@ -1,0 +1,728 @@
+description: Profile a protein — sequence, function, expression, disease associations, and druggability
+tags:
+- protein
+- profile
+- gene
+- function
+- expression
+- biorouter
+input:
+  query:
+    type: string
+    required: true
+    description: Gene symbol, UniProt accession, Ensembl ID, or protein name
+phases:
+- name: resolve
+  parallel: false
+  calls:
+  - source: mygene
+    tool: search
+    params:
+      query: '{input.query}'
+      species: human
+      size: 5
+    pick_best:
+      array: hits
+      match_field: symbol
+      against: input.query
+      as: best_hit
+    extract:
+      entrez_id: best_hit._id
+      symbol: best_hit.symbol
+      name: best_hit.name
+      taxid: best_hit.taxid
+    provides: []
+  - source: uniprot
+    tool: search
+    params:
+      query: '{input.query} AND organism_id:9606'
+      size: 3
+    pick_best:
+      array: results
+      match_field: genes[0].geneName.value
+      against: input.query
+      as: best_uniprot
+    extract:
+      uniprot_ac: best_uniprot.primaryAccession
+      uniprot_id: best_uniprot.uniProtkbId
+    provides: []
+  - source: ensembl
+    tool: lookupSymbol
+    params:
+      symbol: '{input.query}'
+    skip_if: '!input.query'
+    extract:
+      ensembl_id: id
+      biotype: biotype
+      description: description
+      chromosome: seq_region_name
+    provides: []
+- name: fetch
+  parallel: true
+  calls:
+  - source: uniprot
+    tool: getEntry
+    params:
+      accession: '{resolved.uniprot_ac}'
+    skip_if: '!resolved.uniprot_ac'
+    provides:
+    - proteinEntry
+  - source: uniprot
+    tool: getSubcellularLocation
+    params:
+      accession: '{resolved.uniprot_ac}'
+    skip_if: '!resolved.uniprot_ac'
+    provides:
+    - localization
+  - source: mygene
+    tool: getGene
+    params:
+      geneId: '{resolved.entrez_id}'
+    skip_if: '!resolved.entrez_id'
+    provides:
+    - geneAnnotation
+  - source: interpro
+    tool: getProteinEntries
+    params:
+      accession: '{resolved.uniprot_ac}'
+    skip_if: '!resolved.uniprot_ac'
+    provides:
+    - domains
+  - source: proteinatlas
+    tool: getGene
+    params:
+      ensemblId: '{resolved.ensembl_id}'
+    skip_if: '!resolved.ensembl_id'
+    provides:
+    - expression
+    - proteinEntry
+  - source: mobidb
+    tool: getEntry
+    params:
+      acc: '{resolved.uniprot_ac}'
+    skip_if: '!resolved.uniprot_ac'
+    provides:
+    - disorder
+  - source: disprot
+    tool: search
+    params:
+      q: '{input.query}'
+    provides:
+    - disorder
+  - source: alphafold
+    tool: getPrediction
+    params:
+      accession: '{resolved.uniprot_ac}'
+    skip_if: '!resolved.uniprot_ac'
+    provides:
+    - structurePrediction
+  - source: opentargets
+    tool: getTarget
+    params:
+      ensemblId: '{resolved.ensembl_id}'
+    skip_if: '!resolved.ensembl_id'
+    provides:
+    - diseaseAssociations
+  - source: pharos
+    tool: searchTargets
+    params:
+      term: '{input.query}'
+      top: 5
+    provides:
+    - druggability
+  - source: dgidb
+    tool: getGene
+    params:
+      names:
+      - '{resolved.symbol}'
+    skip_if: '!resolved.symbol'
+    provides:
+    - drugInteractions
+  - source: reactome
+    tool: search
+    params:
+      query: '{resolved.symbol}'
+    skip_if: '!resolved.symbol'
+    provides:
+    - pathways
+  - source: gnomad
+    tool: searchVariant
+    params:
+      geneSymbol: '{resolved.symbol}'
+    skip_if: '!resolved.symbol'
+    provides:
+    - constraint
+  - source: omnipath
+    tool: getAnnotations
+    params:
+      proteins: '{resolved.symbol}'
+    skip_if: '!resolved.symbol'
+    provides:
+    - functionalAnnotations
+  - source: monarch
+    tool: search
+    params:
+      query: '{input.query}'
+      limit: 3
+    provides:
+    - knowledgeGraph
+  - source: europepmc
+    tool: search
+    params:
+      query: '{input.query} protein'
+      pageSize: 5
+    provides:
+    - literature
+  - source: hgnc
+    tool: getGene
+    params:
+      symbol: '{resolved.symbol}'
+    skip_if: '!resolved.symbol'
+    provides:
+    - geneNomenclature
+  - source: gtex
+    tool: getGene
+    params:
+      geneId: '{resolved.ensembl_id}'
+    skip_if: '!resolved.ensembl_id'
+    provides:
+    - tissueExpressionSummary
+  - source: gtex
+    tool: getExpression
+    params:
+      gencodeId: '{resolved.ensembl_id}'
+    skip_if: '!resolved.ensembl_id'
+    provides:
+    - tissueExpression
+  - source: elm
+    tool: getInstances
+    params:
+      q: '{resolved.uniprot_ac}'
+    skip_if: '!resolved.uniprot_ac'
+    provides:
+    - linearMotifs
+  - source: iptmnet
+    tool: getEntry
+    params:
+      id: '{resolved.uniprot_ac}'
+    skip_if: '!resolved.uniprot_ac'
+    provides:
+    - ptmSites
+  - source: bgee
+    tool: getGene
+    params:
+      gene_id: '{resolved.ensembl_id}'
+    skip_if: '!resolved.ensembl_id'
+    provides:
+    - expressionEvolution
+  - source: depmap
+    tool: searchGene
+    params:
+      query: '{resolved.symbol}'
+    skip_if: '!resolved.symbol'
+    provides:
+    - geneEssentiality
+  - source: glygen
+    tool: getProtein
+    params:
+      accession: '{resolved.uniprot_ac}'
+    skip_if: '!resolved.uniprot_ac'
+    provides:
+    - glycosylation
+  - source: prosite
+    tool: searchPrositeEntries
+    params:
+      query: '{resolved.symbol}'
+      pageSize: 10
+    skip_if: '!resolved.symbol'
+    provides:
+    - sequenceMotifs
+  - source: cdd
+    tool: search
+    params:
+      queries: '{resolved.uniprot_ac}'
+      db: cdd
+      smode: auto
+      tdata: hits
+    skip_if: '!resolved.uniprot_ac'
+    allowError: true
+    provides:
+    - conservedDomains
+  - source: bgee
+    tool: search
+    params:
+      query: '{input.query}'
+    provides:
+    - expressionSearch
+  - source: dgidb
+    tool: getCategories
+    params:
+      names:
+      - '{resolved.symbol}'
+    skip_if: '!resolved.symbol'
+    provides:
+    - geneCategories
+  - source: ensembl
+    tool: getComparaTree
+    params:
+      symbol: '{resolved.symbol}'
+    skip_if: '!resolved.symbol'
+    provides:
+    - geneTree
+  - source: ensembl
+    tool: getHomologs
+    params:
+      symbol: '{resolved.symbol}'
+    skip_if: '!resolved.symbol'
+    provides:
+    - homologs
+  - source: ensembl
+    tool: getRegulatory
+    params:
+      id: '{resolved.ensembl_id}'
+    skip_if: '!resolved.ensembl_id'
+    provides:
+    - regulatoryFeatures
+  - source: gnomad
+    tool: getGeneVariants
+    params:
+      geneId: '{resolved.ensembl_id}'
+    skip_if: '!resolved.ensembl_id'
+    provides:
+    - geneVariants
+  - source: gtex
+    tool: getEqtl
+    params:
+      gencodeId: '{resolved.ensembl_id}'
+      tissueSiteDetailId: Liver
+    skip_if: '!resolved.ensembl_id'
+    provides:
+    - eqtlAssociations
+  - source: interpro
+    tool: search
+    params:
+      query: '{input.query}'
+    provides:
+    - interproSearch
+  - source: iptmnet
+    tool: search
+    params:
+      search_term: '{resolved.symbol}'
+    skip_if: '!resolved.symbol'
+    provides:
+    - ptmSearch
+  - source: monarch
+    tool: getAssociations
+    params:
+      subject: '{input.query}'
+      limit: 10
+    provides:
+    - monarchAssociations
+  - source: opentargets
+    tool: getAssociations
+    params:
+      ensemblId: '{resolved.ensembl_id}'
+    skip_if: '!resolved.ensembl_id'
+    provides:
+    - targetDiseaseAssociations
+  - source: uniprot
+    tool: getFeatures
+    params:
+      accession: '{resolved.uniprot_ac}'
+    skip_if: '!resolved.uniprot_ac'
+    provides:
+    - uniprotFeatures
+output:
+  identity:
+    symbol:
+      from: resolved.symbol
+    name:
+      from: resolved.name
+    ids:
+      from: resolved
+      fields:
+      - entrez_id
+      - uniprot_ac
+      - uniprot_id
+      - ensembl_id
+    biotype:
+      from: resolved.biotype
+    chromosome:
+      from: resolved.chromosome
+  proteinEntry:
+    recommendedName:
+      sources:
+      - source: uniprot
+        call: getEntry
+        path: proteinDescription.recommendedName.fullName.value
+        rank: 1
+      - source: proteinatlas
+        call: getGene
+        path: Gene description
+        rank: 2
+    organism:
+      sources:
+      - source: uniprot
+        call: getEntry
+        path: organism.scientificName
+        rank: 1
+    sequenceLength:
+      sources:
+      - source: uniprot
+        call: getEntry
+        path: sequence.length
+        rank: 1
+    annotationScore:
+      sources:
+      - source: uniprot
+        call: getEntry
+        path: annotationScore
+        rank: 1
+  geneAnnotation:
+    summary:
+      sources:
+      - source: mygene
+        call: getGene
+        path: summary
+        rank: 1
+      reason: NCBI gene summary — curated functional description
+    typeOfGene:
+      sources:
+      - source: mygene
+        call: getGene
+        path: type_of_gene
+        rank: 1
+    mapLocation:
+      sources:
+      - source: mygene
+        call: getGene
+        path: map_location
+        rank: 1
+  features:
+    proteinFeatures:
+      sources:
+      - source: uniprot
+        call: getEntry
+        path: features
+        rank: 1
+      reason: UniProt curated protein features — active sites, binding sites, domains, PTMs, variants
+  domains:
+    interproDomains:
+      sources:
+      - source: interpro
+        call: getProteinEntries
+        path: results
+        rank: 1
+      reason: InterPro domain/family classification — integrated from Pfam, PROSITE, SMART, CDD
+  localization:
+    subcellularLocation:
+      sources:
+      - source: uniprot
+        call: getSubcellularLocation
+        path: comments
+        rank: 1
+      - source: proteinatlas
+        call: getGene
+        path: Subcellular location
+        rank: 2
+      reason: Where the protein is found inside the cell
+  expression:
+    proteinClass:
+      sources:
+      - source: proteinatlas
+        call: getGene
+        path: Protein class
+        rank: 1
+    biologicalProcess:
+      sources:
+      - source: proteinatlas
+        call: getGene
+        path: Biological process
+        rank: 1
+    molecularFunction:
+      sources:
+      - source: proteinatlas
+        call: getGene
+        path: Molecular function
+        rank: 1
+    rnaTissueSpecificity:
+      sources:
+      - source: proteinatlas
+        call: getGene
+        path: RNA tissue specificity
+        rank: 1
+    diseaseInvolvement:
+      sources:
+      - source: proteinatlas
+        call: getGene
+        path: Disease involvement
+        rank: 1
+  disorder:
+    mobidbDisorder:
+      sources:
+      - source: mobidb
+        call: getEntry
+        path: $passthrough
+        rank: 1
+      reason: MobiDB consensus disorder annotations — predicted and experimental
+    disprotEntries:
+      sources:
+      - source: disprot
+        call: search
+        path: data
+        rank: 1
+      reason: DisProt curated intrinsically disordered regions — experimental evidence
+  structurePrediction:
+    alphafold:
+      sources:
+      - source: alphafold
+        call: getPrediction
+        path: $passthrough
+        rank: 1
+      reason: AlphaFold2 predicted structure — pLDDT confidence, PDB/CIF download URLs
+  diseaseAssociations:
+    associatedDiseases:
+      sources:
+      - source: opentargets
+        call: getTarget
+        path: target.associatedDiseases
+        rank: 1
+      reason: Open Targets disease associations ranked by overall evidence score
+  druggability:
+    tdlClassification:
+      sources:
+      - source: pharos
+        call: searchTargets
+        path: targets.targets
+        rank: 1
+      reason: Pharos Target Development Level — Tclin/Tchem/Tbio/Tdark classification for druggability
+  drugInteractions:
+    dgidbInteractions:
+      sources:
+      - source: dgidb
+        call: getGene
+        path: genes.nodes
+        rank: 1
+      reason: DGIdb drug-gene interactions — approved drugs, interaction types, druggable genome categories
+  pathways:
+    reactomePathways:
+      sources:
+      - source: reactome
+        call: search
+        path: results
+        rank: 1
+      reason: Reactome curated biological pathways involving this protein
+  constraint:
+    gnomadConstraint:
+      sources:
+      - source: gnomad
+        call: searchVariant
+        path: gene.gnomad_constraint
+        rank: 1
+      reason: gnomAD gene constraint — pLI, o/e LoF, o/e missense scores indicating functional importance
+  functionalAnnotations:
+    omnipathAnnotations:
+      sources:
+      - source: omnipath
+        call: getAnnotations
+        path: $passthrough
+        rank: 1
+      reason: OmniPath integrated annotations from multiple curation efforts
+  knowledgeGraph:
+    monarchEntities:
+      sources:
+      - source: monarch
+        call: search
+        path: items
+        rank: 1
+      reason: Monarch Initiative knowledge graph — integrated gene-disease-phenotype relationships
+  literature:
+    recentPublications:
+      sources:
+      - source: europepmc
+        call: search
+        path: resultList.result
+        rank: 1
+      reason: Recent biomedical literature from Europe PMC
+    publicationCount:
+      sources:
+      - source: europepmc
+        call: search
+        path: hitCount
+        rank: 1
+  geneNomenclature:
+    hgncInfo:
+      sources:
+      - source: hgnc
+        call: getGene
+        path: response.docs
+        rank: 1
+      reason: HGNC authoritative gene nomenclature — approved symbol, name, aliases, locus type, gene groups
+  tissueExpressionSummary:
+    gtexGene:
+      sources:
+      - source: gtex
+        call: getGene
+        path: $passthrough
+        rank: 1
+      reason: GTEx gene lookup — resolves versioned GENCODE ID for expression queries
+  tissueExpression:
+    gtexExpression:
+      sources:
+      - source: gtex
+        call: getExpression
+        path: data
+        rank: 1
+      reason: GTEx median gene expression across 53 human tissues — TPM values for tissue-specific expression patterns
+  linearMotifs:
+    elmMotifs:
+      sources:
+      - source: elm
+        call: getInstances
+        path: $passthrough
+        rank: 1
+      reason: ELM functional linear motifs — phosphorylation sites, docking motifs, cleavage sites, localization signals
+  ptmSites:
+    iptmnetPtms:
+      sources:
+      - source: iptmnet
+        call: getEntry
+        path: $passthrough
+        rank: 1
+      reason: iPTMnet comprehensive post-translational modifications — phosphorylation, acetylation, ubiquitination sites
+  expressionEvolution:
+    bgeeExpression:
+      sources:
+      - source: bgee
+        call: getGene
+        path: data.genes
+        rank: 1
+      reason: Bgee gene expression across species and development — evolutionary conservation of expression patterns
+  geneEssentiality:
+    depmapGenes:
+      sources:
+      - source: depmap
+        call: searchGene
+        path: $passthrough
+        rank: 1
+      reason: DepMap cancer dependency — gene essentiality across cancer cell lines from CRISPR/RNAi screens
+  glycosylation:
+    glygenGlycosylation:
+      sources:
+      - source: glygen
+        call: getProtein
+        path: $passthrough
+        rank: 1
+      reason: GlyGen glycosylation data — glycosylation sites, attached glycans, structural context
+  sequenceMotifs:
+    functionalSites:
+      sources:
+      - source: prosite
+        call: searchPrositeEntries
+        path: results
+        rank: 1
+      reason: PROSITE functional sites and motifs — patterns, profiles, and rules for protein families and domains
+  conservedDomains:
+    cddDomains:
+      sources:
+      - source: cdd
+        call: search
+        path: $passthrough
+        rank: 1
+      reason: NCBI CDD conserved domain hits — protein family classification and functional site annotation
+  expressionSearch:
+    bgeeGeneMatches:
+      sources:
+      - source: bgee
+        call: search
+        path: data.result.geneMatches
+        rank: 1
+      reason: Bgee gene search — expression matches across species and tissues
+  geneCategories:
+    dgidbCategories:
+      sources:
+      - source: dgidb
+        call: getCategories
+        path: genes.nodes
+        rank: 1
+      reason: DGIdb gene categories — druggable genome classification (kinase, transporter, ion channel, etc.)
+  geneTree:
+    ensemblGeneTree:
+      sources:
+      - source: ensembl
+        call: getComparaTree
+        path: tree
+        rank: 1
+      reason: Ensembl Compara gene tree — evolutionary relationships and speciation/duplication events
+  homologs:
+    ensemblHomologs:
+      sources:
+      - source: ensembl
+        call: getHomologs
+        path: data
+        rank: 1
+      reason: Ensembl homologs — orthologs and paralogs across species for comparative genomics
+  regulatoryFeatures:
+    ensemblRegulatory:
+      sources:
+      - source: ensembl
+        call: getRegulatory
+        path: $passthrough
+        rank: 1
+      reason: Ensembl regulatory features — promoters, enhancers, CTCF binding sites overlapping the gene
+  geneVariants:
+    gnomadGeneVariants:
+      sources:
+      - source: gnomad
+        call: getGeneVariants
+        path: gene.variants
+        rank: 1
+      reason: gnomAD gene variants — allele frequencies, consequences, and HGVS annotations across populations
+  eqtlAssociations:
+    gtexEqtl:
+      sources:
+      - source: gtex
+        call: getEqtl
+        path: data
+        rank: 1
+      reason: GTEx eQTL associations — genetic variants affecting gene expression in specific tissues
+  interproSearch:
+    interproSearchResults:
+      sources:
+      - source: interpro
+        call: search
+        path: results
+        rank: 1
+      reason: InterPro keyword search — protein family and domain classifications matching the query
+  ptmSearch:
+    iptmnetSearchResults:
+      sources:
+      - source: iptmnet
+        call: search
+        path: $passthrough
+        rank: 1
+      reason: iPTMnet PTM search — proteins with post-translational modifications matching the query
+  monarchAssociations:
+    monarchEntityAssociations:
+      sources:
+      - source: monarch
+        call: getAssociations
+        path: items
+        rank: 1
+      reason: Monarch Initiative associations — gene-disease, gene-phenotype relationships from integrated knowledge graph
+  targetDiseaseAssociations:
+    opentargetsDetailedAssociations:
+      sources:
+      - source: opentargets
+        call: getAssociations
+        path: target.associatedDiseases
+        rank: 1
+      reason: Open Targets detailed associations — target-disease links with datatype-level evidence scores
+  uniprotFeatures:
+    detailedFeatures:
+      sources:
+      - source: uniprot
+        call: getFeatures
+        path: features
+        rank: 1
+      reason: UniProt detailed features — domains, active sites, binding sites, PTMs, and variants

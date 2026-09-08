@@ -2,17 +2,17 @@ name: ols4
 displayName: OLS4
 description: OLS4 — EBI Ontology Lookup Service v4 with 300+ biomedical ontologies
 tags:
-  - ontology
-  - terminology
-  - ebi
-  - controlled-vocabulary
+- ontology
+- terminology
+- ebi
+- controlled-vocabulary
 baseUrl: https://www.ebi.ac.uk/ols4/api
 tools:
   listOntologies:
     description: List available ontologies in OLS4
     tags:
-      - ontology-list
-      - registry
+    - ontology-list
+    - registry
     method: GET
     path: /ontologies
     params:
@@ -27,14 +27,15 @@ tools:
     response:
       format: json
       fields:
-        - _embedded.ontologies[].ontologyId
-        - _embedded.ontologies[].config.title
-        - _embedded.ontologies[].numberOfTerms
+      - _embedded.ontologies[].ontologyId
+      - _embedded.ontologies[].config.title
+      - _embedded.ontologies[].numberOfTerms
+    entity: ontology-term
   searchTerms:
     description: Search for terms across all ontologies
     tags:
-      - term-search
-      - ontology-search
+    - term-search
+    - ontology-search
     method: GET
     path: /search
     params:
@@ -52,17 +53,18 @@ tools:
     response:
       format: json
       fields:
-        - response.numFound
-        - response.docs[].label
-        - response.docs[].obo_id
-        - response.docs[].ontology_name
-        - response.docs[].description
+      - response.numFound
+      - response.docs[].label
+      - response.docs[].obo_id
+      - response.docs[].ontology_name
+      - response.docs[].description
+    entity: ontology-term
 tests:
   listOntologies:
-    - name: lists available ontologies
-      params:
-        page: 0
-        size: 2
-      assert:
-        - path: _embedded.ontologies
-          minLength: 1
+  - name: lists available ontologies
+    params:
+      page: 0
+      size: 2
+    assert:
+    - path: _embedded.ontologies
+      minLength: 1

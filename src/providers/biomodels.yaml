@@ -2,18 +2,18 @@ name: biomodels
 displayName: BioModels
 description: BioModels repository — mathematical models of biological systems in SBML and other formats
 tags:
-  - mathematical-model
-  - systems-biology
-  - simulation
-  - biomodels
-  - sbml
+- mathematical-model
+- systems-biology
+- simulation
+- biomodels
+- sbml
 baseUrl: https://biomodels.org
 tools:
   search:
     description: Search BioModels for mathematical models by keyword
     tags:
-      - model-search
-      - systems-biology-search
+    - model-search
+    - systems-biology-search
     method: GET
     path: /search
     params:
@@ -32,18 +32,19 @@ tools:
     response:
       format: json
       fields:
-        - matches
-        - models[].id
-        - models[].name
-        - models[].format
-        - models[].submitter
-        - models[].submissionDate
-        - models[].url
+      - matches
+      - models[].id
+      - models[].name
+      - models[].format
+      - models[].submitter
+      - models[].submissionDate
+      - models[].url
+    entity: model
   getModel:
     description: Get a specific BioModel by its identifier
     tags:
-      - model-info
-      - model-detail
+    - model-info
+    - model-detail
     method: GET
     path: /{id}
     params:
@@ -58,26 +59,27 @@ tools:
     response:
       format: json
       fields:
-        - name
-        - description
-        - format.name
-        - format.version
-        - publication.title
-        - publication.journal
-        - publication.year
-        - publication.authors[].name
+      - name
+      - description
+      - format.name
+      - format.version
+      - publication.title
+      - publication.journal
+      - publication.year
+      - publication.authors[].name
+    entity: model
 tests:
   search:
-    - name: searches for apoptosis models
-      params:
-        query: apoptosis
-      assert:
-        - anyOf:
-            - facetStats
-            - models
+  - name: searches for apoptosis models
+    params:
+      query: apoptosis
+    assert:
+    - anyOf:
+      - facetStats
+      - models
   getModel:
-    - name: gets model BIOMD0000000012
-      params:
-        id: BIOMD0000000012
-      assert:
-        - path: name
+  - name: gets model BIOMD0000000012
+    params:
+      id: BIOMD0000000012
+    assert:
+    - path: name

@@ -2,18 +2,18 @@ name: gprofiler
 displayName: g:Profiler
 description: g:Profiler — functional enrichment and gene ID conversion
 tags:
-  - enrichment
-  - functional-analysis
-  - gprofiler
-  - gene-ontology
-  - pathways
+- enrichment
+- functional-analysis
+- gprofiler
+- gene-ontology
+- pathways
 baseUrl: https://biit.cs.ut.ee/gprofiler
 tools:
-  analyze:
+  analyzeEnrichment:
     description: Run functional enrichment analysis on a list of genes
     tags:
-      - enrichment-analysis
-      - gene-set-analysis
+    - enrichment-analysis
+    - gene-set-analysis
     method: POST
     path: /api/gost/profile/
     params:
@@ -28,19 +28,20 @@ tools:
     response:
       format: json
       fields:
-        - "result[].native"
-        - "result[].name"
-        - "result[].description"
-        - "result[].source"
-        - "result[].p_value"
-        - "result[].term_size"
-        - "result[].intersection_size"
-        - "result[].significant"
-  convert:
+      - result[].native
+      - result[].name
+      - result[].description
+      - result[].source
+      - result[].p_value
+      - result[].term_size
+      - result[].intersection_size
+      - result[].significant
+    entity: pathway
+  convertGeneIds:
     description: Convert gene identifiers between naming conventions
     tags:
-      - gene-id-conversion
-      - identifier-mapping
+    - gene-id-conversion
+    - identifier-mapping
     method: POST
     path: /api/convert/convert/
     params:
@@ -59,33 +60,34 @@ tools:
     response:
       format: json
       fields:
-        - "result[].incoming"
-        - "result[].converted"
-        - "result[].name"
-        - "result[].description"
-        - "result[].namespaces"
+      - result[].incoming
+      - result[].converted
+      - result[].name
+      - result[].description
+      - result[].namespaces
+    entity: identifier
 tests:
-  analyze:
-    - name: runs enrichment analysis on BRCA1, TP53, EGFR
-      params:
-        query:
-          - BRCA1
-          - TP53
-          - EGFR
-        organism: hsapiens
-      assert:
-        - path: result
-          minLength: 1
-        - path: result.0.source
-        - path: result.0.native
-  convert:
-    - name: converts gene symbols to Ensembl IDs
-      params:
-        query:
-          - BRCA1
-          - TP53
-        organism: hsapiens
-        target: ENSG
-      assert:
-        - path: result
-          minLength: 1
+  analyzeEnrichment:
+  - name: runs enrichment analysis on BRCA1, TP53, EGFR
+    params:
+      query:
+      - BRCA1
+      - TP53
+      - EGFR
+      organism: hsapiens
+    assert:
+    - path: result
+      minLength: 1
+    - path: result.0.source
+    - path: result.0.native
+  convertGeneIds:
+  - name: converts gene symbols to Ensembl IDs
+    params:
+      query:
+      - BRCA1
+      - TP53
+      organism: hsapiens
+      target: ENSG
+    assert:
+    - path: result
+      minLength: 1

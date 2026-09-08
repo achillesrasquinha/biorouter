@@ -1,0 +1,777 @@
+description: Profile a drug or compound — structure, pharmacology, safety, targets, and clinical data
+tags:
+- compound
+- profile
+- drug
+- pharmacology
+- safety
+- biorouter
+input:
+  query:
+    type: string
+    required: true
+    description: Drug name, SMILES, InChIKey, PubChem CID, or ChEMBL ID
+phases:
+- name: resolve
+  parallel: false
+  calls:
+  - source: mychem
+    tool: search
+    params:
+      query: '{input.query}'
+    pick_best:
+      array: hits
+      match_field: chembl.pref_name
+      against: input.query
+      as: best_hit
+    extract:
+      inchikey: best_hit._id
+      name: best_hit.chembl.pref_name
+      chembl_id: best_hit.chembl.molecule_chembl_id
+      pubchem_cid: best_hit.pubchem.cid
+      drugbank_id: best_hit.drugbank.id
+      chebi_id: best_hit.chebi.id
+      rxcui: best_hit.drugbank.rxcui
+      unii: best_hit.drugbank.unii
+      cas: best_hit.drugbank.cas_number
+  - source: chembl
+    tool: getMolecule
+    params:
+      chemblId: '{resolved.chembl_id}'
+    skip_if: '!resolved.chembl_id'
+    extract:
+      canonical_smiles: molecule_structures.canonical_smiles
+  - source: unichem
+    tool: getCompound
+    params:
+      compound: '{resolved.inchikey}'
+      type: inchikey
+      sourceID: '1'
+    skip_if: '!resolved.inchikey'
+    extract:
+      kegg_id: compounds[?source=='KEGG Drugs'].compoundId[0]
+      bindingdb_id: compounds[?source=='BindingDB'].compoundId[0]
+      comptox_id: compounds[?source=='CompTox'].compoundId[0]
+      pdb_ligand_id: compounds[?source=='PDBe'].compoundId[0]
+      surechembl_ids: compounds[?source=='SureChEMBL'].compoundId
+      all_cross_refs: compounds
+- name: fetch
+  parallel: true
+  calls:
+  - source: pubchem
+    tool: getCompound
+    params:
+      cid: '{resolved.pubchem_cid}'
+    skip_if: '!resolved.pubchem_cid'
+    provides:
+    - physicochemistry
+    - structure
+  - source: pubchem
+    tool: getSynonyms
+    params:
+      cid: '{resolved.pubchem_cid}'
+    skip_if: '!resolved.pubchem_cid'
+    provides:
+    - identity
+  - source: chembl
+    tool: getMolecule
+    params:
+      chemblId: '{resolved.chembl_id}'
+    skip_if: '!resolved.chembl_id'
+    provides:
+    - structure
+    - physicochemistry
+    - regulatory
+  - source: kegg
+    tool: getEntry
+    params:
+      entryId: '{resolved.kegg_id}'
+    skip_if: '!resolved.kegg_id'
+    provides:
+    - metabolism
+    - targets
+  - source: dgidb
+    tool: search
+    params:
+      names:
+      - '{resolved.name}'
+    skip_if: '!resolved.name'
+    provides:
+    - targets
+  - source: openfda
+    tool: searchEvents
+    params:
+      query: '{input.query}'
+    provides:
+    - safety
+    validate: contains-drug-name
+  - source: clinicaltrials
+    tool: search
+    params:
+      query: '{input.query}'
+    provides:
+    - trials
+  - source: classyfire
+    tool: classify
+    params:
+      inchikey: '{resolved.inchikey}'
+    skip_if: '!resolved.inchikey'
+    provides:
+    - taxonomy
+  - source: atc
+    tool: searchByDrug
+    params:
+      drugName: '{input.query}'
+    provides:
+    - classification
+  - source: dailymed
+    tool: searchDrugs
+    params:
+      name: '{input.query}'
+    provides:
+    - regulatory
+  - source: guidetopharmacology
+    tool: searchLigands
+    params:
+      name: '{input.query}'
+    provides:
+    - pharmacology
+  - source: pharmgkb
+    tool: searchDrugs
+    params:
+      name: '{input.query}'
+    provides:
+    - pharmacogenomics
+  - source: europepmc
+    tool: search
+    params:
+      query: '{input.query}'
+      pageSize: 5
+    provides:
+    - literature
+  - source: monarch
+    tool: search
+    params:
+      query: '{input.query}'
+      limit: 3
+    provides:
+    - knowledgeGraph
+  - source: drugcentral
+    tool: search
+    params:
+      query: '{input.query}'
+    provides:
+    - drugIndications
+  - source: hmdb
+    tool: search
+    params:
+      query: '{input.query}'
+    provides:
+    - metabolomics
+  - source: bindingdb
+    tool: searchBySmiles
+    params:
+      smiles: '{resolved.canonical_smiles}'
+      cutoff: 0.85
+    skip_if: '!resolved.canonical_smiles'
+    provides:
+    - bindingAffinity
+  - source: rxnorm
+    tool: search
+    params:
+      name: '{input.query}'
+    provides:
+    - clinicalTerminology
+  - source: rxnorm
+    tool: getAllRelated
+    params:
+      rxcui: '{resolved.rxcui}'
+    skip_if: '!resolved.rxcui'
+    provides:
+    - clinicalTerminology
+  - source: rxnorm
+    tool: getDrugInteractions
+    params:
+      rxcui: '{resolved.rxcui}'
+    skip_if: '!resolved.rxcui'
+    provides:
+    - drugInteractions
+  - source: swissadme
+    tool: predict
+    params:
+      smiles: '{resolved.canonical_smiles}'
+    skip_if: '!resolved.canonical_smiles'
+    provides:
+    - admePredictions
+  - source: chebi
+    tool: search
+    params:
+      query: '{input.query}'
+      rows: 5
+    provides:
+    - classification
+  - source: comptox
+    tool: searchByName
+    params:
+      name: '{input.query}'
+    provides:
+    - toxicology
+  - source: orangebook
+    tool: searchDrug
+    params:
+      query: brand_name:{input.query}
+      limit: 5
+    provides:
+    - patents
+  - source: ctd
+    tool: getChemicalInteractions
+    params:
+      inputTerms: '{input.query}'
+    provides:
+    - toxicogenomics
+  - source: stitch
+    tool: resolveIdentifier
+    params:
+      query: '{input.query}'
+      species: 9606
+    provides:
+    - chemicalProteinLinks
+  - source: pkcsm
+    tool: predict
+    params:
+      smiles: '{resolved.canonical_smiles}'
+    skip_if: '!resolved.canonical_smiles'
+    provides:
+    - admePredictions
+  - source: toxcast
+    tool: searchChemical
+    params:
+      query: '{input.query}'
+    provides:
+    - toxicology
+  - source: toxcast
+    tool: getAssays
+    params:
+      dtxsid: '{resolved.comptox_id}'
+    skip_if: '!resolved.comptox_id'
+    provides:
+    - toxicology
+  - source: surechembl
+    tool: search
+    params:
+      query: '{resolved.canonical_smiles}'
+    skip_if: '!resolved.canonical_smiles'
+    provides:
+    - patents
+  - source: comptox
+    tool: getChemicalDetails
+    params:
+      dtxsid: '{resolved.comptox_id}'
+    skip_if: '!resolved.comptox_id'
+    provides:
+    - toxicology
+  - source: mychem
+    tool: getDrug
+    params:
+      chemId: '{resolved.inchikey}'
+    skip_if: '!resolved.inchikey'
+    provides:
+    - drugAnnotation
+  - source: openfda
+    tool: searchRecalls
+    params:
+      query: '{input.query}'
+    provides:
+    - safety
+  - source: pubchem
+    tool: getCompoundBioactivities
+    params:
+      cid: '{resolved.pubchem_cid}'
+    skip_if: '!resolved.pubchem_cid'
+    provides:
+    - bioactivity
+  - source: pubchem
+    tool: getCompoundClassification
+    params:
+      cid: '{resolved.pubchem_cid}'
+    skip_if: '!resolved.pubchem_cid'
+    provides:
+    - classification
+  - source: pubchem
+    tool: getCompoundXrefs
+    params:
+      cid: '{resolved.pubchem_cid}'
+    skip_if: '!resolved.pubchem_cid'
+    provides:
+    - identity
+  - source: openfda
+    tool: searchDrugs
+    params:
+      query: '{input.query}'
+      limit: 5
+    provides:
+    - regulatory
+  - source: nci-cir
+    tool: resolveName
+    params:
+      name: '{input.query}'
+    provides:
+    - structure
+output:
+  identity:
+    name:
+      from: resolved.name
+    synonyms:
+      sources:
+      - source: pubchem
+        call: getSynonyms
+        path: InformationList.Information[0].Synonym
+        rank: 1
+      - source: mychem
+        call: search
+        path: hits[0].chembl.molecule_synonyms
+        rank: 2
+    ids:
+      from: resolved
+      fields:
+      - inchikey
+      - pubchem_cid
+      - chembl_id
+      - drugbank_id
+      - chebi_id
+      - kegg_id
+      - rxcui
+      - unii
+      - cas
+      - bindingdb_id
+      - comptox_id
+      - pdb_ligand_id
+    crossRefs:
+      from: resolved.all_cross_refs
+    pubchemXrefs:
+      sources:
+      - source: pubchem
+        call: getCompoundXrefs
+        path: InformationList.Information
+        rank: 1
+      reason: PubChem — cross-references including registry IDs, CAS RN, and PubMed links
+  structure:
+    canonicalSmiles:
+      sources:
+      - source: chembl
+        call: getMolecule
+        path: molecule_structures.canonical_smiles
+        rank: 1
+      - source: pubchem
+        call: getCompound
+        path: PropertyTable.Properties[0].CanonicalSMILES
+        rank: 2
+      reason: PubChem returns null SMILES for some drugs (validated with vorasidenib)
+    inchi:
+      sources:
+      - source: pubchem
+        call: getCompound
+        path: PropertyTable.Properties[0].InChI
+        rank: 1
+      - source: chembl
+        call: getMolecule
+        path: molecule_structures.standard_inchi
+        rank: 2
+    nciSmiles:
+      sources:
+      - source: nci-cir
+        call: resolveName
+        path: $passthrough
+        rank: 3
+      reason: NCI Chemical Identifier Resolver — SMILES notation resolved from chemical name
+    molecularFormula:
+      sources:
+      - source: pubchem
+        call: getCompound
+        path: PropertyTable.Properties[0].MolecularFormula
+        rank: 1
+      - source: chembl
+        call: getMolecule
+        path: molecule_properties.full_molformula
+        rank: 2
+  physicochemistry:
+    molecularWeight:
+      sources:
+      - source: pubchem
+        call: getCompound
+        path: PropertyTable.Properties[0].MolecularWeight
+        rank: 1
+      - source: chembl
+        call: getMolecule
+        path: molecule_properties.full_mwt
+        rank: 2
+    exactMass:
+      sources:
+      - source: pubchem
+        call: getCompound
+        path: PropertyTable.Properties[0].ExactMass
+        rank: 1
+    xlogp:
+      sources:
+      - source: pubchem
+        call: getCompound
+        path: PropertyTable.Properties[0].XLogP
+        rank: 1
+      - source: chembl
+        call: getMolecule
+        path: molecule_properties.alogp
+        rank: 2
+    tpsa:
+      sources:
+      - source: pubchem
+        call: getCompound
+        path: PropertyTable.Properties[0].TPSA
+        rank: 1
+      - source: chembl
+        call: getMolecule
+        path: molecule_properties.psa
+        rank: 2
+    qed:
+      sources:
+      - source: chembl
+        call: getMolecule
+        path: molecule_properties.qed_weighted
+        rank: 1
+    ro5Violations:
+      sources:
+      - source: chembl
+        call: getMolecule
+        path: molecule_properties.num_ro5_violations
+        rank: 1
+  taxonomy:
+    kingdom:
+      sources:
+      - source: classyfire
+        call: classify
+        path: kingdom.name
+        rank: 1
+    superclass:
+      sources:
+      - source: classyfire
+        call: classify
+        path: superclass.name
+        rank: 1
+    class:
+      sources:
+      - source: classyfire
+        call: classify
+        path: class.name
+        rank: 1
+    subclass:
+      sources:
+      - source: classyfire
+        call: classify
+        path: subclass.name
+        rank: 1
+    directParent:
+      sources:
+      - source: classyfire
+        call: classify
+        path: direct_parent.name
+        rank: 1
+  metabolism:
+    efficacy:
+      sources:
+      - source: kegg
+        call: getEntry
+        path: EFFICACY
+        rank: 1
+    targetGenes:
+      sources:
+      - source: kegg
+        call: getEntry
+        path: TARGET
+        rank: 1
+    metabolizingEnzymes:
+      sources:
+      - source: kegg
+        call: getEntry
+        path: METABOLISM
+        rank: 1
+  targets:
+    drugGeneInteractions:
+      sources:
+      - source: dgidb
+        call: search
+        path: genes.nodes
+        rank: 1
+      - source: chembl
+        call: getMolecule
+        path: drug_mechanisms
+        rank: 2
+      - source: kegg
+        call: getEntry
+        path: TARGET
+        rank: 3
+  safety:
+    adverseEvents:
+      sources:
+      - source: openfda
+        call: searchEvents
+        path: $validated
+        rank: 1
+    recalls:
+      sources:
+      - source: openfda
+        call: searchRecalls
+        path: results
+        rank: 1
+      reason: openFDA — drug recall and enforcement actions
+  classification:
+    atcCode:
+      sources:
+      - source: atc
+        call: searchByDrug
+        path: rxclassDrugInfoList.rxclassDrugInfo[0].rxclassMinConceptItem.classId
+        rank: 1
+      - source: chembl
+        call: getMolecule
+        path: atc_classifications[0]
+        rank: 2
+      - source: mychem
+        call: search
+        path: hits[0].chembl.atc_classifications[0]
+        rank: 3
+    atcClassName:
+      sources:
+      - source: atc
+        call: searchByDrug
+        path: rxclassDrugInfoList.rxclassDrugInfo[0].rxclassMinConceptItem.className
+        rank: 1
+    pubchemClassification:
+      sources:
+      - source: pubchem
+        call: getCompoundClassification
+        path: Hierarchies.Hierarchy
+        rank: 1
+      reason: PubChem — compound classification hierarchy from multiple taxonomies
+    chebiOntology:
+      sources:
+      - source: chebi
+        call: search
+        path: response.docs
+        rank: 1
+      reason: ChEBI — chemical ontology and entity classification
+  regulatory:
+    approvalStatus:
+      sources:
+      - source: chembl
+        call: getMolecule
+        path: max_phase
+        rank: 1
+      - source: dailymed
+        call: searchDrugs
+        path: status
+        rank: 2
+    indications:
+      sources:
+      - source: chembl
+        call: getMolecule
+        path: drug_indications
+        rank: 1
+      - source: dailymed
+        call: searchDrugs
+        path: indications_text
+        rank: 2
+    fdaLabel:
+      sources:
+      - source: dailymed
+        call: searchDrugs
+        path: $passthrough
+        rank: 1
+    fdaDrugLabeling:
+      sources:
+      - source: openfda
+        call: searchDrugs
+        path: results
+        rank: 2
+      reason: openFDA drug labeling — brand names, generic names, routes, indications, and usage information
+  pharmacology:
+    iupharLigand:
+      sources:
+      - source: guidetopharmacology
+        call: searchLigands
+        path: $passthrough
+        rank: 1
+      reason: IUPHAR/BPS Guide to Pharmacology — gold standard for receptor pharmacology and ligand classification
+  pharmacogenomics:
+    cpicDrug:
+      sources:
+      - source: pharmgkb
+        call: searchDrugs
+        path: $passthrough
+        rank: 1
+      reason: CPIC pharmacogenomics — drug-gene pairs, metabolizer phenotypes, dosing recommendations
+  literature:
+    recentPublications:
+      sources:
+      - source: europepmc
+        call: search
+        path: resultList.result
+        rank: 1
+      reason: Recent biomedical literature from Europe PMC
+    publicationCount:
+      sources:
+      - source: europepmc
+        call: search
+        path: hitCount
+        rank: 1
+  knowledgeGraph:
+    monarchEntities:
+      sources:
+      - source: monarch
+        call: search
+        path: items
+        rank: 1
+      reason: Monarch Initiative knowledge graph — integrated disease-gene-drug relationships
+  trials:
+    activeTrials:
+      sources:
+      - source: clinicaltrials
+        call: search
+        path: $passthrough
+        rank: 1
+  drugIndications:
+    drugcentralData:
+      sources:
+      - source: drugcentral
+        call: search
+        path: $passthrough
+        rank: 1
+      reason: DrugCentral — drug indications, mechanisms, and interactions
+  metabolomics:
+    hmdbMetabolites:
+      sources:
+      - source: hmdb
+        call: search
+        path: $passthrough
+        rank: 1
+      reason: Human Metabolome Database — metabolite concentrations and biomarker data
+  bindingAffinity:
+    bindingdbLigands:
+      sources:
+      - source: bindingdb
+        call: searchBySmiles
+        path: $passthrough
+        rank: 1
+      reason: BindingDB — measured binding affinities for similar compounds
+  clinicalTerminology:
+    rxnormConcepts:
+      sources:
+      - source: rxnorm
+        call: search
+        path: drugGroup.conceptGroup
+        rank: 1
+      reason: RxNorm — normalized clinical drug terminology
+    relatedDrugs:
+      sources:
+      - source: rxnorm
+        call: getAllRelated
+        path: allRelatedGroup.conceptGroup
+        rank: 1
+      reason: RxNorm — brand names, ingredients, and dose forms
+  drugInteractions:
+    rxnormInteractions:
+      sources:
+      - source: rxnorm
+        call: getDrugInteractions
+        path: interactionTypeGroup
+        rank: 1
+      reason: RxNorm — known drug-drug interactions
+  admePredictions:
+    swissadmeProperties:
+      sources:
+      - source: swissadme
+        call: predict
+        path: $passthrough
+        rank: 1
+      reason: SwissADME — ADME properties and drug-likeness predictions
+    pkCsmProperties:
+      sources:
+      - source: pkcsm
+        call: predict
+        path: $passthrough
+        rank: 1
+      reason: pkCSM — graph-based ADMET property predictions (absorption, distribution, metabolism, excretion, toxicity)
+  toxicology:
+    comptoxData:
+      sources:
+      - source: comptox
+        call: searchByName
+        path: $passthrough
+        rank: 1
+      - source: comptox
+        call: getChemicalDetails
+        path: $passthrough
+        rank: 2
+      reason: EPA CompTox — toxicology and chemical safety data
+    toxcastScreening:
+      sources:
+      - source: toxcast
+        call: searchChemical
+        path: $passthrough
+        rank: 1
+      reason: EPA ToxCast — high-throughput chemical screening search results
+    toxcastAssays:
+      sources:
+      - source: toxcast
+        call: getAssays
+        path: $passthrough
+        rank: 1
+      reason: EPA ToxCast — high-throughput toxicity assay screening results by DTXSID
+  patents:
+    orangeBook:
+      sources:
+      - source: orangebook
+        call: searchDrug
+        path: results
+        rank: 1
+      reason: FDA Orange Book — patent and exclusivity information
+    surechemblPatents:
+      sources:
+      - source: surechembl
+        call: search
+        path: $passthrough
+        rank: 1
+      reason: SureChEMBL — patent literature linking chemical structures to patent documents
+  toxicogenomics:
+    ctdGeneInteractions:
+      sources:
+      - source: ctd
+        call: getChemicalInteractions
+        path: $passthrough
+        rank: 1
+      reason: CTD — curated chemical-gene interactions and disease associations
+  chemicalProteinLinks:
+    stitchIdentifier:
+      sources:
+      - source: stitch
+        call: resolveIdentifier
+        path: $passthrough
+        rank: 1
+      reason: STITCH — chemical identifier resolution for protein interaction queries
+  bioactivity:
+    pubchemBioactivities:
+      sources:
+      - source: pubchem
+        call: getCompoundBioactivities
+        path: Table
+        rank: 1
+      reason: PubChem — compound bioactivity data across all assays
+  drugAnnotation:
+    mychemData:
+      sources:
+      - source: mychem
+        call: getDrug
+        path: $passthrough
+        rank: 1
+      reason: MyChem.info — aggregated drug annotation from ChEMBL, DrugBank, PubChem, and more
+validators:
+  contains-drug-name:
+    description: Confirm queried drug name appears in returned adverse event records
+    action: discard

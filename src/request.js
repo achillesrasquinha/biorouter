@@ -1,10 +1,9 @@
-import { throttle } from "./throttle.js";
-import { resolveAuth } from "./auth.js";
-import { mapParams } from "./params.js";
 import { pluck } from "./pluck.js";
 import { parseTsv, parseLines, parseKeyValue, parseXml } from "./parsers.js";
 
-const USER_AGENT = "life-science-mcp/0.1.0";
+const USER_AGENT = "life-science-mcp/0.3.0";
+
+// ---- Public API ----
 
 export async function request(source, tool, params) {
   const rps = source.rateLimit?.requestsPerSecond || null;
@@ -13,6 +12,10 @@ export async function request(source, tool, params) {
   if (source.protocol === "graphql") return graphqlRequest(source, tool, params);
   return restRequest(source, tool, params);
 }
+
+export { mapParams };
+
+// ---- REST + GraphQL ----
 
 async function restRequest(source, tool, params) {
   let path = tool.path || "";
@@ -63,6 +66,8 @@ async function graphqlRequest(source, tool, params) {
   return json.data;
 }
 
+// ---- Response parsing ----
+
 async function parseResponse(res, tool) {
   const ct = res.headers.get("content-type") || "";
   const text = await res.text();
@@ -93,4 +98,69 @@ function parseText(text, fmt, responseConfig) {
   if (fmt === "keyvalue") return parseKeyValue(text);
   if (fmt === "xml") return parseXml(text);
   return { raw: text };
+}
+
+// ---- Auth ----
+
+export function resolveAuth(source) {
+  const auth = source.auth;
+  if (!auth) return {};
+
+  const val = auth.env ? process.env[auth.env] : null;
+  if (!val) {
+    if (auth.required) throw new Error(`Missing env var: ${auth.env}`);
+    return {};
+  }
+
+  if (auth.type === "apiKey") return { params: { [auth.param]: val } };
+  if (auth.type === "header") return { headers: { [auth.header]: val } };
+  if (auth.type === "bearer") return { headers: { Authorization: `Bearer ${val}` } };
+  return {};
+}
+
+// ---- Param mapping ----
+
+const STANDARD_ALIASES = {
+  query: ["q", "term", "text", "searchTerm", "search_term", "input", "search", "name", "keyword"],
+  limit: ["size", "pageSize", "maxResults", "rows", "per_page", "page_size", "number", "max", "top", "count", "first", "numResults", "maxList", "hitsPerPage"],
+  offset: ["page", "start", "skip", "cursor", "pageNumber", "page_number"],
+};
+
+function mapParams(tool, params) {
+  const mapped = {};
+  const schema = tool.params || {};
+  for (const [key, def] of Object.entries(schema)) {
+    let value = params[key];
+    if (value === undefined) {
+      for (const [std, natives] of Object.entries(STANDARD_ALIASES)) {
+        if (natives.includes(key) && params[std] !== undefined) {
+          value = params[std];
+          break;
+        }
+      }
+    }
+    value = value ?? def.default;
+    if (value === undefined) {
+      if (def.required) throw new Error(`Missing required param: ${key}`);
+      continue;
+    }
+    mapped[def.mapsTo || key] = def.prefix ? def.prefix + value : value;
+  }
+  return mapped;
+}
+
+// ---- Throttle ----
+
+const buckets = new Map();
+
+async function throttle(sourceName, rps) {
+  if (!rps) return;
+  const interval = 1000 / rps;
+  if (!buckets.has(sourceName)) buckets.set(sourceName, Promise.resolve());
+  const prev = buckets.get(sourceName);
+  let release;
+  const next = new Promise((r) => { release = r; });
+  buckets.set(sourceName, next);
+  await prev;
+  setTimeout(release, interval);
 }

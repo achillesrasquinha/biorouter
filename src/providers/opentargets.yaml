@@ -2,29 +2,20 @@ name: opentargets
 displayName: Open Targets
 description: Drug target identification and prioritization platform
 tags:
-  - drug-targets
-  - disease-associations
-  - genetics
-  - opentargets
+- drug-targets
+- disease-associations
+- genetics
+- opentargets
 baseUrl: https://api.platform.opentargets.org/api/v4/graphql
 protocol: graphql
 tools:
   searchTarget:
     description: Search for drug targets by keyword
     tags:
-      - target-search
-      - gene-search
-    query: |
-      query($queryString: String!) {
-        search(queryString: $queryString, entityNames: ["target"], page: {size: 5, index: 0}) {
-          total
-          hits {
-            id
-            name
-            description
-          }
-        }
-      }
+    - target-search
+    - gene-search
+    query: "query($queryString: String!) {\n  search(queryString: $queryString, entityNames: [\"target\"], page: {size: 5,\
+      \ index: 0}) {\n    total\n    hits {\n      id\n      name\n      description\n    }\n  }\n}\n"
     params:
       queryString:
         type: string
@@ -33,34 +24,19 @@ tools:
     response:
       format: json
       fields:
-        - search.total
-        - search.hits[].id
-        - search.hits[].name
-        - search.hits[].description
+      - search.total
+      - search.hits[].id
+      - search.hits[].name
+      - search.hits[].description
+    entity: compound
   getTarget:
     description: Get target details and top associated diseases
     tags:
-      - target-info
-      - disease-association
-    query: |
-      query($ensemblId: String!) {
-        target(ensemblId: $ensemblId) {
-          id
-          approvedSymbol
-          approvedName
-          biotype
-          associatedDiseases(page: {size: 5, index: 0}) {
-            count
-            rows {
-              disease {
-                id
-                name
-              }
-              score
-            }
-          }
-        }
-      }
+    - target-info
+    - disease-association
+    query: "query($ensemblId: String!) {\n  target(ensemblId: $ensemblId) {\n    id\n    approvedSymbol\n    approvedName\n\
+      \    biotype\n    associatedDiseases(page: {size: 5, index: 0}) {\n      count\n      rows {\n        disease {\n  \
+      \        id\n          name\n        }\n        score\n      }\n    }\n  }\n}\n"
     params:
       ensemblId:
         type: string
@@ -69,31 +45,23 @@ tools:
     response:
       format: json
       fields:
-        - target.id
-        - target.approvedSymbol
-        - target.approvedName
-        - target.biotype
-        - target.associatedDiseases.count
-        - target.associatedDiseases.rows[].disease.id
-        - target.associatedDiseases.rows[].disease.name
-        - target.associatedDiseases.rows[].score
+      - target.id
+      - target.approvedSymbol
+      - target.approvedName
+      - target.biotype
+      - target.associatedDiseases.count
+      - target.associatedDiseases.rows[].disease.id
+      - target.associatedDiseases.rows[].disease.name
+      - target.associatedDiseases.rows[].score
+    entity: disease
   searchDisease:
     description: Search for diseases by keyword
     tags:
-      - disease-search
-      - disease
-    query: |
-      query($queryString: String!, $size: Int!) {
-        search(queryString: $queryString, entityNames: ["disease"], page: {size: $size, index: 0}) {
-          total
-          hits {
-            id
-            name
-            description
-            entity
-          }
-        }
-      }
+    - disease-search
+    - disease
+    query: "query($queryString: String!, $size: Int!) {\n  search(queryString: $queryString, entityNames: [\"disease\"], page:\
+      \ {size: $size, index: 0}) {\n    total\n    hits {\n      id\n      name\n      description\n      entity\n    }\n\
+      \  }\n}\n"
     params:
       queryString:
         type: string
@@ -106,37 +74,21 @@ tools:
     response:
       format: json
       fields:
-        - search.total
-        - search.hits[].id
-        - search.hits[].name
-        - search.hits[].description
-        - search.hits[].entity
+      - search.total
+      - search.hits[].id
+      - search.hits[].name
+      - search.hits[].description
+      - search.hits[].entity
+    entity: disease
   getAssociations:
     description: Get target-disease associations for a given gene
     tags:
-      - associations
-      - target-disease
-    query: |
-      query($ensemblId: String!, $size: Int!) {
-        target(ensemblId: $ensemblId) {
-          id
-          approvedSymbol
-          associatedDiseases(page: {size: $size, index: 0}) {
-            count
-            rows {
-              disease {
-                id
-                name
-              }
-              score
-              datatypeScores {
-                componentId
-                score
-              }
-            }
-          }
-        }
-      }
+    - associations
+    - target-disease
+    query: "query($ensemblId: String!, $size: Int!) {\n  target(ensemblId: $ensemblId) {\n    id\n    approvedSymbol\n   \
+      \ associatedDiseases(page: {size: $size, index: 0}) {\n      count\n      rows {\n        disease {\n          id\n\
+      \          name\n        }\n        score\n        datatypeScores {\n          id\n          score\n      \
+      \  }\n      }\n    }\n  }\n}\n"
     params:
       ensemblId:
         type: string
@@ -149,48 +101,26 @@ tools:
     response:
       format: json
       fields:
-        - target.id
-        - target.approvedSymbol
-        - target.associatedDiseases.count
-        - target.associatedDiseases.rows[].disease.id
-        - target.associatedDiseases.rows[].disease.name
-        - target.associatedDiseases.rows[].score
-        - target.associatedDiseases.rows[].datatypeScores[].componentId
-        - target.associatedDiseases.rows[].datatypeScores[].score
+      - target.id
+      - target.approvedSymbol
+      - target.associatedDiseases.count
+      - target.associatedDiseases.rows[].disease.id
+      - target.associatedDiseases.rows[].disease.name
+      - target.associatedDiseases.rows[].score
+      - target.associatedDiseases.rows[].datatypeScores[].id
+      - target.associatedDiseases.rows[].datatypeScores[].score
+    entity: gene
   getDrugs:
     description: Get known drugs for a target gene
     tags:
-      - drugs
-      - pharmacology
-      - target-drugs
-    query: |
-      query($ensemblId: String!) {
-        target(ensemblId: $ensemblId) {
-          id
-          approvedSymbol
-          drugAndClinicalCandidates {
-            count
-            rows {
-              drug {
-                id
-                name
-                drugType
-                mechanismsOfAction {
-                  rows {
-                    mechanismOfAction
-                    actionType
-                    targets {
-                      id
-                      approvedSymbol
-                    }
-                  }
-                }
-              }
-              maxClinicalStage
-            }
-          }
-        }
-      }
+    - drugs
+    - pharmacology
+    - target-drugs
+    query: "query($ensemblId: String!) {\n  target(ensemblId: $ensemblId) {\n    id\n    approvedSymbol\n    drugAndClinicalCandidates\
+      \ {\n      count\n      rows {\n        drug {\n          id\n          name\n          drugType\n          mechanismsOfAction\
+      \ {\n            rows {\n              mechanismOfAction\n              actionType\n              targets {\n      \
+      \          id\n                approvedSymbol\n              }\n            }\n          }\n        }\n        maxClinicalStage\n\
+      \      }\n    }\n  }\n}\n"
     params:
       ensemblId:
         type: string
@@ -199,36 +129,23 @@ tools:
     response:
       format: json
       fields:
-        - target.id
-        - target.approvedSymbol
-        - target.drugAndClinicalCandidates.count
-        - target.drugAndClinicalCandidates.rows[].drug.id
-        - target.drugAndClinicalCandidates.rows[].drug.name
-        - target.drugAndClinicalCandidates.rows[].drug.drugType
-        - target.drugAndClinicalCandidates.rows[].drug.mechanismsOfAction
-        - target.drugAndClinicalCandidates.rows[].maxClinicalStage
+      - target.id
+      - target.approvedSymbol
+      - target.drugAndClinicalCandidates.count
+      - target.drugAndClinicalCandidates.rows[].drug.id
+      - target.drugAndClinicalCandidates.rows[].drug.name
+      - target.drugAndClinicalCandidates.rows[].drug.drugType
+      - target.drugAndClinicalCandidates.rows[].drug.mechanismsOfAction
+      - target.drugAndClinicalCandidates.rows[].maxClinicalStage
+    entity: compound
   getEvidence:
     description: Get evidence linking a target to a disease
     tags:
-      - evidence
-      - target-disease-evidence
-    query: |
-      query($ensemblId: String!, $efoId: String!, $size: Int!) {
-        disease(efoId: $efoId) {
-          id
-          name
-          evidences(ensemblIds: [$ensemblId], size: $size) {
-            count
-            rows {
-              id
-              score
-              datasourceId
-              datatypeId
-              literature
-            }
-          }
-        }
-      }
+    - evidence
+    - target-disease-evidence
+    query: "query($ensemblId: String!, $efoId: String!, $size: Int!) {\n  disease(efoId: $efoId) {\n    id\n    name\n   \
+      \ evidences(ensemblIds: [$ensemblId], size: $size) {\n      count\n      rows {\n        id\n        score\n       \
+      \ datasourceId\n        datatypeId\n        literature\n      }\n    }\n  }\n}\n"
     params:
       ensemblId:
         type: string
@@ -245,47 +162,25 @@ tools:
     response:
       format: json
       fields:
-        - disease.id
-        - disease.name
-        - disease.evidences.count
-        - disease.evidences.rows[].id
-        - disease.evidences.rows[].score
-        - disease.evidences.rows[].datasourceId
-        - disease.evidences.rows[].datatypeId
-        - disease.evidences.rows[].literature
+      - disease.id
+      - disease.name
+      - disease.evidences.count
+      - disease.evidences.rows[].id
+      - disease.evidences.rows[].score
+      - disease.evidences.rows[].datasourceId
+      - disease.evidences.rows[].datatypeId
+      - disease.evidences.rows[].literature
+    entity: disease
   getDiseaseDrugs:
     description: Get drugs in clinical trials or approved for a disease
     tags:
-      - disease-drugs
-      - clinical-candidates
-    query: |
-      query($efoId: String!) {
-        disease(efoId: $efoId) {
-          id
-          name
-          drugAndClinicalCandidates {
-            count
-            rows {
-              id
-              maxClinicalStage
-              drug {
-                id
-                name
-                drugType
-                mechanismsOfAction {
-                  rows {
-                    mechanismOfAction
-                    targets {
-                      id
-                      approvedSymbol
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
+    - disease-drugs
+    - clinical-candidates
+    query: "query($efoId: String!) {\n  disease(efoId: $efoId) {\n    id\n    name\n    drugAndClinicalCandidates {\n    \
+      \  count\n      rows {\n        id\n        maxClinicalStage\n        drug {\n          id\n          name\n       \
+      \   drugType\n          mechanismsOfAction {\n            rows {\n              mechanismOfAction\n              targets\
+      \ {\n                id\n                approvedSymbol\n              }\n            }\n          }\n        }\n  \
+      \    }\n    }\n  }\n}\n"
     params:
       efoId:
         type: string
@@ -294,44 +189,27 @@ tools:
     response:
       format: json
       fields:
-        - disease.id
-        - disease.name
-        - disease.drugAndClinicalCandidates.count
-        - disease.drugAndClinicalCandidates.rows[].id
-        - disease.drugAndClinicalCandidates.rows[].maxClinicalStage
-        - disease.drugAndClinicalCandidates.rows[].drug.id
-        - disease.drugAndClinicalCandidates.rows[].drug.name
-        - disease.drugAndClinicalCandidates.rows[].drug.drugType
-        - disease.drugAndClinicalCandidates.rows[].drug.mechanismsOfAction.rows[].mechanismOfAction
-        - disease.drugAndClinicalCandidates.rows[].drug.mechanismsOfAction.rows[].targets[].id
-        - disease.drugAndClinicalCandidates.rows[].drug.mechanismsOfAction.rows[].targets[].approvedSymbol
+      - disease.id
+      - disease.name
+      - disease.drugAndClinicalCandidates.count
+      - disease.drugAndClinicalCandidates.rows[].id
+      - disease.drugAndClinicalCandidates.rows[].maxClinicalStage
+      - disease.drugAndClinicalCandidates.rows[].drug.id
+      - disease.drugAndClinicalCandidates.rows[].drug.name
+      - disease.drugAndClinicalCandidates.rows[].drug.drugType
+      - disease.drugAndClinicalCandidates.rows[].drug.mechanismsOfAction.rows[].mechanismOfAction
+      - disease.drugAndClinicalCandidates.rows[].drug.mechanismsOfAction.rows[].targets[].id
+      - disease.drugAndClinicalCandidates.rows[].drug.mechanismsOfAction.rows[].targets[].approvedSymbol
+    entity: compound
   getDiseaseTargets:
     description: Get top gene targets associated with a disease
     tags:
-      - disease-targets
-      - gene-associations
-    query: |
-      query($efoId: String!, $size: Int!) {
-        disease(efoId: $efoId) {
-          id
-          name
-          associatedTargets(page: {size: $size, index: 0}) {
-            count
-            rows {
-              target {
-                id
-                approvedSymbol
-                approvedName
-              }
-              score
-              datatypeScores {
-                id
-                score
-              }
-            }
-          }
-        }
-      }
+    - disease-targets
+    - gene-associations
+    query: "query($efoId: String!, $size: Int!) {\n  disease(efoId: $efoId) {\n    id\n    name\n    associatedTargets(page:\
+      \ {size: $size, index: 0}) {\n      count\n      rows {\n        target {\n          id\n          approvedSymbol\n\
+      \          approvedName\n        }\n        score\n        datatypeScores {\n          id\n          score\n       \
+      \ }\n      }\n    }\n  }\n}\n"
     params:
       efoId:
         type: string
@@ -344,46 +222,25 @@ tools:
     response:
       format: json
       fields:
-        - disease.id
-        - disease.name
-        - disease.associatedTargets.count
-        - disease.associatedTargets.rows[].target.id
-        - disease.associatedTargets.rows[].target.approvedSymbol
-        - disease.associatedTargets.rows[].target.approvedName
-        - disease.associatedTargets.rows[].score
-        - disease.associatedTargets.rows[].datatypeScores[].id
-        - disease.associatedTargets.rows[].datatypeScores[].score
+      - disease.id
+      - disease.name
+      - disease.associatedTargets.count
+      - disease.associatedTargets.rows[].target.id
+      - disease.associatedTargets.rows[].target.approvedSymbol
+      - disease.associatedTargets.rows[].target.approvedName
+      - disease.associatedTargets.rows[].score
+      - disease.associatedTargets.rows[].datatypeScores[].id
+      - disease.associatedTargets.rows[].datatypeScores[].score
+    entity: disease
   getDiseasePhenotypes:
     description: Get phenotypes (HPO terms) associated with a disease
     tags:
-      - disease-phenotypes
-      - hpo
-    query: |
-      query($efoId: String!) {
-        disease(efoId: $efoId) {
-          id
-          name
-          phenotypes(page: {size: 25, index: 0}) {
-            count
-            rows {
-              phenotypeHPO {
-                id
-                name
-              }
-              phenotypeEFO {
-                id
-                name
-              }
-              evidence {
-                frequencyHPO {
-                  id
-                  name
-                }
-              }
-            }
-          }
-        }
-      }
+    - disease-phenotypes
+    - hpo
+    query: "query($efoId: String!) {\n  disease(efoId: $efoId) {\n    id\n    name\n    phenotypes(page: {size: 25, index:\
+      \ 0}) {\n      count\n      rows {\n        phenotypeHPO {\n          id\n          name\n        }\n        phenotypeEFO\
+      \ {\n          id\n          name\n        }\n        evidence {\n          frequencyHPO {\n            id\n       \
+      \     name\n          }\n        }\n      }\n    }\n  }\n}\n"
     params:
       efoId:
         type: string
@@ -392,96 +249,184 @@ tools:
     response:
       format: json
       fields:
-        - disease.id
-        - disease.name
-        - disease.phenotypes.count
-        - disease.phenotypes.rows[].phenotypeHPO.id
-        - disease.phenotypes.rows[].phenotypeHPO.name
-        - disease.phenotypes.rows[].phenotypeEFO.id
-        - disease.phenotypes.rows[].phenotypeEFO.name
-        - disease.phenotypes.rows[].evidence[].frequencyHPO.id
-        - disease.phenotypes.rows[].evidence[].frequencyHPO.name
+      - disease.id
+      - disease.name
+      - disease.phenotypes.count
+      - disease.phenotypes.rows[].phenotypeHPO.id
+      - disease.phenotypes.rows[].phenotypeHPO.name
+      - disease.phenotypes.rows[].phenotypeEFO.id
+      - disease.phenotypes.rows[].phenotypeEFO.name
+      - disease.phenotypes.rows[].evidence[].frequencyHPO.id
+      - disease.phenotypes.rows[].evidence[].frequencyHPO.name
+    entity: disease
+  getDrug:
+    description: Get drug details by ChEMBL ID
+    tags:
+    - drug-info
+    - drug-detail
+    query: 'query($chemblId: String!) { drug(chemblId: $chemblId) { id name drugType maximumClinicalStage
+      description mechanismsOfAction { rows { mechanismOfAction actionType targets { id approvedSymbol } } } indications {
+      count rows { disease { id name } maxClinicalStage } } } }'
+    params:
+      chemblId:
+        type: string
+        required: true
+        description: ChEMBL drug ID (e.g. CHEMBL941 for imatinib)
+    response:
+      format: json
+      fields:
+      - drug.id
+      - drug.name
+      - drug.drugType
+      - drug.maximumClinicalStage
+      - drug.description
+    entity: compound
+  searchDrug:
+    description: Search drugs by keyword
+    tags:
+    - drug-search
+    - pharmacology
+    query: 'query($queryString: String!, $size: Int!) { search(queryString: $queryString, entityNames: ["drug"], page: {size:
+      $size, index: 0}) { total hits { id name description entity } } }'
+    params:
+      queryString:
+        type: string
+        required: true
+        description: Drug name or keyword
+      size:
+        type: integer
+        default: 10
+    response:
+      format: json
+      fields:
+      - search.total
+      - search.hits[].id
+      - search.hits[].name
+      - search.hits[].description
+    entity: compound
+  getTargetInteractions:
+    description: Get protein-protein interactions for a target
+    tags:
+    - protein-interaction
+    - ppi
+    query: 'query($ensemblId: String!) { target(ensemblId: $ensemblId) { id approvedSymbol interactions { count rows { intA
+      intB sourceDatabase score targetB { id approvedSymbol } } } } }'
+    params:
+      ensemblId:
+        type: string
+        required: true
+        description: Ensembl gene ID (e.g. ENSG00000141510 for TP53)
+    response:
+      format: json
+      fields:
+      - target.id
+      - target.approvedSymbol
+      - target.interactions.count
+      - target.interactions.rows[].sourceDatabase
+      - target.interactions.rows[].score
+      - target.interactions.rows[].targetB.approvedSymbol
+    entity: interaction
 tests:
   searchTarget:
-    - name: searches for EGFR target
-      params:
-        queryString: EGFR
-      assert:
-        - path: search.total
-          gt: 0
-        - path: search.hits
-          minLength: 1
-        - path: search.hits.0.name
+  - name: searches for EGFR target
+    params:
+      queryString: EGFR
+    assert:
+    - path: search.total
+      gt: 0
+    - path: search.hits
+      minLength: 1
+    - path: search.hits.0.name
   getTarget:
-    - name: gets target details with disease associations
-      params:
-        ensemblId: ENSG00000146648
-      assert:
-        - path: target.approvedSymbol
-          equals: EGFR
-        - path: target.associatedDiseases.count
-          gt: 0
+  - name: gets target details with disease associations
+    params:
+      ensemblId: ENSG00000146648
+    assert:
+    - path: target.approvedSymbol
+      equals: EGFR
+    - path: target.associatedDiseases.count
+      gt: 0
   searchDisease:
-    - name: searches for cancer diseases
-      params:
-        queryString: cancer
-      assert:
-        - path: search.total
-          gt: 0
-        - path: search.hits
-          minLength: 1
-        - path: search.hits.0.name
+  - name: searches for cancer diseases
+    params:
+      queryString: cancer
+    assert:
+    - path: search.total
+      gt: 0
+    - path: search.hits
+      minLength: 1
+    - path: search.hits.0.name
   getAssociations:
-    - name: gets target-disease associations for TP53
-      params:
-        ensemblId: ENSG00000141510
-      assert:
-        - path: target.approvedSymbol
-          equals: TP53
-        - path: target.associatedDiseases.count
-          gt: 0
+  - name: gets target-disease associations for TP53
+    params:
+      ensemblId: ENSG00000141510
+    assert:
+    - path: target.approvedSymbol
+      equals: TP53
+    - path: target.associatedDiseases.count
+      gt: 0
   getDrugs:
-    - name: gets drugs for EGFR target
-      params:
-        ensemblId: ENSG00000146648
-      assert:
-        - path: target.approvedSymbol
-          equals: EGFR
-        - path: target.drugAndClinicalCandidates.count
-          gt: 0
+  - name: gets drugs for EGFR target
+    params:
+      ensemblId: ENSG00000146648
+    assert:
+    - path: target.approvedSymbol
+      equals: EGFR
+    - path: target.drugAndClinicalCandidates.count
+      gt: 0
   getEvidence:
-    - name: gets evidence for TP53 and cancer
-      params:
-        ensemblId: ENSG00000141510
-        efoId: EFO_0000311
-      assert:
-        - path: disease.id
-          equals: EFO_0000311
-        - path: disease.evidences.count
-          gt: 0
+  - name: gets evidence for TP53 and cancer
+    params:
+      ensemblId: ENSG00000141510
+      efoId: EFO_0000311
+    assert:
+    - path: disease.id
+      equals: EFO_0000311
+    - path: disease.evidences.count
+      gt: 0
   getDiseaseDrugs:
-    - name: gets drugs for glioma
-      params:
-        efoId: MONDO_0021042
-      assert:
-        - path: disease.name
-          equals: glioma
-        - path: disease.drugAndClinicalCandidates.count
-          gt: 0
+  - name: gets drugs for glioma
+    params:
+      efoId: MONDO_0021042
+    assert:
+    - path: disease.name
+      equals: glioma
+    - path: disease.drugAndClinicalCandidates.count
+      gt: 0
   getDiseaseTargets:
-    - name: gets targets associated with glioma
-      params:
-        efoId: MONDO_0021042
-        size: 5
-      assert:
-        - path: disease.name
-          equals: glioma
-        - path: disease.associatedTargets.count
-          gt: 0
+  - name: gets targets associated with glioma
+    params:
+      efoId: MONDO_0021042
+      size: 5
+    assert:
+    - path: disease.name
+      equals: glioma
+    - path: disease.associatedTargets.count
+      gt: 0
   getDiseasePhenotypes:
-    - name: gets phenotypes for glioma
-      params:
-        efoId: MONDO_0021042
-      assert:
-        - path: disease.name
-          equals: glioma
+  - name: gets phenotypes for glioma
+    params:
+      efoId: MONDO_0021042
+    assert:
+    - path: disease.name
+      equals: glioma
+  getDrug:
+  - name: gets drug details for imatinib
+    params:
+      chemblId: CHEMBL941
+    assert:
+    - path: drug.name
+  searchDrug:
+  - name: searches for imatinib
+    params:
+      queryString: imatinib
+    assert:
+    - path: search.total
+      gt: 0
+  getTargetInteractions:
+  - name: gets PPI for TP53
+    params:
+      ensemblId: ENSG00000141510
+    assert:
+    - path: target.approvedSymbol
+      equals: TP53

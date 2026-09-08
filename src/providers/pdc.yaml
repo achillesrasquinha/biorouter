@@ -2,67 +2,41 @@ name: pdc
 displayName: Proteomic Data Commons
 description: NCI Proteomic Data Commons — proteomics data from cancer research studies
 tags:
-  - proteomics
-  - cancer
-  - mass-spectrometry
-  - pdc
-  - nci
+- proteomics
+- cancer
+- mass-spectrometry
+- pdc
+- nci
 baseUrl: https://proteomic.datacommons.cancer.gov/graphql
 protocol: graphql
 tools:
   searchStudies:
     description: Search proteomics studies from NCI programs and projects
     tags:
-      - study-search
-      - cancer-proteomics
-    query: |
-      {
-        programsProjectsStudies {
-          program_id
-          program_manager
-          projects {
-            project_id
-            studies {
-              study_id
-              study_name
-              pdc_study_id
-              disease_type
-              primary_site
-              analytical_fraction
-              experiment_type
-            }
-          }
-        }
-      }
+    - study-search
+    - cancer-proteomics
+    query: "{\n  programsProjectsStudies {\n    program_id\n    program_manager\n    projects {\n      project_id\n      studies\
+      \ {\n        study_id\n        study_name\n        pdc_study_id\n        disease_type\n        primary_site\n      \
+      \  analytical_fraction\n        experiment_type\n      }\n    }\n  }\n}\n"
     params: {}
     response:
       format: json
       fields:
-        - programsProjectsStudies[].program_id
-        - programsProjectsStudies[].projects[].project_id
-        - programsProjectsStudies[].projects[].studies[].study_name
-        - programsProjectsStudies[].projects[].studies[].pdc_study_id
-        - programsProjectsStudies[].projects[].studies[].disease_type
-        - programsProjectsStudies[].projects[].studies[].analytical_fraction
-        - programsProjectsStudies[].projects[].studies[].experiment_type
+      - programsProjectsStudies[].program_id
+      - programsProjectsStudies[].projects[].project_id
+      - programsProjectsStudies[].projects[].studies[].study_name
+      - programsProjectsStudies[].projects[].studies[].pdc_study_id
+      - programsProjectsStudies[].projects[].studies[].disease_type
+      - programsProjectsStudies[].projects[].studies[].analytical_fraction
+      - programsProjectsStudies[].projects[].studies[].experiment_type
+    entity: dataset
   getGeneData:
     description: Get protein spectral count data for a gene across studies
     tags:
-      - gene-expression
-      - spectral-count
-    query: |
-      query($geneName: String!) {
-        geneSpectralCount(gene_name: $geneName) {
-          gene_name
-          NCBI_gene_id
-          spectral_counts {
-            project_id
-            plex
-            spectral_count
-            distinct_peptide
-          }
-        }
-      }
+    - gene-expression
+    - spectral-count
+    query: "query($geneName: String!) {\n  geneSpectralCount(gene_name: $geneName) {\n    gene_name\n    NCBI_gene_id\n  \
+      \  spectral_counts {\n      project_id\n      plex\n      spectral_count\n      distinct_peptide\n    }\n  }\n}\n"
     params:
       geneName:
         type: string
@@ -71,24 +45,25 @@ tools:
     response:
       format: json
       fields:
-        - geneSpectralCount[].gene_name
-        - geneSpectralCount[].NCBI_gene_id
-        - geneSpectralCount[].spectral_counts[].project_id
-        - geneSpectralCount[].spectral_counts[].spectral_count
-        - geneSpectralCount[].spectral_counts[].distinct_peptide
+      - geneSpectralCount[].gene_name
+      - geneSpectralCount[].NCBI_gene_id
+      - geneSpectralCount[].spectral_counts[].project_id
+      - geneSpectralCount[].spectral_counts[].spectral_count
+      - geneSpectralCount[].spectral_counts[].distinct_peptide
+    entity: gene
 tests:
   searchStudies:
-    - name: lists proteomics studies
-      params: {}
-      assert:
-        - path: programsProjectsStudies
-          minLength: 1
+  - name: lists proteomics studies
+    params: {}
+    assert:
+    - path: programsProjectsStudies
+      minLength: 1
   getGeneData:
-    - name: gets spectral count data for BRCA1
-      params:
-        geneName: BRCA1
-      assert:
-        - path: geneSpectralCount
-          minLength: 1
-        - path: geneSpectralCount.0.gene_name
-          equals: BRCA1
+  - name: gets spectral count data for BRCA1
+    params:
+      geneName: BRCA1
+    assert:
+    - path: geneSpectralCount
+      minLength: 1
+    - path: geneSpectralCount.0.gene_name
+      equals: BRCA1

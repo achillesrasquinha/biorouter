@@ -1,0 +1,135 @@
+name: mavedb
+displayName: MaveDB
+description: Repository for multiplexed assays of variant effect (MAVE) experimental data
+tags:
+- variant-effects
+- dms
+- functional-assay
+- mavedb
+baseUrl: https://api.mavedb.org/api/v1
+tools:
+  searchExperiments:
+    description: Search MaveDB experiments by keyword
+    tags:
+    - experiment-search
+    - mave-experiment
+    method: GET
+    path: /experiments/
+    params:
+      query:
+        type: string
+        required: true
+        mapsTo: search
+        description: Search query for experiments (e.g. BRCA1, TP53, VAMP)
+    response:
+      format: json
+      fields:
+      - '[].urn'
+      - '[].title'
+      - '[].shortDescription'
+      - '[].abstractText'
+      - '[].scoreSetUrns'
+      - '[].createdBy'
+    entity: assay
+  getExperiment:
+    description: Get details for a specific MaveDB experiment by URN
+    tags:
+    - experiment-detail
+    - mave-experiment
+    method: GET
+    path: /experiments/{urn}
+    params:
+      urn:
+        type: string
+        required: true
+        description: MaveDB experiment URN (e.g. urn:mavedb:00000001-a)
+    response:
+      format: json
+      fields:
+      - urn
+      - title
+      - shortDescription
+      - abstractText
+      - scoreSetUrns
+      - createdBy
+      - modifiedBy
+    entity: assay
+  getScoreSet:
+    description: Get details for a specific MaveDB score set by URN
+    tags:
+    - score-set-detail
+    - variant-scores
+    method: GET
+    path: /score-sets/{urn}
+    params:
+      urn:
+        type: string
+        required: true
+        description: MaveDB score set URN (e.g. urn:mavedb:00000001-a-1)
+    response:
+      format: json
+      fields:
+      - urn
+      - title
+      - shortDescription
+      - abstractText
+      - numVariants
+      - targetGenes[].name
+      - targetGenes[].category
+      - experiment
+    entity: variant
+  searchScoreSets:
+    description: Search MaveDB score sets by keyword
+    tags:
+    - score-set-search
+    - variant-scores
+    method: POST
+    path: /score-sets/search
+    params:
+      query:
+        type: string
+        required: true
+        mapsTo: text
+        description: Search query for score sets (e.g. BRCA1, TP53)
+    response:
+      format: json
+      fields:
+      - scoreSets[].urn
+      - scoreSets[].title
+      - scoreSets[].shortDescription
+      - scoreSets[].numVariants
+      - scoreSets[].experiment.title
+    entity: variant
+tests:
+  searchExperiments:
+  - name: searches experiments for BRCA1
+    params:
+      query: BRCA1
+    assert:
+    - isArray: true
+    - minLength: 1
+    - path: 0.urn
+  searchScoreSets:
+  - name: searches score sets for BRCA1
+    params:
+      query: BRCA1
+    assert:
+    - path: scoreSets
+      minLength: 1
+    - path: scoreSets.0.urn
+  getScoreSet:
+  - name: gets score set details by URN
+    params:
+      urn: urn:mavedb:00000001-a-1
+    assert:
+    - path: urn
+      equals: urn:mavedb:00000001-a-1
+    - path: title
+  getExperiment:
+  - name: gets experiment details by URN
+    params:
+      urn: urn:mavedb:00000001-a
+    assert:
+    - path: urn
+      equals: urn:mavedb:00000001-a
+    - path: title

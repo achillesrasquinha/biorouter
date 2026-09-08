@@ -2,18 +2,18 @@ name: signor
 displayName: SIGNOR
 description: SIGNOR — signaling network open resource for causal interactions in signaling pathways
 tags:
-  - signaling
-  - pathways
-  - protein-interactions
-  - causal-interactions
-  - signal-transduction
+- signaling
+- pathways
+- protein-interactions
+- causal-interactions
+- signal-transduction
 baseUrl: https://signor.uniroma2.it/API
 tools:
   getInteractions:
     description: Get signaling interactions for a given entity (gene or protein)
     tags:
-      - interaction-search
-      - signaling-interactions
+    - interaction-search
+    - signaling-interactions
     method: GET
     path: /getdata
     params:
@@ -27,11 +27,12 @@ tools:
         description: Response format (json or csv)
     response:
       format: json
+    entity: interaction
   searchPathway:
     description: Get signaling pathway data by pathway name
     tags:
-      - pathway-search
-      - pathway-info
+    - pathway-search
+    - pathway-info
     method: GET
     path: /getPathwayData
     params:
@@ -45,20 +46,21 @@ tools:
         description: Response format (json or csv)
     response:
       format: json
+    entity: pathway
 tests:
   getInteractions:
-    - name: gets signaling interactions for TP53
-      params:
-        entityA: TP53
-        format: json
-      assert:
-        - minLength: 1
-      allowError: true
+  - name: gets signaling interactions for TP53
+    params:
+      entityA: TP53
+      format: json
+    assert:
+    - minLength: 1
+    allowError: true
   searchPathway:
-    - name: searches EGFR signaling pathway
-      params:
-        pathway: EGFR
-        format: json
-      assert:
-        - minLength: 1
-      allowError: true
+  - name: searches EGFR signaling pathway
+    params:
+      pathway: EGFR
+      format: json
+    assert:
+    - minLength: 1
+    allowError: true

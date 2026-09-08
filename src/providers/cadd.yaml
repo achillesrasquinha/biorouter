@@ -2,22 +2,25 @@ name: cadd
 displayName: CADD
 description: Combined Annotation Dependent Depletion — variant deleteriousness scoring
 tags:
-  - variant-scoring
-  - pathogenicity
-  - annotation
-  - cadd
-  - deleteriousness
+- variant-scoring
+- pathogenicity
+- annotation
+- cadd
+- deleteriousness
 baseUrl: https://cadd.gs.washington.edu/api/v1.0
-
 tools:
   score:
     description: Get CADD deleteriousness score for a specific variant
     tags:
-      - variant-score
-      - cadd-score
+    - variant-score
+    - cadd-score
     method: GET
-    path: /score/{chrom}/{pos}/{ref}/{alt}
+    path: /{version}/{chrom}:{pos}
     params:
+      version:
+        type: string
+        default: GRCh38-v1.7
+        description: CADD model version (e.g. GRCh38-v1.7, GRCh37-v1.7)
       chrom:
         type: string
         required: true
@@ -26,24 +29,21 @@ tools:
         type: integer
         required: true
         description: Genomic position (1-based)
-      ref:
-        type: string
-        required: true
-        description: Reference allele (e.g. A, C, G, T)
-      alt:
-        type: string
-        required: true
-        description: Alternate allele (e.g. A, C, G, T)
     response:
       format: json
+    entity: variant
   getAnnotation:
     description: Get full CADD annotation details for a specific variant
     tags:
-      - variant-annotation
-      - cadd-annotation
+    - variant-annotation
+    - cadd-annotation
     method: GET
-    path: /anno/{chrom}/{pos}/{ref}/{alt}
+    path: /{version}/{chrom}:{pos}
     params:
+      version:
+        type: string
+        default: GRCh38-v1.7
+        description: CADD model version (e.g. GRCh38-v1.7, GRCh37-v1.7)
       chrom:
         type: string
         required: true
@@ -52,35 +52,25 @@ tools:
         type: integer
         required: true
         description: Genomic position (1-based)
-      ref:
-        type: string
-        required: true
-        description: Reference allele (e.g. A, C, G, T)
-      alt:
-        type: string
-        required: true
-        description: Alternate allele (e.g. A, C, G, T)
     response:
       format: json
-
+    entity: annotation
 tests:
   score:
-    - name: scores a well-known pathogenic variant
-      params:
-        chrom: "22"
-        pos: 19963748
-        ref: C
-        alt: T
-      assert:
-        - minLength: 1
-      allowError: true
+  - name: scores a well-known pathogenic variant
+    params:
+      version: GRCh38-v1.7
+      chrom: '22'
+      pos: 19963748
+    assert:
+    - minLength: 1
+    allowError: true
   getAnnotation:
-    - name: gets annotation for a variant
-      params:
-        chrom: "22"
-        pos: 19963748
-        ref: C
-        alt: T
-      assert:
-        - minLength: 1
-      allowError: true
+  - name: gets annotation for a variant
+    params:
+      version: GRCh38-v1.7
+      chrom: '22'
+      pos: 19963748
+    assert:
+    - minLength: 1
+    allowError: true

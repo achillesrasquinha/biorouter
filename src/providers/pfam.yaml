@@ -2,18 +2,18 @@ name: pfam
 displayName: Pfam
 description: Pfam protein families database — protein domain classification via InterPro
 tags:
-  - protein
-  - domain
-  - family
-  - pfam
-  - classification
+- protein
+- domain
+- family
+- pfam
+- classification
 baseUrl: https://www.ebi.ac.uk/interpro/api
 tools:
   searchFamily:
     description: Search Pfam protein families by keyword
     tags:
-      - family-search
-      - domain-search
+    - family-search
+    - domain-search
     method: GET
     path: /entry/pfam
     params:
@@ -30,17 +30,18 @@ tools:
     response:
       format: json
       fields:
-        - count
-        - results[].metadata.accession
-        - results[].metadata.name
-        - results[].metadata.source_database
-        - results[].metadata.type
-        - results[].metadata.integrated
+      - count
+      - results[].metadata.accession
+      - results[].metadata.name
+      - results[].metadata.source_database
+      - results[].metadata.type
+      - results[].metadata.integrated
+    entity: protein
   getFamily:
     description: Get detailed information for a specific Pfam family
     tags:
-      - family-info
-      - domain-info
+    - family-info
+    - domain-info
     method: GET
     path: /entry/pfam/{accession}
     params:
@@ -51,21 +52,22 @@ tools:
     response:
       format: json
       fields:
-        - metadata.accession
-        - metadata.name.name
-        - metadata.name.short
-        - metadata.type
-        - metadata.integrated
-        - metadata.set_info.accession
-        - metadata.set_info.name
-        - metadata.counters.proteins
-        - metadata.counters.structures
-        - metadata.counters.taxa
+      - metadata.accession
+      - metadata.name.name
+      - metadata.name.short
+      - metadata.type
+      - metadata.integrated
+      - metadata.set_info.accession
+      - metadata.set_info.name
+      - metadata.counters.proteins
+      - metadata.counters.structures
+      - metadata.counters.taxa
+    entity: protein
   getProteins:
     description: Get UniProt proteins associated with a Pfam family
     tags:
-      - family-proteins
-      - protein-members
+    - family-proteins
+    - protein-members
     method: GET
     path: /entry/pfam/{accession}/protein/UniProt
     params:
@@ -81,37 +83,38 @@ tools:
     response:
       format: json
       fields:
-        - count
-        - results[].metadata.accession
-        - results[].metadata.name
-        - results[].metadata.source_database
-        - results[].metadata.length
-        - results[].metadata.source_organism.scientificName
-        - results[].metadata.gene
-        - results[].entries[].accession
-        - results[].entries[].entry_type
+      - count
+      - results[].metadata.accession
+      - results[].metadata.name
+      - results[].metadata.source_database
+      - results[].metadata.length
+      - results[].metadata.source_organism.scientificName
+      - results[].metadata.gene
+      - results[].entries[].accession
+      - results[].entries[].entry_type
+    entity: protein
 tests:
   searchFamily:
-    - name: searches for kinase families
-      params:
-        query: kinase
-      assert:
-        - path: results
-          minLength: 1
-      allowError: true
+  - name: searches for kinase families
+    params:
+      query: kinase
+    assert:
+    - path: results
+      minLength: 1
+    allowError: true
   getFamily:
-    - name: gets Pfam family PF00069
-      params:
-        accession: PF00069
-      assert:
-        - path: metadata.accession
-          equals: PF00069
-      allowError: true
+  - name: gets Pfam family PF00069
+    params:
+      accession: PF00069
+    assert:
+    - path: metadata.accession
+      equals: PF00069
+    allowError: true
   getProteins:
-    - name: gets proteins for Pfam family PF00069
-      params:
-        accession: PF00069
-      assert:
-        - path: results
-          minLength: 1
-      allowError: true
+  - name: gets proteins for Pfam family PF00069
+    params:
+      accession: PF00069
+    assert:
+    - path: results
+      minLength: 1
+    allowError: true

@@ -2,17 +2,17 @@ name: unichem
 displayName: UniChem
 description: UniChem compound cross-referencing — map chemical identifiers across databases
 tags:
-  - chemistry
-  - cross-reference
-  - compound-mapping
-  - unichem
+- chemistry
+- cross-reference
+- compound-mapping
+- unichem
 baseUrl: https://www.ebi.ac.uk/unichem/api/v1
 tools:
   getCompound:
     description: Look up a compound by source ID and find cross-references across databases
     tags:
-      - compound-lookup
-      - cross-reference
+    - compound-lookup
+    - cross-reference
     method: POST
     path: /compounds
     params:
@@ -33,17 +33,18 @@ tools:
     response:
       format: json
       fields:
-        - response
-        - compounds[].standardInchiKey
-        - compounds[].sources[].compoundId
-        - compounds[].sources[].shortName
-        - compounds[].sources[].longName
-        - compounds[].inchi.formula
+      - response
+      - compounds[].standardInchiKey
+      - compounds[].sources[].compoundId
+      - compounds[].sources[].shortName
+      - compounds[].sources[].longName
+      - compounds[].inchi.formula
+    entity: compound
   getConnectivity:
     description: Find all compounds connected to a given compound across databases
     tags:
-      - connectivity
-      - compound-network
+    - connectivity
+    - compound-network
     method: POST
     path: /connectivity
     params:
@@ -64,34 +65,35 @@ tools:
     response:
       format: json
       fields:
-        - response
-        - totalCompounds
-        - totalSources
-        - searchedCompound.standardInchiKey
-        - sources[].compoundId
-        - sources[].shortName
-        - sources[].longName
-        - sources[].typeOfSearch
+      - response
+      - totalCompounds
+      - totalSources
+      - searchedCompound.standardInchiKey
+      - sources[].compoundId
+      - sources[].shortName
+      - sources[].longName
+      - sources[].typeOfSearch
+    entity: compound
 tests:
   getConnectivity:
-    - name: finds connectivity for CHEMBL25 (aspirin)
-      params:
-        compound: CHEMBL25
-        sourceID: 1
-        type: sourceID
-      assert:
-        - path: response
-          equals: Success
-        - path: sources
-          minLength: 1
+  - name: finds connectivity for CHEMBL25 (aspirin)
+    params:
+      compound: CHEMBL25
+      sourceID: 1
+      type: sourceID
+    assert:
+    - path: response
+      equals: Success
+    - path: sources
+      minLength: 1
   getCompound:
-    - name: looks up compound CHEMBL25
-      params:
-        compound: CHEMBL25
-        sourceID: 1
-        type: sourceID
-      assert:
-        - path: compounds
-        - path: compounds
-          minLength: 1
-      allowError: true
+  - name: looks up compound CHEMBL25
+    params:
+      compound: CHEMBL25
+      sourceID: 1
+      type: sourceID
+    assert:
+    - path: compounds
+    - path: compounds
+      minLength: 1
+    allowError: true

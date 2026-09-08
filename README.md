@@ -1,6 +1,8 @@
 # life-science-mcp
 
-A unified MCP server for 282 life science APIs and databases (265 free, 17 API key). Two tools — `findTools` and `callTools` — provide progressive discovery across 742 endpoints with field projection and batch execution.
+A unified MCP server for 299 life science APIs and databases (281 free, 18 API key). Two tools — `findTools` and `callTools` — provide progressive discovery across 857 endpoints with field projection and batch execution.
+
+On top of individual API tools, **19 BioRouter endpoints** orchestrate multi-source queries across 197 providers in parallel — a single call like `compound/profile "ibuprofen"` fans out to 40+ APIs and returns a merged, deduplicated result.
 
 ## Installation
 
@@ -15,7 +17,33 @@ A unified MCP server for 282 life science APIs and databases (265 free, 17 API k
 }
 ```
 
-## Providers (247)
+## BioRouter Endpoints (19)
+
+High-level orchestrated queries that resolve identifiers, fan out to multiple APIs in parallel, and merge results with ranked provenance.
+
+| Endpoint | Description |
+|----------|-------------|
+| `compound/profile` | Profile a drug or compound — structure, pharmacology, safety, targets, and clinical data |
+| `compound/interactions` | Map drug interactions — mechanisms, targets, gene interactions, indications, and bioactivity |
+| `compound/similar` | Find structurally similar compounds — fingerprint, substructure, and binding-based similarity |
+| `disease/profile` | Profile a disease — phenotypes, genetics, ontology, therapeutics, and clinical classification |
+| `disease/drugs` | Find drugs for a disease — approved treatments, clinical candidates, and drug-gene interactions |
+| `protein/profile` | Profile a protein — sequence, function, expression, disease associations, and druggability |
+| `protein/interactions` | Map protein interactions — PPIs, signaling, complexes, drug targets, and binding affinities |
+| `protein/structure` | Analyze protein structure — 3D coordinates, domains, disorder, AlphaFold predictions, and classification |
+| `pathway/profile` | Profile a biological pathway — reactions, participants, regulation, and cross-database annotations |
+| `pathway/enrichment` | Analyze gene-set enrichment — GO terms, pathways, and functional categories for a gene list |
+| `variant/annotate` | Annotate a genetic variant — pathogenicity, population frequency, consequence predictions, and pharmacogenomics |
+| `cancer/profile` | Profile the molecular landscape of a cancer — mutations, copy number, clinical evidence, and therapeutic targets |
+| `interaction/check` | Check molecular interactions — PPI evidence, signaling, complexes, and drug-gene links for two entities |
+| `literature/search` | Search biomedical literature — publications, preprints, citations, and semantic annotations |
+| `trial/search` | Search clinical trials — interventional studies, drug development, and precision medicine evidence |
+| `organism/profile` | Profile an organism — taxonomy, genome, model organism resources, ecology, and phylogenetics |
+| `sequence/search` | Search and retrieve sequences — nucleotide, protein, genomic context, alignments, and domain annotations |
+| `data/search` | Search life-science data repositories — genomics, single-cell, proteomics, metabolomics, and imaging archives |
+| `ontology/resolve` | Resolve biomedical terms — map free text, CURIEs, and accessions to ontology concepts across 900+ vocabularies |
+
+## Providers (299)
 
 | Provider | Description | Auth |
 |----------|-------------|------|
@@ -212,7 +240,6 @@ A unified MCP server for 282 life science APIs and databases (265 free, 17 API k
 | [OBIS](https://api.obis.org/v3) | Ocean Biodiversity Information System — marine species occurrence and distribution data | Free |
 | [OBO Foundry](https://obofoundry.org/registry) | Registry of 267 interoperable biomedical ontologies (GO, HPO, ChEBI, etc.) | Free |
 | [OLS](https://www.ebi.ac.uk/ols4/api) | Ontology Lookup Service — search and browse biomedical ontologies (GO, EFO, HPO, etc.) | Free |
-| [OLS4](https://www.ebi.ac.uk/ols4/api) | EBI Ontology Lookup Service v4 with 300+ biomedical ontologies | Free |
 | [OMA](https://omabrowser.org/api) | Orthologous Matrix — comprehensive ortholog database | Free |
 | [OMIM](https://api.omim.org/api) | Online Mendelian Inheritance in Man — catalog of human genes and genetic disorders | API Key |
 | [Ontobee](https://ontobee.org/api) | Ontology term search and browsing across OBO and OWL ontologies | Free |

@@ -1,0 +1,586 @@
+description: Resolve biomedical terms — map free text, CURIEs, and accessions to ontology concepts across 900+ vocabularies
+tags:
+- ontology
+- resolve
+- identifiers
+- terminology
+- coding
+- biorouter
+input:
+  query:
+    type: string
+    required: true
+    description: Term, CURIE, accession, concept name, or free text to resolve (e.g. "MONDO:0005301", "creatinine blood test",
+      "EGFR", "systemic lupus erythematosus", "GO:0006915")
+phases:
+- name: resolve
+  parallel: false
+  calls: []
+- name: fetch
+  parallel: true
+  calls:
+  - source: bioportal
+    tool: search
+    params:
+      query: '{input.query}'
+      pagesize: 10
+    provides:
+    - ontologySearch
+  - source: ols4
+    tool: searchTerms
+    params:
+      q: '{input.query}'
+      rows: 10
+    provides:
+    - ontologySearch
+  - source: ontobee
+    tool: search
+    params:
+      term: '{input.query}'
+      max: 10
+    provides:
+    - ontologySearch
+  - source: obo-foundry
+    tool: listOntologies
+    params: {}
+    provides:
+    - ontologySearch
+  - source: bioportal
+    tool: annotateText
+    params:
+      text: '{input.query}'
+    provides:
+    - textAnnotation
+  - source: zooma
+    tool: annotateText
+    params:
+      propertyValue: '{input.query}'
+      limit: 10
+    provides:
+    - textAnnotation
+  - source: loinc
+    tool: searchCodes
+    params:
+      code: '{input.query}'
+    provides:
+    - clinicalCoding
+  - source: loinc
+    tool: searchValueSet
+    params:
+      name: '{input.query}'
+    provides:
+    - clinicalCoding
+  - source: clinical-tables
+    tool: searchConditions
+    params:
+      terms: '{input.query}'
+      maxList: 10
+    provides:
+    - clinicalCoding
+  - source: clinical-tables
+    tool: searchICD10
+    params:
+      sf: code,name
+      terms: '{input.query}'
+      maxList: 10
+    provides:
+    - clinicalCoding
+  - source: clinical-tables
+    tool: searchLOINC
+    params:
+      terms: '{input.query}'
+      maxList: 10
+    provides:
+    - clinicalCoding
+  - source: clinical-tables
+    tool: searchRxTerms
+    params:
+      terms: '{input.query}'
+      maxList: 10
+    provides:
+    - clinicalCoding
+  - source: fhir
+    tool: searchResource
+    params:
+      resourceType: CodeSystem
+      query: '{input.query}'
+      _count: 5
+    provides:
+    - clinicalCoding
+  - source: hgnc
+    tool: search
+    params:
+      query: '{input.query}'
+    provides:
+    - geneNomenclature
+  - source: hgnc
+    tool: getGene
+    params:
+      symbol: '{input.query}'
+    provides:
+    - geneNomenclature
+  - source: mesh
+    tool: search
+    params:
+      query: '{input.query}'
+      maxResults: 10
+    provides:
+    - biomedicalVocabulary
+  - source: snomed
+    tool: searchConcepts
+    params:
+      term: '{input.query}'
+      count: 10
+    provides:
+    - biomedicalVocabulary
+  - source: umls
+    tool: searchConcepts
+    params:
+      query: '{input.query}'
+      pageSize: 10
+    provides:
+    - biomedicalVocabulary
+  - source: icd
+    tool: search
+    params:
+      query: '{input.query}'
+    provides:
+    - diseaseClassification
+  - source: hpo
+    tool: searchTerms
+    params:
+      query: '{input.query}'
+      max: 10
+    provides:
+    - diseaseClassification
+  - source: chebi
+    tool: search
+    params:
+      query: '{input.query}'
+      rows: 10
+    provides:
+    - chemicalOntology
+  - source: rxnorm
+    tool: search
+    params:
+      name: '{input.query}'
+    provides:
+    - chemicalOntology
+  - source: rxnorm
+    tool: getRxcuiByString
+    params:
+      name: '{input.query}'
+    provides:
+    - chemicalOntology
+  - source: geneontology
+    tool: search
+    params:
+      query: '{input.query}'
+      rows: 10
+    provides:
+    - geneFunction
+  - source: geneontology
+    tool: getTerm
+    params:
+      go_id: '{input.query}'
+    provides:
+    - geneFunction
+  - source: bioregistry
+    tool: getResource
+    params:
+      prefix: '{input.query}'
+    provides:
+    - idResolution
+  - source: bioregistry
+    tool: resolveIdentifier
+    params:
+      curie: '{input.query}'
+    provides:
+    - idResolution
+  - source: name-resolution
+    tool: resolveIdentifier
+    params:
+      string: '{input.query}'
+      limit: 10
+    provides:
+    - idResolution
+  - source: node-normalization
+    tool: getNormalizedNodes
+    params:
+      curie: '{input.query}'
+    provides:
+    - idResolution
+  - source: identifiers-org
+    tool: resolve
+    params:
+      curie: '{input.query}'
+    provides:
+    - idResolution
+  - source: bridgedb
+    tool: searchByAttribute
+    params:
+      organism: Homo sapiens
+      query: '{input.query}'
+      limit: 10
+    provides:
+    - idResolution
+  - source: bioportal
+    tool: getClass
+    params:
+      ontology: NCIT
+      classId: '{input.query}'
+    provides:
+    - ontologySearch
+  - source: bridgedb
+    tool: mapIdentifiers
+    params:
+      organism: Homo sapiens
+      systemCode: H
+      identifier: '{input.query}'
+    provides:
+    - idResolution
+  - source: chebi
+    tool: getTerm
+    params:
+      shortForm: '{input.query}'
+    provides:
+    - chemicalOntology
+  - source: geneontology
+    tool: getAnnotations
+    params:
+      geneId: '{input.query}'
+    provides:
+    - geneFunction
+  - source: hpo
+    tool: getTerm
+    params:
+      id: '{input.query}'
+    provides:
+    - diseaseClassification
+  - source: identifiers-org
+    tool: getNamespace
+    params:
+      query: '{input.query}'
+    provides:
+    - idResolution
+  - source: snomed
+    tool: getConcept
+    params:
+      code: '{input.query}'
+    provides:
+    - biomedicalVocabulary
+  - source: umls
+    tool: crosswalk
+    params:
+      cui: '{input.query}'
+    provides:
+    - biomedicalVocabulary
+  - source: umls
+    tool: getConcept
+    params:
+      cui: '{input.query}'
+    provides:
+    - biomedicalVocabulary
+  - source: umls
+    tool: getRelations
+    params:
+      cui: '{input.query}'
+    provides:
+    - biomedicalVocabulary
+output:
+  ontologySearch:
+    bioportalResults:
+      sources:
+      - source: bioportal
+        call: search
+        path: collection
+        rank: 1
+      reason: BioPortal search across 900+ biomedical ontologies with class details and mappings
+    ols4Results:
+      sources:
+      - source: ols4
+        call: searchTerms
+        path: response.docs
+        rank: 1
+      reason: EBI OLS4 term search across 300+ ontologies with OBO IDs and descriptions
+    ontobeeResults:
+      sources:
+      - source: ontobee
+        call: search
+        path: $passthrough
+        rank: 1
+      reason: Ontobee search across OBO and OWL ontologies with term labels and IRIs
+    oboFoundryOntologies:
+      sources:
+      - source: obo-foundry
+        call: listOntologies
+        path: ontologies
+        rank: 1
+      reason: OBO Foundry registry of 267 interoperable biomedical ontologies for reference
+    bioportalClassDetail:
+      sources:
+      - source: bioportal
+        call: getClass
+        path: $passthrough
+        rank: 1
+      reason: BioPortal ontology class details including definitions, synonyms, and hierarchy
+  textAnnotation:
+    bioportalAnnotations:
+      sources:
+      - source: bioportal
+        call: annotateText
+        path: $passthrough
+        rank: 1
+      reason: BioPortal annotator mapping free text to ontology concepts with longest match
+    zoomaMappings:
+      sources:
+      - source: zooma
+        call: annotateText
+        path: $passthrough
+        rank: 1
+      reason: EBI Zooma high-confidence text-to-ontology mappings with provenance
+  clinicalCoding:
+    loincCodes:
+      sources:
+      - source: loinc
+        call: searchCodes
+        path: parameter
+        rank: 1
+      reason: LOINC code lookup for laboratory tests and clinical observations
+    loincValueSets:
+      sources:
+      - source: loinc
+        call: searchValueSet
+        path: entry
+        rank: 1
+      reason: LOINC value sets grouping related clinical codes by category
+    clinicalConditions:
+      sources:
+      - source: clinical-tables
+        call: searchConditions
+        path: $passthrough
+        rank: 1
+      reason: NLM Clinical Tables condition and disease term autocomplete
+    icd10Codes:
+      sources:
+      - source: clinical-tables
+        call: searchICD10
+        path: $passthrough
+        rank: 1
+      reason: ICD-10-CM diagnosis codes from NLM Clinical Tables
+    loincClinical:
+      sources:
+      - source: clinical-tables
+        call: searchLOINC
+        path: $passthrough
+        rank: 1
+      reason: LOINC lab test codes via NLM Clinical Tables autocomplete
+    rxterms:
+      sources:
+      - source: clinical-tables
+        call: searchRxTerms
+        path: $passthrough
+        rank: 1
+      reason: RxTerms drug names and formulations from NLM Clinical Tables
+    fhirResources:
+      sources:
+      - source: fhir
+        call: searchResource
+        path: entry
+        rank: 1
+      reason: FHIR R4 CodeSystem resources for healthcare terminology lookup
+  geneNomenclature:
+    hgncSearchResults:
+      sources:
+      - source: hgnc
+        call: search
+        path: response.docs
+        rank: 1
+      reason: HGNC approved gene symbols and names matching the query
+    hgncGeneRecord:
+      sources:
+      - source: hgnc
+        call: getGene
+        path: response.docs
+        rank: 1
+      reason: HGNC gene record with approved symbol, aliases, locus type, and cross-references
+  biomedicalVocabulary:
+    meshResults:
+      sources:
+      - source: mesh
+        call: search
+        path: esearchresult.idlist
+        rank: 1
+      reason: MeSH descriptor IDs for medical subject headings matching the query
+    snomedConcepts:
+      sources:
+      - source: snomed
+        call: searchConcepts
+        path: expansion.contains
+        rank: 1
+      reason: SNOMED CT clinical concepts with codes and display terms via FHIR ValueSet expansion
+    snomedConceptDetail:
+      sources:
+      - source: snomed
+        call: getConcept
+        path: parameter
+        rank: 1
+      reason: SNOMED CT concept lookup by code with display name and properties
+    umlsConcepts:
+      sources:
+      - source: umls
+        call: searchConcepts
+        path: result.results
+        rank: 1
+      reason: UMLS Metathesaurus concepts with CUIs for cross-vocabulary term mapping
+    umlsConceptDetail:
+      sources:
+      - source: umls
+        call: getConcept
+        path: result
+        rank: 1
+      reason: UMLS concept details with semantic types and definitions
+    umlsRelations:
+      sources:
+      - source: umls
+        call: getRelations
+        path: result
+        rank: 1
+      reason: UMLS related concepts with relation labels and source vocabularies
+    umlsCrosswalk:
+      sources:
+      - source: umls
+        call: crosswalk
+        path: result
+        rank: 1
+      reason: UMLS terminology crosswalk — atoms and source mappings across vocabularies
+  diseaseClassification:
+    icd11Results:
+      sources:
+      - source: icd
+        call: search
+        path: $passthrough
+        rank: 1
+      reason: WHO ICD-11 disease classification codes and entity matches
+    hpoPhenotypeTerms:
+      sources:
+      - source: hpo
+        call: searchTerms
+        path: terms
+        rank: 1
+      reason: Human Phenotype Ontology terms with definitions and synonym counts
+    hpoTermDetail:
+      sources:
+      - source: hpo
+        call: getTerm
+        path: $passthrough
+        rank: 1
+      reason: HPO term details with definition, synonyms, and descendant count
+  chemicalOntology:
+    chebiResults:
+      sources:
+      - source: chebi
+        call: search
+        path: response.docs
+        rank: 1
+      reason: ChEBI chemical entities with OBO IDs, labels, and ontology descriptions
+    chebiTermDetail:
+      sources:
+      - source: chebi
+        call: getTerm
+        path: _embedded.terms
+        rank: 1
+      reason: ChEBI term details with description, synonyms, and database cross-references
+    rxnormDrugs:
+      sources:
+      - source: rxnorm
+        call: search
+        path: drugGroup.conceptGroup
+        rank: 1
+      reason: RxNorm drug concepts with RxCUIs, names, and term types
+    rxnormRxcui:
+      sources:
+      - source: rxnorm
+        call: getRxcuiByString
+        path: idGroup
+        rank: 1
+      reason: RxNorm concept unique identifier resolved from drug name string
+  geneFunction:
+    goSearchResults:
+      sources:
+      - source: geneontology
+        call: search
+        path: docs
+        rank: 1
+      reason: Gene Ontology term matches with IDs, labels, and categories
+    goTermDetail:
+      sources:
+      - source: geneontology
+        call: getTerm
+        path: $passthrough
+        rank: 1
+      reason: Gene Ontology term definition, synonyms, and alternative IDs
+    goAnnotations:
+      sources:
+      - source: geneontology
+        call: getAnnotations
+        path: associations
+        rank: 1
+      reason: Gene Ontology functional annotations for a gene or gene product
+  idResolution:
+    bioregistryResource:
+      sources:
+      - source: bioregistry
+        call: getResource
+        path: $passthrough
+        rank: 1
+      reason: Bioregistry metadata for the database prefix including URI patterns and descriptions
+    bioregistryResolved:
+      sources:
+      - source: bioregistry
+        call: resolveIdentifier
+        path: providers
+        rank: 1
+      reason: Bioregistry CURIE resolution to provider URLs across databases
+    nameResolved:
+      sources:
+      - source: name-resolution
+        call: resolveIdentifier
+        path: $passthrough
+        rank: 1
+      reason: RENCI Name Resolution mapping text labels to standardized biomedical CURIEs
+    normalizedNodes:
+      sources:
+      - source: node-normalization
+        call: getNormalizedNodes
+        path: $passthrough
+        rank: 1
+      reason: RENCI Node Normalization canonical CURIE with equivalent identifiers and categories
+    identifiersOrgResolved:
+      sources:
+      - source: identifiers-org
+        call: resolve
+        path: payload.resolvedResources
+        rank: 1
+      reason: Identifiers.org CURIE resolution to provider URLs with institutional metadata
+    bridgedbMappings:
+      sources:
+      - source: bridgedb
+        call: searchByAttribute
+        path: searchResults
+        rank: 1
+      reason: BridgeDb cross-database identifier search for biological entities
+    bridgedbIdentifierMap:
+      sources:
+      - source: bridgedb
+        call: mapIdentifiers
+        path: $passthrough
+        rank: 1
+      reason: BridgeDb cross-database identifier mappings for biological entities
+    identifiersOrgNamespace:
+      sources:
+      - source: identifiers-org
+        call: getNamespace
+        path: payload.resolvedResources
+        rank: 1
+      reason: Identifiers.org namespace information with provider URLs and descriptions

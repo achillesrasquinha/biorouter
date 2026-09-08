@@ -1,0 +1,168 @@
+name: bigg-models
+displayName: BiGG Models
+description: BiGG Models — genome-scale metabolic network reconstructions and reactions database
+tags:
+- metabolism
+- metabolic-model
+- systems-biology
+- bigg
+baseUrl: https://bigg.ucsd.edu/api/v2
+tools:
+  searchModels:
+    description: Search BiGG for genome-scale metabolic models by keyword
+    tags:
+    - model-search
+    - metabolic-network
+    method: GET
+    path: /search
+    params:
+      query:
+        type: string
+        required: true
+        description: Search query for models (e.g. "human", "escherichia", "yeast")
+      search_type:
+        type: string
+        default: models
+        description: Type of search — must be "models"
+    response:
+      format: json
+      fields:
+      - results_count
+      - results[].bigg_id
+      - results[].name
+      - results[].organism
+      - results[].model_bigg_id
+    entity: model
+  getModel:
+    description: Get details of a specific genome-scale metabolic model by BiGG identifier
+    tags:
+    - model-detail
+    - metabolic-network
+    method: GET
+    path: /models/{modelId}
+    params:
+      modelId:
+        type: string
+        required: true
+        description: BiGG model identifier (e.g. "iML1515", "iJO1366", "Recon3D")
+    response:
+      format: json
+      fields:
+      - model_bigg_id
+      - organism
+      - metabolite_count
+      - reaction_count
+      - gene_count
+      - reference_id
+      - reference_type
+    entity: model
+  getModelReactions:
+    description: List all reactions in a specific metabolic model
+    tags:
+    - reaction-list
+    - metabolic-network
+    method: GET
+    path: /models/{modelId}/reactions
+    params:
+      modelId:
+        type: string
+        required: true
+        description: BiGG model identifier (e.g. "iML1515")
+    response:
+      format: json
+      fields:
+      - results_count
+      - results[].bigg_id
+      - results[].name
+    entity: reaction
+  getModelMetabolites:
+    description: List all metabolites in a specific metabolic model
+    tags:
+    - metabolite-list
+    - metabolic-network
+    method: GET
+    path: /models/{modelId}/metabolites
+    params:
+      modelId:
+        type: string
+        required: true
+        description: BiGG model identifier (e.g. "iML1515")
+    response:
+      format: json
+      fields:
+      - results_count
+      - results[].bigg_id
+      - results[].name
+    entity: compound
+  searchReactions:
+    description: Search BiGG for metabolic reactions by name or identifier
+    tags:
+    - reaction-search
+    - metabolic-reaction
+    method: GET
+    path: /search
+    params:
+      query:
+        type: string
+        required: true
+        description: Search query for reactions (e.g. "pyruvate kinase", "PFK", "ATP synthase")
+      search_type:
+        type: string
+        default: reactions
+        description: Type of search — must be "reactions"
+    response:
+      format: json
+      fields:
+      - results_count
+      - results[].bigg_id
+      - results[].name
+      - results[].model_bigg_id
+      - results[].organism
+    entity: reaction
+  searchMetabolites:
+    description: Search BiGG for metabolites by name or identifier
+    tags:
+    - metabolite-search
+    - compound-search
+    method: GET
+    path: /search
+    params:
+      query:
+        type: string
+        required: true
+        description: Search query for metabolites (e.g. "glucose", "atp", "pyruvate")
+      search_type:
+        type: string
+        default: metabolites
+        description: Type of search — must be "metabolites"
+    response:
+      format: json
+      fields:
+      - results_count
+      - results[].bigg_id
+      - results[].name
+      - results[].model_bigg_id
+      - results[].organism
+    entity: compound
+tests:
+  searchModels:
+  - name: searches for E. coli metabolic models
+    params:
+      query: Escherichia
+      search_type: models
+    assert:
+    - path: results_count
+      gt: 0
+    - path: results
+      minLength: 1
+  getModel:
+  - name: gets iML1515 E. coli model details
+    params:
+      modelId: iML1515
+    assert:
+    - path: model_bigg_id
+      equals: iML1515
+    - path: reaction_count
+      gt: 0
+    - path: gene_count
+      gt: 0

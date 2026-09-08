@@ -2,11 +2,11 @@ name: encode
 displayName: ENCODE
 description: Encyclopedia of DNA Elements — functional annotations of the human genome
 tags:
-  - epigenomics
-  - encode
-  - regulation
-  - chip-seq
-  - dnase
+- epigenomics
+- encode
+- regulation
+- chip-seq
+- dnase
 baseUrl: https://www.encodeproject.org
 headers:
   Accept: application/json
@@ -14,8 +14,8 @@ tools:
   search:
     description: Search ENCODE experiments by keyword and type
     tags:
-      - experiment-search
-      - encode-search
+    - experiment-search
+    - encode-search
     method: GET
     path: /search/
     params:
@@ -38,19 +38,20 @@ tools:
     response:
       format: json
       fields:
-        - "total"
-        - "@graph[].accession"
-        - "@graph[].assay_term_name"
-        - "@graph[].assay_title"
-        - "@graph[].biosample_summary"
-        - "@graph[].description"
-        - "@graph[].status"
-        - "@graph[].target"
+      - total
+      - '@graph[].accession'
+      - '@graph[].assay_term_name'
+      - '@graph[].assay_title'
+      - '@graph[].biosample_summary'
+      - '@graph[].description'
+      - '@graph[].status'
+      - '@graph[].target'
+    entity: assay
   getExperiment:
     description: Get details of a specific ENCODE experiment by accession
     tags:
-      - experiment-info
-      - encode-detail
+    - experiment-info
+    - encode-detail
     method: GET
     path: /{accession}/
     params:
@@ -65,18 +66,19 @@ tools:
     response:
       format: json
       fields:
-        - "accession"
-        - "assay_term_name"
-        - "description"
-        - "status"
-        - "biosample_summary"
-        - "target.label"
-        - "lab.title"
+      - accession
+      - assay_term_name
+      - description
+      - status
+      - biosample_summary
+      - target.label
+      - lab.title
+    entity: assay
   searchFiles:
     description: Search ENCODE files by dataset or other criteria
     tags:
-      - file-search
-      - encode-files
+    - file-search
+    - encode-files
     method: GET
     path: /search/
     params:
@@ -100,35 +102,95 @@ tools:
     response:
       format: json
       fields:
-        - "total"
-        - "@graph[].accession"
-        - "@graph[].file_format"
-        - "@graph[].file_type"
-        - "@graph[].output_type"
-        - "@graph[].assembly"
-        - "@graph[].status"
+      - total
+      - '@graph[].accession'
+      - '@graph[].file_format'
+      - '@graph[].file_type'
+      - '@graph[].output_type'
+      - '@graph[].assembly'
+      - '@graph[].status'
+    entity: dataset
+  getBiosample:
+    description: Get details of a specific ENCODE biosample
+    tags:
+    - biosample-info
+    - encode-biosample
+    method: GET
+    path: /{accession}/
+    params:
+      accession:
+        type: string
+        required: true
+        description: ENCODE biosample accession
+      format:
+        type: string
+        default: json
+    response:
+      format: json
+      fields:
+      - accession
+      - biosample_ontology.term_name
+      - organism.scientific_name
+      - description
+    entity: sample
+  searchAnnotations:
+    description: Search ENCODE annotation tracks
+    tags:
+    - annotation-search
+    - regulatory-elements
+    method: GET
+    path: /search/
+    params:
+      searchTerm:
+        type: string
+        description: Search term
+      type:
+        type: string
+        default: Annotation
+      format:
+        type: string
+        default: json
+      limit:
+        type: integer
+        default: 10
+    response:
+      format: json
+      fields:
+      - total
+      - '@graph[].accession'
+      - '@graph[].annotation_type'
+      - '@graph[].description'
+    entity: annotation
 tests:
   search:
-    - name: searches for ChIP-seq experiments
-      params:
-        searchTerm: ChIP-seq
-        limit: 3
-      assert:
-        - path: total
-          gt: 0
+  - name: searches for ChIP-seq experiments
+    params:
+      searchTerm: ChIP-seq
+      limit: 3
+    assert:
+    - path: total
+      gt: 0
   getExperiment:
-    - name: gets a specific experiment by accession
-      params:
-        accession: ENCSR245QRV
-      assert:
-        - path: accession
-          equals: ENCSR245QRV
-        - path: assay_term_name
+  - name: gets a specific experiment by accession
+    params:
+      accession: ENCSR245QRV
+    assert:
+    - path: accession
+      equals: ENCSR245QRV
+    - path: assay_term_name
   searchFiles:
-    - name: searches files for an experiment dataset
-      params:
-        dataset: /experiments/ENCSR245QRV/
-        limit: 3
-      assert:
-        - path: total
-          gt: 0
+  - name: searches files for an experiment dataset
+    params:
+      dataset: /experiments/ENCSR245QRV/
+      limit: 3
+    assert:
+    - path: total
+      gt: 0
+  searchAnnotations:
+  - name: searches for ENCODE annotation tracks
+    params:
+      searchTerm: CTCF
+      limit: 3
+    assert:
+    - path: total
+      gt: 0

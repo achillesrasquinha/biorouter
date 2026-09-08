@@ -2,18 +2,18 @@ name: pathway-commons
 displayName: Pathway Commons
 description: Integrated biological pathway and interaction data from multiple sources
 tags:
-  - pathway
-  - interaction
-  - signaling
-  - metabolism
-  - pathway-commons
+- pathway
+- interaction
+- signaling
+- metabolism
+- pathway-commons
 baseUrl: https://www.pathwaycommons.org/pc2
 tools:
   search:
     description: Search pathways and interactions
     tags:
-      - pathway-search
-      - interaction-search
+    - pathway-search
+    - interaction-search
     method: GET
     path: /search
     params:
@@ -31,19 +31,20 @@ tools:
     response:
       format: json
       fields:
-        - numHits
-        - searchHit[].uri
-        - searchHit[].name
-        - searchHit[].biopaxClass
-        - searchHit[].dataSource
-        - searchHit[].numParticipants
-        - searchHit[].numProcesses
-        - searchHit[].pathway
-  get:
+      - numHits
+      - searchHit[].uri
+      - searchHit[].name
+      - searchHit[].biopaxClass
+      - searchHit[].dataSource
+      - searchHit[].numParticipants
+      - searchHit[].numProcesses
+      - searchHit[].pathway
+    entity: pathway
+  getEntity:
     description: Get entity details by URI
     tags:
-      - entity-detail
-      - biopax
+    - entity-detail
+    - biopax
     method: GET
     path: /get
     params:
@@ -58,17 +59,18 @@ tools:
     response:
       format: json
       fields:
-        - '@id'
-        - '@type'
-        - name
-        - dataSource
-        - displayName
-        - comment
+      - '@id'
+      - '@type'
+      - name
+      - dataSource
+      - displayName
+      - comment
+    entity: pathway
   graph:
     description: Get interaction neighborhood graph
     tags:
-      - graph-query
-      - neighborhood
+    - graph-query
+    - neighborhood
     method: GET
     path: /graph
     params:
@@ -87,18 +89,19 @@ tools:
     response:
       format: json
       fields:
-        - '[].PARTICIPANT_A'
-        - '[].INTERACTION_TYPE'
-        - '[].PARTICIPANT_B'
-        - '[].INTERACTION_DATA_SOURCE'
-        - '[].INTERACTION_PUBMED_ID'
+      - '[].PARTICIPANT_A'
+      - '[].INTERACTION_TYPE'
+      - '[].PARTICIPANT_B'
+      - '[].INTERACTION_DATA_SOURCE'
+      - '[].INTERACTION_PUBMED_ID'
+    entity: pathway
 tests:
   search:
-    - name: searches for BRCA1 pathways
-      params:
-        q: BRCA1
-        type: Pathway
-      assert:
-        - {}
-        - path: searchHit
-      allowError: true
+  - name: searches for BRCA1 pathways
+    params:
+      q: BRCA1
+      type: Pathway
+    assert:
+    - {}
+    - path: searchHit
+    allowError: true

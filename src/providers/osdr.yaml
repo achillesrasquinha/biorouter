@@ -2,18 +2,18 @@ name: osdr
 displayName: NASA OSDR
 description: NASA Open Science Data Repository — space biology and radiation genomics datasets from GeneLab
 tags:
-  - space-biology
-  - radiation
-  - genomics
-  - nasa
-  - genelab
+- space-biology
+- radiation
+- genomics
+- nasa
+- genelab
 baseUrl: https://osdr.nasa.gov/osdr/data
 tools:
   searchStudies:
     description: Search GeneLab space biology studies and experiments
     tags:
-      - study-search
-      - space-biology
+    - study-search
+    - space-biology
     method: GET
     path: /search
     params:
@@ -28,13 +28,14 @@ tools:
     response:
       format: json
       fields:
-        - hits.total
-        - hits.hits[]._source
+      - hits.total
+      - hits.hits[]._source
+    entity: gene
 tests:
   searchStudies:
-    - name: searches for radiation studies
-      params:
-        term: radiation
-        size: 3
-      assert:
-        - path: hits.total
+  - name: searches for radiation studies
+    params:
+      term: radiation
+      size: 3
+    assert:
+    - path: hits.total

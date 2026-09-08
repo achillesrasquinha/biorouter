@@ -2,18 +2,18 @@ name: ddbj
 displayName: DDBJ
 description: DNA Data Bank of Japan — nucleotide sequence archive
 tags:
-  - sequence
-  - nucleotide
-  - ddbj
-  - japan
-  - dna
+- sequence
+- nucleotide
+- ddbj
+- japan
+- dna
 baseUrl: https://getentry.ddbj.nig.ac.jp/getentry
 tools:
   getEntry:
     description: Get a DDBJ nucleotide entry by accession
     tags:
-      - sequence-lookup
-      - nucleotide-entry
+    - sequence-lookup
+    - nucleotide-entry
     method: GET
     path: /na/{id}
     params:
@@ -27,15 +27,16 @@ tools:
     response:
       format: keyvalue
       fields:
-        - LOCUS
-        - DEFINITION
-        - ACCESSION
-        - ORGANISM
-        - REFERENCE
+      - LOCUS
+      - DEFINITION
+      - ACCESSION
+      - ORGANISM
+      - REFERENCE
+    entity: dataset
 tests:
   getEntry:
-    - name: gets entry for AB000001
-      params:
-        id: AB000001
-      assert:
-        - isNonEmpty: true
+  - name: gets entry for AB000001
+    params:
+      id: AB000001
+    assert:
+    - isNonEmpty: true

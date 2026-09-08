@@ -2,18 +2,18 @@ name: jaspar
 displayName: JASPAR
 description: JASPAR — open-access database of transcription factor binding profiles
 tags:
-  - transcription-factors
-  - motifs
-  - binding-sites
-  - jaspar
-  - regulation
-baseUrl: https://jaspar.elixir.no/api/v2
+- transcription-factors
+- motifs
+- binding-sites
+- jaspar
+- regulation
+baseUrl: https://jaspar.elixir.no/api/v1
 tools:
   searchMotifs:
     description: Search JASPAR for transcription factor binding profiles by name
     tags:
-      - motif-search
-      - tf-search
+    - motif-search
+    - tf-search
     method: GET
     path: /matrix/
     params:
@@ -33,19 +33,20 @@ tools:
     response:
       format: json
       fields:
-        - count
-        - results[].matrix_id
-        - results[].name
-        - results[].collection
-        - results[].base_id
-        - results[].version
-        - results[].sequence_logo
-        - results[].url
+      - count
+      - results[].matrix_id
+      - results[].name
+      - results[].collection
+      - results[].base_id
+      - results[].version
+      - results[].sequence_logo
+      - results[].url
+    entity: motif
   getMatrix:
     description: Get a specific binding profile matrix by its JASPAR ID
     tags:
-      - motif-info
-      - matrix-info
+    - motif-info
+    - matrix-info
     method: GET
     path: /matrix/{id}/
     params:
@@ -60,33 +61,34 @@ tools:
     response:
       format: json
       fields:
-        - matrix_id
-        - name
-        - collection
-        - version
-        - tax_group
-        - type
-        - class
-        - family
-        - species[].name
-        - species[].tax_id
-        - uniprot_ids
-        - pubmed_ids
-        - sequence_logo
-        - pfm
+      - matrix_id
+      - name
+      - collection
+      - version
+      - tax_group
+      - type
+      - class
+      - family
+      - species[].name
+      - species[].tax_id
+      - uniprot_ids
+      - pubmed_ids
+      - sequence_logo
+      - pfm
+    entity: motif
 tests:
   searchMotifs:
-    - name: searches for TP53 transcription factor motifs
-      params:
-        query: TP53
-      assert:
-        - path: results
-          minLength: 1
+  - name: searches for TP53 transcription factor motifs
+    params:
+      query: TP53
+    assert:
+    - path: results
+      minLength: 1
   getMatrix:
-    - name: gets a specific matrix by ID
-      params:
-        id: MA0106.1
-      assert:
-        - anyOf:
-            - matrix_id
-            - name
+  - name: gets a specific matrix by ID
+    params:
+      id: MA0106.1
+    assert:
+    - anyOf:
+      - matrix_id
+      - name

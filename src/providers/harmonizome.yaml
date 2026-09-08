@@ -2,18 +2,18 @@ name: harmonizome
 displayName: Harmonizome
 description: Harmonizome — unified access to 177 datasets of gene and protein knowledge from Ma'ayan Lab
 tags:
-  - gene-annotations
-  - datasets
-  - integration
-  - harmonizome
-  - maayanlab
+- gene-annotations
+- datasets
+- integration
+- harmonizome
+- maayanlab
 baseUrl: https://maayanlab.cloud/Harmonizome/api/1.0
 tools:
   getGene:
     description: Get gene information and annotations from Harmonizome
     tags:
-      - gene-info
-      - gene-annotations
+    - gene-info
+    - gene-annotations
     method: GET
     path: /gene/{symbol}
     params:
@@ -24,31 +24,33 @@ tools:
     response:
       format: json
       fields:
-        - symbol
-        - name
-        - description
-        - synonyms
-        - ncbiEntrezGeneId
-        - proteins[].symbol
+      - symbol
+      - name
+      - description
+      - synonyms
+      - ncbiEntrezGeneId
+      - proteins[].symbol
+    entity: gene
   listDatasets:
     description: List all 177 available gene/protein datasets
     tags:
-      - dataset-list
-      - data-catalog
+    - dataset-list
+    - data-catalog
     method: GET
     path: /dataset
     params: {}
     response:
       format: json
       fields:
-        - count
-        - entities[].name
-        - entities[].href
+      - count
+      - entities[].name
+      - entities[].href
+    entity: dataset
   getDataset:
     description: Get details about a specific dataset
     tags:
-      - dataset-info
-      - data-details
+    - dataset-info
+    - data-details
     method: GET
     path: /dataset/{name}
     params:
@@ -58,20 +60,21 @@ tools:
         description: Dataset name (e.g. ENCODE Histone Modification Site Profiles)
     response:
       format: json
+    entity: dataset
 tests:
   getGene:
-    - name: gets TP53 gene info
-      params:
-        symbol: TP53
-      assert:
-        - path: symbol
-          equals: TP53
-        - path: name
-        - path: description
+  - name: gets TP53 gene info
+    params:
+      symbol: TP53
+    assert:
+    - path: symbol
+      equals: TP53
+    - path: name
+    - path: description
   listDatasets:
-    - name: lists available datasets
-      params: {}
-      assert:
-        - path: count
-        - path: entities
-          minLength: 1
+  - name: lists available datasets
+    params: {}
+    assert:
+    - path: count
+    - path: entities
+      minLength: 1

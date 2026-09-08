@@ -2,29 +2,30 @@ name: ucsc
 displayName: UCSC Genome Browser
 description: UCSC Genome Browser — genome assemblies, annotations, and track data
 tags:
-  - genome-browser
-  - tracks
-  - ucsc
-  - annotations
+- genome-browser
+- tracks
+- ucsc
+- annotations
 baseUrl: https://api.genome.ucsc.edu
 tools:
   getGenomes:
     description: List available genome assemblies in the UCSC Genome Browser
     tags:
-      - genome-list
-      - assemblies
+    - genome-list
+    - assemblies
     method: GET
     path: /list/ucscGenomes
     params: {}
     response:
       format: json
       fields:
-        - ucscGenomes
+      - ucscGenomes
+    entity: organism
   getTrack:
     description: Get track data for a specific genome, track, and chromosome
     tags:
-      - track-data
-      - annotation-data
+    - track-data
+    - annotation-data
     method: GET
     path: /getData/track
     params:
@@ -49,26 +50,27 @@ tools:
     response:
       format: json
       fields:
-        - genome
-        - track
-        - chrom
-        - start
-        - end
-        - itemsReturned
+      - genome
+      - track
+      - chrom
+      - start
+      - end
+      - itemsReturned
+    entity: gene
 tests:
   getGenomes:
-    - name: lists available genome assemblies
-      params: {}
-      assert:
-        - path: ucscGenomes
-        - path: ucscGenomes.hg38
+  - name: lists available genome assemblies
+    params: {}
+    assert:
+    - path: ucscGenomes
+    - path: ucscGenomes.hg38
   getTrack:
-    - name: gets track data for hg38 gold on chr1
-      params:
-        genome: hg38
-        track: gold
-        chrom: chr1
-        start: 0
-        end: 100000
-      assert:
-        - {}
+  - name: gets track data for hg38 gold on chr1
+    params:
+      genome: hg38
+      track: gold
+      chrom: chr1
+      start: 0
+      end: 100000
+    assert:
+    - {}

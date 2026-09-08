@@ -1,0 +1,633 @@
+description: Profile the molecular landscape of a cancer — mutations, copy number, clinical evidence, and therapeutic targets
+tags:
+- cancer
+- profile
+- mutations
+- genomics
+- therapeutics
+- biorouter
+input:
+  query:
+    type: string
+    required: true
+    description: Cancer type, gene name, study ID, or molecular profile (e.g. "BRCA1 breast cancer", "TP53 lung adenocarcinoma",
+      "pancreatic cancer")
+phases:
+- name: resolve
+  parallel: false
+  calls:
+  - source: oncotree
+    tool: searchTumorType
+    params:
+      query: '{input.query}'
+    pick_best:
+      array: $passthrough
+      match_field: name
+      against: input.query
+      as: best_tumor
+    extract:
+      cancer_code: best_tumor.code
+      cancer_name: best_tumor.name
+      tissue: best_tumor.tissue
+      main_type: best_tumor.mainType
+  - source: cbioportal
+    tool: getCancerTypes
+    params:
+      pageSize: 20
+    pick_best:
+      array: $passthrough
+      match_field: name
+      against: input.query
+      as: best_cbio_type
+    extract:
+      cbio_cancer_id: best_cbio_type.cancerTypeId
+      cbio_cancer_name: best_cbio_type.name
+  - source: gdc
+    tool: searchProjects
+    params:
+      size: 10
+    pick_best:
+      array: data.hits
+      match_field: name
+      against: input.query
+      as: best_project
+    extract:
+      gdc_project_id: best_project.project_id
+      gdc_project_name: best_project.name
+      gdc_disease_type: best_project.disease_type
+      gdc_primary_site: best_project.primary_site
+  - source: civic
+    tool: searchGenes
+    params:
+      symbols:
+      - '{input.query}'
+    pick_best:
+      array: genes.nodes
+      match_field: name
+      against: input.query
+      as: best_civic_gene
+    extract:
+      civic_gene_id: best_civic_gene.id
+      civic_gene_name: best_civic_gene.name
+      civic_mp_id: best_civic_gene.variants.nodes.0.molecularProfiles.nodes.0.id
+      civic_variant_id: best_civic_gene.variants.nodes.0.id
+  - source: cbioportal
+    tool: getGenes
+    params:
+      geneId: '{input.query}'
+    extract:
+      gene_symbol: hugoGeneSymbol
+      entrez_gene_id: entrezGeneId
+  - source: gdc
+    tool: searchGenes
+    params:
+      size: 5
+    pick_best:
+      array: data.hits
+      match_field: symbol
+      against: input.query
+      as: best_gdc_gene
+    extract:
+      gdc_gene_id: best_gdc_gene.gene_id
+      gdc_gene_symbol: best_gdc_gene.symbol
+- name: fetch
+  parallel: true
+  calls:
+  - source: gdc
+    tool: searchMutations
+    params:
+      filters: '{"op":"and","content":[{"op":"in","content":{"field":"consequence.transcript.gene.symbol","value":["{resolved.gene_symbol}"]}},{"op":"in","content":{"field":"project.project_id","value":["{resolved.gdc_project_id}"]}}]}'
+      fields: consequence.transcript.gene.symbol,mutation_subtype,genomic_dna_change
+      size: 20
+    skip_if: '!resolved.gdc_project_id || !resolved.gene_symbol'
+    provides:
+    - mutations
+  - source: cbioportal
+    tool: getMutations
+    params:
+      molecularProfileId: '{resolved.cbio_cancer_id}'
+      sampleListId: '{resolved.cbio_cancer_id}'
+      entrezGeneId: '{resolved.entrez_gene_id}'
+    skip_if: '!resolved.cbio_cancer_id || !resolved.entrez_gene_id'
+    provides:
+    - mutations
+  - source: cbioportal
+    tool: getCopyNumberSegments
+    params:
+      studyId: '{resolved.cbio_cancer_id}'
+    skip_if: '!resolved.cbio_cancer_id'
+    provides:
+    - copyNumber
+  - source: gdc
+    tool: searchCNVs
+    params:
+      filters: '{"op":"in","content":{"field":"cases.project.project_id","value":["{resolved.gdc_project_id}"]}}'
+      fields: gene_level_cn.gene_id,gene_level_cn.copy_number
+      size: 20
+    skip_if: '!resolved.gdc_project_id'
+    provides:
+    - copyNumber
+  - source: cbioportal
+    tool: getMolecularProfiles
+    params:
+      studyId: '{resolved.cbio_cancer_id}'
+    skip_if: '!resolved.cbio_cancer_id'
+    provides:
+    - molecularProfiles
+  - source: civic
+    tool: getMolecularProfile
+    params:
+      id: '{resolved.civic_mp_id}'
+    skip_if: '!resolved.civic_mp_id'
+    provides:
+    - molecularProfiles
+  - source: civic
+    tool: searchVariants
+    params:
+      name: '{input.query}'
+      first: 20
+    provides:
+    - variantEvidence
+  - source: civic
+    tool: getEvidence
+    params:
+      molecularProfileId: '{resolved.civic_mp_id}'
+      first: 20
+    skip_if: '!resolved.civic_mp_id'
+    provides:
+    - variantEvidence
+  - source: civic
+    tool: getVariantDetails
+    params:
+      id: '{resolved.civic_variant_id}'
+    skip_if: '!resolved.civic_variant_id'
+    provides:
+    - variantEvidence
+  - source: civic
+    tool: searchTherapies
+    params:
+      name: '{input.query}'
+      first: 10
+    provides:
+    - variantEvidence
+  - source: civic
+    tool: searchAssertions
+    params:
+      diseaseName: '{input.query}'
+      first: 10
+    provides:
+    - variantEvidence
+  - source: cbioportal
+    tool: getGenes
+    params:
+      geneId: '{resolved.gene_symbol}'
+    skip_if: '!resolved.gene_symbol'
+    provides:
+    - geneContext
+  - source: civic
+    tool: getGeneDetails
+    params:
+      geneId: '{resolved.civic_gene_id}'
+    skip_if: '!resolved.civic_gene_id'
+    provides:
+    - geneContext
+  - source: depmap
+    tool: getGeneDependency
+    params:
+      geneId: '{resolved.gene_symbol}'
+    skip_if: '!resolved.gene_symbol'
+    provides:
+    - dependencies
+  - source: depmap
+    tool: searchGene
+    params:
+      query: '{resolved.gene_symbol}'
+    skip_if: '!resolved.gene_symbol'
+    provides:
+    - dependencies
+  - source: cellosaurus
+    tool: search
+    params:
+      query: '{input.query}'
+    provides:
+    - cellModels
+  - source: cbioportal
+    tool: getClinicalData
+    params:
+      studyId: '{resolved.cbio_cancer_id}'
+    skip_if: '!resolved.cbio_cancer_id'
+    provides:
+    - clinicalData
+  - source: gdc
+    tool: searchCases
+    params:
+      filters: '{"op":"in","content":{"field":"project.project_id","value":["{resolved.gdc_project_id}"]}}'
+      fields: submitter_id,disease_type,primary_site,diagnoses.primary_diagnosis
+      size: 10
+    skip_if: '!resolved.gdc_project_id'
+    provides:
+    - clinicalData
+  - source: cbioportal
+    tool: getSampleList
+    params:
+      studyId: '{resolved.cbio_cancer_id}'
+    skip_if: '!resolved.cbio_cancer_id'
+    provides:
+    - clinicalData
+  - source: gdc
+    tool: searchFiles
+    params:
+      filters: '{"op":"in","content":{"field":"cases.project.project_id","value":["{resolved.gdc_project_id}"]}}'
+      fields: file_name,data_type,data_format,file_size
+      size: 5
+    skip_if: '!resolved.gdc_project_id'
+    provides:
+    - clinicalData
+  - source: oncokb
+    tool: searchByGene
+    params:
+      gene: '{resolved.gene_symbol}'
+    skip_if: '!resolved.gene_symbol'
+    provides:
+    - actionability
+  - source: oncokb
+    tool: getVariantAnnotation
+    params:
+      gene: '{resolved.gene_symbol}'
+      alteration: '{input.query}'
+    skip_if: '!resolved.gene_symbol'
+    provides:
+    - actionability
+  - source: cancerhotspots
+    tool: getHotspotsByGene
+    params:
+      gene: '{resolved.gene_symbol}'
+    skip_if: '!resolved.gene_symbol'
+    provides:
+    - cancerHotspots
+  - source: pdc
+    tool: getGeneData
+    params:
+      geneName: '{resolved.gene_symbol}'
+    skip_if: '!resolved.gene_symbol'
+    provides:
+    - proteomics
+  - source: mavedb
+    tool: searchScoreSets
+    params:
+      query: '{resolved.gene_symbol}'
+    skip_if: '!resolved.gene_symbol'
+    provides:
+    - functionalAssays
+  - source: europepmc
+    tool: search
+    params:
+      query: '{input.query} cancer'
+      pageSize: 5
+    provides:
+    - literature
+  - source: clinicaltrials
+    tool: search
+    params:
+      query: '{input.query}'
+    provides:
+    - trials
+  - source: opentargets
+    tool: searchDisease
+    params:
+      queryString: '{input.query}'
+      size: 5
+    provides:
+    - actionability
+  - source: tcia
+    tool: getCollections
+    params: {}
+    provides:
+    - imaging
+  - source: tcia
+    tool: getPatients
+    params:
+      collection: '{resolved.cancer_code}'
+    skip_if: '!resolved.cancer_code'
+    provides:
+    - imaging
+  - source: gdc
+    tool: searchAnnotations
+    params:
+      fields: annotation_id,category,classification,entity_type
+      size: 10
+    provides:
+    - clinicalData
+  - source: cbioportal
+    tool: getStudies
+    params:
+      pageSize: 20
+    provides:
+    - molecularProfiles
+  - source: oncokb
+    tool: getCancerGeneList
+    params: {}
+    provides:
+    - actionability
+  - source: progenetix
+    tool: searchBiosamples
+    params:
+      filters: '{input.query}'
+      limit: 10
+    provides:
+    - copyNumber
+output:
+  identity:
+    cancerName:
+      sources:
+      - source: oncotree
+        call: searchTumorType
+        path: resolved.cancer_name
+        rank: 1
+      - source: cbioportal
+        call: getCancerTypes
+        path: resolved.cbio_cancer_name
+        rank: 2
+      - source: gdc
+        call: searchProjects
+        path: resolved.gdc_project_name
+        rank: 3
+      reason: Canonical cancer type name resolved across OncoTree, cBioPortal, and GDC
+    cancerCode:
+      from: resolved.cancer_code
+    tissue:
+      from: resolved.tissue
+    mainType:
+      from: resolved.main_type
+    geneSymbol:
+      from: resolved.gene_symbol
+    ids:
+      from: resolved
+      fields:
+      - cancer_code
+      - cbio_cancer_id
+      - gdc_project_id
+      - civic_gene_id
+      - civic_mp_id
+      - civic_variant_id
+      - entrez_gene_id
+      - gdc_gene_id
+  mutations:
+    gdcSomaticMutations:
+      sources:
+      - source: gdc
+        call: searchMutations
+        path: data.hits
+        rank: 1
+      reason: GDC somatic mutations — NCI harmonized mutation calls across TCGA, TARGET, and other programs
+    cbioportalMutations:
+      sources:
+      - source: cbioportal
+        call: getMutations
+        path: $passthrough
+        rank: 2
+      reason: cBioPortal mutations — protein changes, mutation types, and variant classifications for a gene in a study
+  copyNumber:
+    cbioportalCnv:
+      sources:
+      - source: cbioportal
+        call: getCopyNumberSegments
+        path: $passthrough
+        rank: 1
+      reason: cBioPortal copy number segments — segmented copy number data with log2 ratios
+    gdcCnv:
+      sources:
+      - source: gdc
+        call: searchCNVs
+        path: data.hits
+        rank: 1
+      reason: GDC copy number variations — harmonized CNV calls from whole-genome and SNP array data
+    progenetixCnvs:
+      sources:
+      - source: progenetix
+        call: searchBiosamples
+        path: response.resultSets
+        rank: 2
+      reason: Progenetix copy number variation data — cancer biosamples with CNV profiles across tumor types
+  molecularProfiles:
+    cbioportalProfiles:
+      sources:
+      - source: cbioportal
+        call: getMolecularProfiles
+        path: $passthrough
+        rank: 1
+      reason: cBioPortal molecular profiles — available mutation, CNA, expression, and methylation profiles for the study
+    civicMolecular:
+      sources:
+      - source: civic
+        call: getMolecularProfile
+        path: $passthrough
+        rank: 1
+      reason: CIViC molecular profile — curated variant combinations with clinical significance annotations
+    cbioportalStudies:
+      sources:
+      - source: cbioportal
+        call: getStudies
+        path: $passthrough
+        rank: 2
+      reason: cBioPortal cancer genomics studies — available studies with mutation, CNA, and expression data
+  variantEvidence:
+    civicVariants:
+      sources:
+      - source: civic
+        call: searchVariants
+        path: variants.nodes
+        rank: 1
+      reason: CIViC variants — community-curated cancer variants with clinical evidence levels and actionability
+    civicEvidence:
+      sources:
+      - source: civic
+        call: getEvidence
+        path: evidenceItems.nodes
+        rank: 1
+      reason: CIViC evidence items — curated clinical evidence linking variants to diagnoses, prognoses, and therapies
+    civicVariantDetails:
+      sources:
+      - source: civic
+        call: getVariantDetails
+        path: $passthrough
+        rank: 1
+      reason: CIViC variant details — coordinates, allele registry IDs, and associated molecular profiles
+    civicTherapies:
+      sources:
+      - source: civic
+        call: searchTherapies
+        path: therapies
+        rank: 1
+      reason: CIViC therapies — drugs and treatment regimens with variant-level clinical evidence
+    civicAssertions:
+      sources:
+      - source: civic
+        call: searchAssertions
+        path: assertions
+        rank: 1
+      reason: CIViC clinical assertions — expert-reviewed variant-disease-therapy associations with AMP/ASCO/CAP classifications
+  geneContext:
+    cbioportalGenes:
+      sources:
+      - source: cbioportal
+        call: getGenes
+        path: $passthrough
+        rank: 1
+      reason: cBioPortal gene info — Hugo symbol, Entrez ID, and gene type for cancer genomics context
+    civicGenes:
+      sources:
+      - source: civic
+        call: getGeneDetails
+        path: $passthrough
+        rank: 1
+      reason: CIViC gene details — gene descriptions, aliases, and associated variant counts for clinical interpretation
+  dependencies:
+    depmapDependency:
+      sources:
+      - source: depmap
+        call: getGeneDependency
+        path: $passthrough
+        rank: 1
+      reason: DepMap gene dependency — CRISPR essentiality scores across hundreds of cancer cell lines
+    depmapGeneSearch:
+      sources:
+      - source: depmap
+        call: searchGene
+        path: $passthrough
+        rank: 1
+      reason: DepMap gene essentiality overview — gene fitness effects across cancer cell line panels
+  cellModels:
+    cellosaurusLines:
+      sources:
+      - source: cellosaurus
+        call: search
+        path: $passthrough
+        rank: 1
+      reason: Cellosaurus cell line knowledge base — species, disease, cross-references, and STR profiles for cancer cell lines
+  clinicalData:
+    cbioportalClinical:
+      sources:
+      - source: cbioportal
+        call: getClinicalData
+        path: $passthrough
+        rank: 1
+      reason: cBioPortal clinical data — patient demographics, staging, survival, and treatment history
+    gdcCases:
+      sources:
+      - source: gdc
+        call: searchCases
+        path: data.hits
+        rank: 1
+      reason: GDC clinical cases — TCGA and TARGET patient data with diagnosis, treatment, and follow-up
+    cbioportalSamples:
+      sources:
+      - source: cbioportal
+        call: getSampleList
+        path: $passthrough
+        rank: 1
+      reason: cBioPortal sample lists — sample groupings by molecular profile type within a study
+    gdcFiles:
+      sources:
+      - source: gdc
+        call: searchFiles
+        path: data.hits
+        rank: 1
+      reason: GDC data files — available genomic and clinical data files for download and analysis
+    gdcAnnotations:
+      sources:
+      - source: gdc
+        call: searchAnnotations
+        path: data.hits
+        rank: 1
+      reason: GDC annotations — data quality notes and annotations for cancer genomics data
+  actionability:
+    annotatedVariants:
+      sources:
+      - source: oncokb
+        call: searchByGene
+        path: $passthrough
+        rank: 1
+      reason: OncoKB annotated variants — oncogenicity, mutation effect, and therapeutic sensitivity/resistance levels for the gene
+    variantAnnotation:
+      sources:
+      - source: oncokb
+        call: getVariantAnnotation
+        path: $passthrough
+        rank: 1
+      reason: OncoKB variant annotation — protein-change-level oncogenicity, mutation effect, and FDA-approved treatment levels
+    diseaseTargets:
+      sources:
+      - source: opentargets
+        call: searchDisease
+        path: search.hits
+        rank: 1
+      reason: Open Targets disease search — disease/target associations for this cancer type
+    cancerGeneList:
+      sources:
+      - source: oncokb
+        call: getCancerGeneList
+        path: $passthrough
+        rank: 1
+      reason: OncoKB curated cancer gene list — oncogenes and tumor suppressors with therapeutic levels
+  cancerHotspots:
+    hotspotResidues:
+      sources:
+      - source: cancerhotspots
+        call: getHotspotsByGene
+        path: $passthrough
+        rank: 1
+      reason: Cancer Hotspots — statistically significant recurrent somatic mutation hotspots with residue-level detail
+  proteomics:
+    pdcSpectralCounts:
+      sources:
+      - source: pdc
+        call: getGeneData
+        path: geneSpectralCount
+        rank: 1
+      reason: PDC proteomic data — protein spectral counts and distinct peptide counts across NCI cancer studies
+  functionalAssays:
+    mavedbScoreSets:
+      sources:
+      - source: mavedb
+        call: searchScoreSets
+        path: $passthrough
+        rank: 1
+      reason: MaveDB score sets — multiplexed assay variant effect data for functional impact assessment
+  literature:
+    publications:
+      sources:
+      - source: europepmc
+        call: search
+        path: resultList.result
+        rank: 1
+      reason: Recent cancer-related biomedical literature from Europe PMC
+    publicationCount:
+      sources:
+      - source: europepmc
+        call: search
+        path: hitCount
+        rank: 1
+  trials:
+    activeTrials:
+      sources:
+      - source: clinicaltrials
+        call: search
+        path: $passthrough
+        rank: 1
+      reason: ClinicalTrials.gov — active and recruiting trials for this cancer type
+  imaging:
+    tciaCollections:
+      sources:
+      - source: tcia
+        call: getCollections
+        path: $passthrough
+        rank: 1
+      reason: TCIA — available cancer imaging collections from The Cancer Imaging Archive
+    tciaPatients:
+      sources:
+      - source: tcia
+        call: getPatients
+        path: $passthrough
+        rank: 1
+      reason: TCIA — patient imaging study data for the matched cancer collection

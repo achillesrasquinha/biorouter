@@ -2,16 +2,16 @@ name: cellosaurus
 displayName: Cellosaurus
 description: Knowledge resource on cell lines — cell line identification and characterization
 tags:
-  - cell-line
-  - cell-culture
-  - cellosaurus
-  - biobank
+- cell-line
+- cell-culture
+- cellosaurus
+- biobank
 baseUrl: https://api.cellosaurus.org
 tools:
   search:
     description: Search cell lines by name or keyword
     tags:
-      - cell-line-search
+    - cell-line-search
     method: GET
     path: /search/cell-line
     params:
@@ -27,18 +27,19 @@ tools:
     response:
       format: json
       fields:
-        - Cellosaurus.cell-line-list[].accession-list
-        - Cellosaurus.cell-line-list[].name-list
-        - Cellosaurus.cell-line-list[].category
-        - Cellosaurus.cell-line-list[].sex
-        - Cellosaurus.cell-line-list[].age
-        - Cellosaurus.cell-line-list[].species-list
-        - Cellosaurus.cell-line-list[].disease-list
+      - Cellosaurus.cell-line-list[].accession-list
+      - Cellosaurus.cell-line-list[].name-list
+      - Cellosaurus.cell-line-list[].category
+      - Cellosaurus.cell-line-list[].sex
+      - Cellosaurus.cell-line-list[].age
+      - Cellosaurus.cell-line-list[].species-list
+      - Cellosaurus.cell-line-list[].disease-list
+    entity: sample
   getCellLine:
     description: Get cell line details by Cellosaurus accession
     tags:
-      - cell-line-info
-      - cell-line-details
+    - cell-line-info
+    - cell-line-details
     method: GET
     path: /cell-line/{accession}
     params:
@@ -53,24 +54,25 @@ tools:
     response:
       format: json
       fields:
-        - Cellosaurus.cell-line-list[].accession-list
-        - Cellosaurus.cell-line-list[].name-list
-        - Cellosaurus.cell-line-list[].category
-        - Cellosaurus.cell-line-list[].sex
-        - Cellosaurus.cell-line-list[].age
-        - Cellosaurus.cell-line-list[].species-list
-        - Cellosaurus.cell-line-list[].disease-list
-        - Cellosaurus.cell-line-list[].derived-from-site-list
+      - Cellosaurus.cell-line-list[].accession-list
+      - Cellosaurus.cell-line-list[].name-list
+      - Cellosaurus.cell-line-list[].category
+      - Cellosaurus.cell-line-list[].sex
+      - Cellosaurus.cell-line-list[].age
+      - Cellosaurus.cell-line-list[].species-list
+      - Cellosaurus.cell-line-list[].disease-list
+      - Cellosaurus.cell-line-list[].derived-from-site-list
+    entity: sample
 tests:
   search:
-    - name: searches for HeLa cell lines
-      params:
-        query: HeLa
-      assert:
-        - path: Cellosaurus.cell-line-list
-          minLength: 1
+  - name: searches for HeLa cell lines
+    params:
+      query: HeLa
+    assert:
+    - path: Cellosaurus.cell-line-list
+      minLength: 1
   getCellLine:
-    - name: gets HeLa cell line by accession
-      params:
-        accession: CVCL_0030
-      assert: []
+  - name: gets HeLa cell line by accession
+    params:
+      accession: CVCL_0030
+    assert: []

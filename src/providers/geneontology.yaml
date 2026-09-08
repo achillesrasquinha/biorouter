@@ -2,17 +2,17 @@ name: geneontology
 displayName: Gene Ontology
 description: Gene Ontology API — GO terms, annotations, and bioentity information
 tags:
-  - gene-ontology
-  - go
-  - functional-annotation
-  - biological-process
+- gene-ontology
+- go
+- functional-annotation
+- biological-process
 baseUrl: https://api.geneontology.org/api
 tools:
   search:
     description: Search Gene Ontology for terms by keyword using autocomplete
     tags:
-      - go-term-search
-      - ontology-search
+    - go-term-search
+    - ontology-search
     method: GET
     path: /search/entity/autocomplete/{query}
     params:
@@ -27,17 +27,18 @@ tools:
     response:
       format: json
       fields:
-        - "docs[].id"
-        - "docs[].label"
-        - "docs[].name"
-        - "docs[].taxon"
-        - "docs[].taxon_label"
-        - "docs[].category"
+      - docs[].id
+      - docs[].label
+      - docs[].name
+      - docs[].taxon
+      - docs[].taxon_label
+      - docs[].category
+    entity: gene
   getTerm:
     description: Get detailed information about a specific GO term
     tags:
-      - go-term-detail
-      - ontology-term
+    - go-term-detail
+    - ontology-term
     method: GET
     path: /ontology/term/{go_id}
     params:
@@ -48,26 +49,82 @@ tools:
     response:
       format: json
       fields:
-        - "goid"
-        - "label"
-        - "definition"
-        - "synonyms"
-        - "alternativeIds"
-        - "comment"
+      - goid
+      - label
+      - definition
+      - synonyms
+      - alternativeIds
+      - comment
+    entity: ontology-term
+  getAnnotations:
+    description: Get GO annotations for a gene or gene product
+    tags:
+    - go-annotations
+    - functional-annotation
+    method: GET
+    path: /bioentity/gene/{geneId}/function
+    params:
+      geneId:
+        type: string
+        required: true
+        description: Gene ID using HGNC or UniProtKB prefix (e.g. HGNC:1100 for BRCA1, UniProtKB:P04637 for TP53)
+      rows:
+        type: integer
+        default: 20
+    response:
+      format: json
+      fields:
+      - associations[].object.id
+      - associations[].object.label
+      - associations[].qualifiers
+    entity: annotation
+  getSharedAncestors:
+    description: Get shared ancestor GO terms between two GO terms
+    tags:
+    - go-shared-ancestors
+    - ontology-comparison
+    method: GET
+    path: /ontology/shared/{subject}/{object}
+    params:
+      subject:
+        type: string
+        required: true
+        description: First GO term identifier (e.g. GO:0006259)
+      object:
+        type: string
+        required: true
+        description: Second GO term identifier (e.g. GO:0016070)
+    response:
+      format: json
+    entity: ontology-term
 tests:
   search:
-    - name: searches for apoptosis GO terms
-      params:
-        query: apoptosis
-      assert:
-        - path: docs
-          minLength: 1
+  - name: searches for apoptosis GO terms
+    params:
+      query: apoptosis
+    assert:
+    - path: docs
+      minLength: 1
   getTerm:
-    - name: gets GO:0006915 apoptotic process term
-      params:
-        go_id: GO:0006915
-      assert:
-        - path: label
-          equals: apoptotic process
-        - path: goid
-          equals: GO:0006915
+  - name: gets GO:0006915 apoptotic process term
+    params:
+      go_id: GO:0006915
+    assert:
+    - path: label
+      equals: apoptotic process
+    - path: goid
+      equals: GO:0006915
+  getAnnotations:
+  - name: gets GO annotations for BRCA1
+    params:
+      geneId: HGNC:1100
+    assert:
+    - path: associations
+      minLength: 1
+  getSharedAncestors:
+  - name: gets shared ancestors between two GO terms
+    params:
+      subject: GO:0006259
+      object: GO:0016070
+    assert:
+    - {}

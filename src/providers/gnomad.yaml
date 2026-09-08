@@ -2,51 +2,35 @@ name: gnomad
 displayName: gnomAD
 description: Genome Aggregation Database — population variant frequencies and annotations
 tags:
-  - variants
-  - population-genetics
-  - allele-frequency
-  - gnomad
+- variants
+- population-genetics
+- allele-frequency
+- gnomad
 baseUrl: https://gnomad.broadinstitute.org/api
 protocol: graphql
 tools:
   searchVariant:
     description: Search for gene information and variant summary by gene symbol
     tags:
-      - variant-search
-      - gene-lookup
-    query: |
-      query($geneSymbol: String!, $referenceGenome: ReferenceGenomeId!) {
-        gene(gene_symbol: $geneSymbol, reference_genome: $referenceGenome) {
-          gene_id
-          symbol
-          name
-          chrom
-          start
-          stop
-          gnomad_constraint {
-            pLI
-            oe_mis
-            oe_mis_lower
-            oe_mis_upper
-            oe_lof
-            oe_lof_lower
-            oe_lof_upper
-          }
-        }
-      }
+    - variant-search
+    - gene-lookup
+    query: "query($geneSymbol: String!, $referenceGenome: ReferenceGenomeId!) {\n  gene(gene_symbol: $geneSymbol, reference_genome:\
+      \ $referenceGenome) {\n    gene_id\n    symbol\n    name\n    chrom\n    start\n    stop\n    gnomad_constraint {\n\
+      \      pLI\n      oe_mis\n      oe_mis_lower\n      oe_mis_upper\n      oe_lof\n      oe_lof_lower\n      oe_lof_upper\n\
+      \    }\n  }\n}\n"
     response:
       format: json
       fields:
-        - gene.symbol
-        - gene.name
-        - gene.gene_id
-        - gene.gnomad_constraint.pLI
-        - gene.gnomad_constraint.oe_mis
-        - gene.gnomad_constraint.oe_mis_lower
-        - gene.gnomad_constraint.oe_mis_upper
-        - gene.gnomad_constraint.oe_lof
-        - gene.gnomad_constraint.oe_lof_lower
-        - gene.gnomad_constraint.oe_lof_upper
+      - gene.symbol
+      - gene.name
+      - gene.gene_id
+      - gene.gnomad_constraint.pLI
+      - gene.gnomad_constraint.oe_mis
+      - gene.gnomad_constraint.oe_mis_lower
+      - gene.gnomad_constraint.oe_mis_upper
+      - gene.gnomad_constraint.oe_lof
+      - gene.gnomad_constraint.oe_lof_lower
+      - gene.gnomad_constraint.oe_lof_upper
     params:
       geneSymbol:
         type: string
@@ -56,39 +40,26 @@ tools:
         type: string
         default: GRCh37
         description: Reference genome (GRCh37 or GRCh38)
+    entity: variant
   getVariant:
     description: Get a specific variant by its gnomAD variant ID
     tags:
-      - variant-info
-      - allele-frequency
-    query: |
-      query($variantId: String!, $dataset: DatasetId!) {
-        variant(variantId: $variantId, dataset: $dataset) {
-          variantId
-          rsids
-          exome {
-            ac
-            an
-            af
-          }
-          genome {
-            ac
-            an
-            af
-          }
-        }
-      }
+    - variant-info
+    - allele-frequency
+    query: "query($variantId: String!, $dataset: DatasetId!) {\n  variant(variantId: $variantId, dataset: $dataset) {\n  \
+      \  variantId\n    rsids\n    exome {\n      ac\n      an\n      af\n    }\n    genome {\n      ac\n      an\n      af\n\
+      \    }\n  }\n}\n"
     response:
       format: json
       fields:
-        - variant.variantId
-        - variant.rsids
-        - variant.exome.ac
-        - variant.exome.an
-        - variant.exome.af
-        - variant.genome.ac
-        - variant.genome.an
-        - variant.genome.af
+      - variant.variantId
+      - variant.rsids
+      - variant.exome.ac
+      - variant.exome.an
+      - variant.exome.af
+      - variant.genome.ac
+      - variant.genome.an
+      - variant.genome.af
     params:
       variantId:
         type: string
@@ -98,25 +69,15 @@ tools:
         type: string
         default: gnomad_r2_1
         description: Dataset version (e.g. gnomad_r2_1, gnomad_r4)
+    entity: variant
   getGeneVariants:
     description: Get variants for a gene with allele frequency data
     tags:
-      - gene-variants
-      - allele-frequency
-    query: |
-      query($geneId: String!, $dataset: DatasetId!, $referenceGenome: ReferenceGenomeId!) {
-        gene(gene_id: $geneId, reference_genome: $referenceGenome) {
-          variants(dataset: $dataset) {
-            variant_id
-            rsids
-            consequence
-            hgvsc
-            hgvsp
-            exome { ac an af }
-            genome { ac an af }
-          }
-        }
-      }
+    - gene-variants
+    - allele-frequency
+    query: "query($geneId: String!, $dataset: DatasetId!, $referenceGenome: ReferenceGenomeId!) {\n  gene(gene_id: $geneId,\
+      \ reference_genome: $referenceGenome) {\n    variants(dataset: $dataset) {\n      variant_id\n      rsids\n      consequence\n\
+      \      hgvsc\n      hgvsp\n      exome { ac an af }\n      genome { ac an af }\n    }\n  }\n}\n"
     params:
       geneId:
         type: string
@@ -133,25 +94,20 @@ tools:
     response:
       format: json
       fields:
-        - gene.variants[].variant_id
-        - gene.variants[].rsids
-        - gene.variants[].consequence
-        - gene.variants[].exome.af
-        - gene.variants[].genome.af
+      - gene.variants[].variant_id
+      - gene.variants[].rsids
+      - gene.variants[].consequence
+      - gene.variants[].exome.af
+      - gene.variants[].genome.af
+    entity: gene
   getTranscript:
     description: Get transcript-level constraint and exon information
     tags:
-      - transcript
-      - constraint
-    query: |
-      query($transcriptId: String!, $referenceGenome: ReferenceGenomeId!) {
-        transcript(transcript_id: $transcriptId, reference_genome: $referenceGenome) {
-          transcript_id
-          gene { gene_id symbol }
-          gnomad_constraint { pLI oe_mis oe_lof }
-          exons { start stop }
-        }
-      }
+    - transcript
+    - constraint
+    query: "query($transcriptId: String!, $referenceGenome: ReferenceGenomeId!) {\n  transcript(transcript_id: $transcriptId,\
+      \ reference_genome: $referenceGenome) {\n    transcript_id\n    gene { gene_id symbol }\n    gnomad_constraint { pLI\
+      \ oe_mis oe_lof }\n    exons { start stop }\n  }\n}\n"
     params:
       transcriptId:
         type: string
@@ -164,28 +120,21 @@ tools:
     response:
       format: json
       fields:
-        - transcript.transcript_id
-        - transcript.gene.symbol
-        - transcript.gnomad_constraint.pLI
-        - transcript.exons[].start
-        - transcript.exons[].stop
+      - transcript.transcript_id
+      - transcript.gene.symbol
+      - transcript.gnomad_constraint.pLI
+      - transcript.exons[].start
+      - transcript.exons[].stop
+    entity: expression
   getRegion:
     description: Get variants in a genomic region
     tags:
-      - region
-      - variant-search
-    query: |
-      query($chrom: String!, $start: Int!, $stop: Int!, $dataset: DatasetId!, $referenceGenome: ReferenceGenomeId!) {
-        region(chrom: $chrom, start: $start, stop: $stop, reference_genome: $referenceGenome) {
-          variants(dataset: $dataset) {
-            variant_id
-            rsids
-            consequence
-            exome { ac an af }
-            genome { ac an af }
-          }
-        }
-      }
+    - region
+    - variant-search
+    query: "query($chrom: String!, $start: Int!, $stop: Int!, $dataset: DatasetId!, $referenceGenome: ReferenceGenomeId!)\
+      \ {\n  region(chrom: $chrom, start: $start, stop: $stop, reference_genome: $referenceGenome) {\n    variants(dataset:\
+      \ $dataset) {\n      variant_id\n      rsids\n      consequence\n      exome { ac an af }\n      genome { ac an af }\n\
+      \    }\n  }\n}\n"
     params:
       chrom:
         type: string
@@ -210,32 +159,20 @@ tools:
     response:
       format: json
       fields:
-        - region.variants[].variant_id
-        - region.variants[].rsids
-        - region.variants[].consequence
-        - region.variants[].exome.af
-        - region.variants[].genome.af
+      - region.variants[].variant_id
+      - region.variants[].rsids
+      - region.variants[].consequence
+      - region.variants[].exome.af
+      - region.variants[].genome.af
+    entity: variant
   getStructuralVariants:
     description: Get structural variants for a gene
     tags:
-      - structural-variant
-      - sv
-    query: |
-      query($geneSymbol: String!, $referenceGenome: ReferenceGenomeId!) {
-        gene(gene_symbol: $geneSymbol, reference_genome: $referenceGenome) {
-          structural_variants(dataset: gnomad_sv_r2_1) {
-            variant_id
-            type
-            consequence
-            chrom
-            pos
-            end
-            ac
-            an
-            af
-          }
-        }
-      }
+    - structural-variant
+    - sv
+    query: "query($geneSymbol: String!, $referenceGenome: ReferenceGenomeId!) {\n  gene(gene_symbol: $geneSymbol, reference_genome:\
+      \ $referenceGenome) {\n    structural_variants(dataset: gnomad_sv_r2_1) {\n      variant_id\n      type\n      consequence\n\
+      \      chrom\n      pos\n      end\n      ac\n      an\n      af\n    }\n  }\n}\n"
     params:
       geneSymbol:
         type: string
@@ -248,60 +185,43 @@ tools:
     response:
       format: json
       fields:
-        - gene.structural_variants[].variant_id
-        - gene.structural_variants[].type
-        - gene.structural_variants[].consequence
-        - gene.structural_variants[].chrom
-        - gene.structural_variants[].pos
-        - gene.structural_variants[].end
-        - gene.structural_variants[].af
+      - gene.structural_variants[].variant_id
+      - gene.structural_variants[].type
+      - gene.structural_variants[].consequence
+      - gene.structural_variants[].chrom
+      - gene.structural_variants[].pos
+      - gene.structural_variants[].end
+      - gene.structural_variants[].af
+    entity: variant
   getMitochondrialVariants:
     description: Get mitochondrial variants from gnomAD
     tags:
-      - mitochondrial
-      - variant
-    query: |
-      query {
-        mitochondrial_variants(dataset: gnomad_r3) {
-          variant_id
-          consequence
-          an
-          ac_hom
-          af_hom
-          max_heteroplasmy
-        }
-      }
+    - mitochondrial
+    - variant
+    query: "query($variantId: String!) {\n  mitochondrial_variant(variant_id: $variantId, dataset: gnomad_r4) {\n    variant_id\n\
+      \    an\n    ac_hom\n    ac_het\n    max_heteroplasmy\n  }\n}\n"
     params:
-      first:
-        type: integer
-        default: 25
-        description: Number of results to return
+      variantId:
+        type: string
+        required: true
+        description: Mitochondrial variant ID in chrom-pos-ref-alt format (e.g. M-8557-G-A)
     response:
       format: json
       fields:
-        - mitochondrial_variants[].variant_id
-        - mitochondrial_variants[].consequence
-        - mitochondrial_variants[].an
-        - mitochondrial_variants[].ac_hom
-        - mitochondrial_variants[].af_hom
-        - mitochondrial_variants[].max_heteroplasmy
+      - mitochondrial_variant.variant_id
+      - mitochondrial_variant.an
+      - mitochondrial_variant.ac_hom
+      - mitochondrial_variant.ac_het
+      - mitochondrial_variant.max_heteroplasmy
+    entity: variant
   getCopyNumberVariants:
     description: Get copy number variants for a gene
     tags:
-      - copy-number-variant
-      - cnv
-    query: |
-      query($geneSymbol: String!, $referenceGenome: ReferenceGenomeId!) {
-        gene(gene_symbol: $geneSymbol, reference_genome: $referenceGenome) {
-          copy_number_variants(dataset: gnomad_cnv_r4) {
-            variant_id
-            type
-            sc
-            sn
-            sf
-          }
-        }
-      }
+    - copy-number-variant
+    - cnv
+    query: "query($geneSymbol: String!, $referenceGenome: ReferenceGenomeId!) {\n  gene(gene_symbol: $geneSymbol, reference_genome:\
+      \ $referenceGenome) {\n    copy_number_variants(dataset: gnomad_cnv_r4) {\n      variant_id\n      type\n      sc\n\
+      \      sn\n      sf\n    }\n  }\n}\n"
     params:
       geneSymbol:
         type: string
@@ -314,73 +234,76 @@ tools:
     response:
       format: json
       fields:
-        - gene.copy_number_variants[].variant_id
-        - gene.copy_number_variants[].type
-        - gene.copy_number_variants[].sc
-        - gene.copy_number_variants[].sn
-        - gene.copy_number_variants[].sf
+      - gene.copy_number_variants[].variant_id
+      - gene.copy_number_variants[].type
+      - gene.copy_number_variants[].sc
+      - gene.copy_number_variants[].sn
+      - gene.copy_number_variants[].sf
+    entity: variant
 tests:
   searchVariant:
-    - name: searches for PCSK9 gene information
-      params:
-        geneSymbol: PCSK9
-      assert:
-        - path: gene
-        - path: gene.gene_id
-        - path: gene.symbol
-          equals: PCSK9
+  - name: searches for PCSK9 gene information
+    params:
+      geneSymbol: PCSK9
+    assert:
+    - path: gene
+    - path: gene.gene_id
+    - path: gene.symbol
+      equals: PCSK9
   getVariant:
-    - name: gets a specific variant by ID
-      params:
-        variantId: 1-55516888-G-A
-      assert:
-        - path: variant
-        - path: variant.variantId
-          equals: 1-55516888-G-A
+  - name: gets a specific variant by ID
+    params:
+      variantId: 1-55516888-G-A
+    assert:
+    - path: variant
+    - path: variant.variantId
+      equals: 1-55516888-G-A
   getGeneVariants:
-    - name: gets variants for BRCA2 gene
-      params:
-        geneId: ENSG00000139618
-        dataset: gnomad_r2_1
-        referenceGenome: GRCh37
-      assert:
-        - path: gene.variants
+  - name: gets variants for BRCA2 gene
+    params:
+      geneId: ENSG00000139618
+      dataset: gnomad_r2_1
+      referenceGenome: GRCh37
+    assert:
+    - path: gene.variants
   getTranscript:
-    - name: gets transcript info for ENST00000357654
-      params:
-        transcriptId: ENST00000357654
-        referenceGenome: GRCh37
-      assert:
-        - path: transcript.transcript_id
-          equals: ENST00000357654
-        - path: transcript.gene.symbol
+  - name: gets transcript info for ENST00000357654
+    params:
+      transcriptId: ENST00000357654
+      referenceGenome: GRCh37
+    assert:
+    - path: transcript.transcript_id
+      equals: ENST00000357654
+    - path: transcript.gene.symbol
   getRegion:
-    - name: gets variants in a region on chromosome 1
-      params:
-        chrom: "1"
-        start: 55516888
-        stop: 55516988
-        dataset: gnomad_r2_1
-        referenceGenome: GRCh37
-      assert:
-        - path: region
+  - name: gets variants in a region on chromosome 1
+    params:
+      chrom: '1'
+      start: 55516888
+      stop: 55516988
+      dataset: gnomad_r2_1
+      referenceGenome: GRCh37
+    assert:
+    - path: region
   getStructuralVariants:
-    - name: gets structural variants for BRCA1
-      params:
-        geneSymbol: BRCA1
-        referenceGenome: GRCh37
-      assert:
-        - path: gene
+  - name: gets structural variants for BRCA1
+    params:
+      geneSymbol: BRCA1
+      referenceGenome: GRCh37
+    assert:
+    - path: gene
   getMitochondrialVariants:
-    - name: gets mitochondrial variants
-      params:
-        first: 10
-      assert:
-        - path: mitochondrial_variants
+  - name: gets mitochondrial variant by ID
+    params:
+      variantId: M-8557-G-A
+    assert:
+    - path: mitochondrial_variant
+    - path: mitochondrial_variant.variant_id
+      equals: M-8557-G-A
   getCopyNumberVariants:
-    - name: gets copy number variants for BRCA1
-      params:
-        geneSymbol: BRCA1
-        referenceGenome: GRCh38
-      assert:
-        - path: gene
+  - name: gets copy number variants for BRCA1
+    params:
+      geneSymbol: BRCA1
+      referenceGenome: GRCh38
+    assert:
+    - path: gene

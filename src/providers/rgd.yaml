@@ -1,0 +1,129 @@
+name: rgd
+displayName: Rat Genome Database
+description: Rat Genome Database (RGD) — rat genetics, genomics, and disease model data
+tags:
+- rat
+- model-organism
+- genetics
+- rgd
+baseUrl: https://rest.rgd.mcw.edu/rgdws
+tools:
+  searchGenes:
+    description: Search RGD for rat genes by symbol (returns a single gene object for the given species)
+    tags:
+    - gene-search
+    - rat-gene
+    method: GET
+    path: /genes/{query}/{speciesTypeKey}
+    params:
+      query:
+        type: string
+        required: true
+        description: Gene symbol (e.g. "Tp53", "Brca1")
+      speciesTypeKey:
+        type: integer
+        default: 3
+        description: Species type key (1=human, 2=mouse, 3=rat)
+    response:
+      format: json
+      fields:
+      - rgdId
+      - symbol
+      - name
+      - description
+      - chromosome
+      - type
+    entity: gene
+  getGene:
+    description: Get detailed gene information by RGD ID
+    tags:
+    - gene-detail
+    - gene-info
+    method: GET
+    path: /genes/{rgdId}
+    params:
+      rgdId:
+        type: integer
+        required: true
+        description: RGD gene identifier (e.g. 3889 for Tp53)
+    response:
+      format: json
+      fields:
+      - rgdId
+      - symbol
+      - name
+      - description
+      - chromosome
+      - type
+      - speciesTypeKey
+      - ncbiGeneId
+    entity: gene
+  getOrthologs:
+    description: Get all orthologs of a gene across species
+    tags:
+    - ortholog
+    - comparative-genomics
+    method: GET
+    path: /genes/orthologs/{rgdId}
+    params:
+      rgdId:
+        type: integer
+        required: true
+        description: RGD gene identifier (e.g. 3889 for Tp53)
+    response:
+      format: json
+      fields:
+      - '[].rgdId'
+      - '[].symbol'
+      - '[].name'
+      - '[].speciesTypeKey'
+      - '[].chromosome'
+    entity: gene
+  searchStrains:
+    description: Search RGD for rat strains by keyword
+    tags:
+    - strain-search
+    - rat-strain
+    method: GET
+    path: /strains/search/{query}
+    params:
+      query:
+        type: string
+        required: true
+        description: Search term for rat strains (e.g. "SHR", "Wistar")
+    response:
+      format: json
+      fields:
+      - '[].strainRgdId'
+      - '[].strain'
+      - '[].diseaseOrPhenotypeTerm'
+      - '[].evidence'
+    entity: organism
+tests:
+  searchGenes:
+  - name: searches for Tp53 gene in rat
+    params:
+      query: Tp53
+      speciesTypeKey: 3
+    assert:
+    - path: symbol
+      equals: Tp53
+  getGene:
+  - name: gets gene details for Tp53
+    params:
+      rgdId: 3889
+    assert:
+    - path: symbol
+      equals: Tp53
+  getOrthologs:
+  - name: gets all orthologs of rat Tp53
+    params:
+      rgdId: 3889
+    assert:
+    - minLength: 1
+  searchStrains:
+  - name: searches for SHR strain
+    params:
+      query: SHR
+    assert:
+    - minLength: 1

@@ -1,0 +1,379 @@
+description: Map drug interactions — mechanisms, targets, gene interactions, indications, and bioactivity
+tags:
+- compound
+- interactions
+- drug
+- targets
+- mechanisms
+- biorouter
+input:
+  query:
+    type: string
+    required: true
+    description: Drug name, SMILES, InChIKey, PubChem CID, or ChEMBL ID
+phases:
+- name: resolve
+  parallel: false
+  calls:
+  - source: mychem
+    tool: search
+    params:
+      query: '{input.query}'
+    pick_best:
+      array: hits
+      match_field: chembl.pref_name
+      against: input.query
+      as: best_hit
+    extract:
+      inchikey: best_hit._id
+      name: best_hit.chembl.pref_name
+      chembl_id: best_hit.chembl.molecule_chembl_id
+      pubchem_cid: best_hit.pubchem.cid
+      rxcui: best_hit.drugbank.rxcui
+    provides: []
+  - source: chembl
+    tool: getMolecule
+    params:
+      chemblId: '{resolved.chembl_id}'
+    skip_if: '!resolved.chembl_id'
+    extract:
+      canonical_smiles: molecule_structures.canonical_smiles
+    provides: []
+- name: fetch
+  parallel: true
+  calls:
+  - source: chembl
+    tool: getMechanism
+    params:
+      molecule_chembl_id: '{resolved.chembl_id}'
+      limit: 20
+    skip_if: '!resolved.chembl_id'
+    provides:
+    - mechanisms
+  - source: chembl
+    tool: getDrugIndication
+    params:
+      molecule_chembl_id: '{resolved.chembl_id}'
+      limit: 20
+    skip_if: '!resolved.chembl_id'
+    provides:
+    - indications
+  - source: chembl
+    tool: getActivity
+    params:
+      molecule_chembl_id: '{resolved.chembl_id}'
+      limit: 20
+    skip_if: '!resolved.chembl_id'
+    provides:
+    - bioactivity
+  - source: dgidb
+    tool: search
+    params:
+      names:
+      - '{resolved.name}'
+    skip_if: '!resolved.name'
+    provides:
+    - geneInteractions
+  - source: openfda
+    tool: searchEvents
+    params:
+      query: '{input.query}'
+    provides:
+    - safety
+    validate: contains-drug-name
+  - source: guidetopharmacology
+    tool: searchLigands
+    params:
+      name: '{input.query}'
+    provides:
+    - receptorPharmacology
+  - source: europepmc
+    tool: search
+    params:
+      query: '{input.query} mechanism target interaction'
+      pageSize: 5
+    provides:
+    - literature
+  - source: civic
+    tool: searchTherapies
+    params:
+      name: '{input.query}'
+      first: 5
+    provides:
+    - cancerTherapy
+  - source: drugcentral
+    tool: search
+    params:
+      query: '{input.query}'
+    provides:
+    - drugMechanisms
+  - source: bindingdb
+    tool: searchBySmiles
+    params:
+      smiles: '{resolved.canonical_smiles}'
+      cutoff: 0.85
+    skip_if: '!resolved.canonical_smiles'
+    provides:
+    - bindingAffinity
+  - source: rxnorm
+    tool: getDrugInteractions
+    params:
+      rxcui: '{resolved.rxcui}'
+    skip_if: '!resolved.rxcui'
+    provides:
+    - drugDrugInteractions
+  - source: stitch
+    tool: resolveIdentifier
+    params:
+      query: '{input.query}'
+      species: 9606
+    provides:
+    - chemicalProteinLinks
+  - source: ctd
+    tool: getChemicalInteractions
+    params:
+      inputTerms: '{input.query}'
+    provides:
+    - chemicalGeneInteractions
+  - source: sigcom-lincs
+    tool: listEntities
+    params:
+      filter: '{"where":{"meta.pert_name":"{resolved.name}"},"limit":10}'
+    skip_if: '!resolved.name'
+    provides:
+    - perturbationSignatures
+  - source: ctd
+    tool: getDiseases
+    params:
+      inputTerms: '{input.query}'
+    provides:
+    - diseaseAssociations
+  - source: guidetopharmacology
+    tool: searchTargets
+    params:
+      name: '{input.query}'
+    provides:
+    - targetPharmacology
+  - source: string
+    tool: getInteractions
+    params:
+      identifiers: '{resolved.name}'
+      species: 9606
+      limit: 10
+    skip_if: '!resolved.name'
+    provides:
+    - proteinInteractions
+  - source: stitch
+    tool: getInteractions
+    params:
+      chemical: '{input.query}'
+      species: 9606
+    provides:
+    - chemicalProteinInteractions
+  - source: biogrid
+    tool: searchInteractions
+    params:
+      searchNames: '{resolved.name}'
+      searchLimit: 25
+      taxId: 9606
+    skip_if: '!resolved.name'
+    provides:
+    - proteinInteractions
+  - source: chembl
+    tool: searchTarget
+    params:
+      query: '{input.query}'
+    provides:
+    - targetInfo
+output:
+  identity:
+    name:
+      from: resolved.name
+    ids:
+      from: resolved
+      fields:
+      - inchikey
+      - chembl_id
+      - pubchem_cid
+  mechanisms:
+    mechanismOfAction:
+      sources:
+      - source: chembl
+        call: getMechanism
+        path: mechanisms
+        rank: 1
+    primaryAction:
+      sources:
+      - source: chembl
+        call: getMechanism
+        path: mechanisms[0].mechanism_of_action
+        rank: 1
+    actionType:
+      sources:
+      - source: chembl
+        call: getMechanism
+        path: mechanisms[0].action_type
+        rank: 1
+    targetChemblIds:
+      sources:
+      - source: chembl
+        call: getMechanism
+        path: mechanisms[0].target_chembl_id
+        rank: 1
+  indications:
+    approvedIndications:
+      sources:
+      - source: chembl
+        call: getDrugIndication
+        path: drug_indications
+        rank: 1
+  bioactivity:
+    activityData:
+      sources:
+      - source: chembl
+        call: getActivity
+        path: activities
+        rank: 1
+  geneInteractions:
+    dgidbInteractions:
+      sources:
+      - source: dgidb
+        call: search
+        path: genes.nodes
+        rank: 1
+  safety:
+    adverseEvents:
+      sources:
+      - source: openfda
+        call: searchEvents
+        path: $validated
+        rank: 1
+  receptorPharmacology:
+    ligandMatches:
+      sources:
+      - source: guidetopharmacology
+        call: searchLigands
+        path: $passthrough
+        rank: 1
+      reason: IUPHAR/BPS — curated receptor-ligand interactions, approved drug status, selectivity data
+  cancerTherapy:
+    civicTherapies:
+      sources:
+      - source: civic
+        call: searchTherapies
+        path: therapies
+        rank: 1
+      reason: CIViC cancer therapy evidence — precision medicine clinical interpretation
+  literature:
+    interactionPublications:
+      sources:
+      - source: europepmc
+        call: search
+        path: resultList.result
+        rank: 1
+      reason: Recent literature on this drug's mechanisms and interactions
+    publicationCount:
+      sources:
+      - source: europepmc
+        call: search
+        path: hitCount
+        rank: 1
+  drugMechanisms:
+    drugcentralData:
+      sources:
+      - source: drugcentral
+        call: search
+        path: $passthrough
+        rank: 1
+      reason: DrugCentral — drug indications, mechanisms, and bioactivity
+  bindingAffinity:
+    bindingData:
+      sources:
+      - source: bindingdb
+        call: searchBySmiles
+        path: $passthrough
+        rank: 1
+      reason: BindingDB — measured binding affinities for structurally similar compounds
+  drugDrugInteractions:
+    drugDrugInteractions:
+      sources:
+      - source: rxnorm
+        call: getDrugInteractions
+        path: interactionTypeGroup
+        rank: 1
+      reason: RxNorm — known drug-drug interactions from clinical data
+  chemicalProteinLinks:
+    stitchIds:
+      sources:
+      - source: stitch
+        call: resolveIdentifier
+        path: $passthrough
+        rank: 1
+      reason: STITCH — chemical identifier resolution for protein interaction network queries
+  chemicalGeneInteractions:
+    chemicalGeneInteractions:
+      sources:
+      - source: ctd
+        call: getChemicalInteractions
+        path: $passthrough
+        rank: 1
+      reason: CTD — curated chemical-gene interactions and toxicogenomics data
+  perturbationSignatures:
+    perturbationSignatures:
+      sources:
+      - source: sigcom-lincs
+        call: listEntities
+        path: $passthrough
+        rank: 1
+      reason: SigCom LINCS — L1000 perturbation gene expression signatures for this compound
+  diseaseAssociations:
+    ctdDiseases:
+      sources:
+      - source: ctd
+        call: getDiseases
+        path: $passthrough
+        rank: 1
+      reason: CTD — curated chemical-disease associations
+  targetPharmacology:
+    iupharTargets:
+      sources:
+      - source: guidetopharmacology
+        call: searchTargets
+        path: $passthrough
+        rank: 1
+      reason: IUPHAR/BPS — pharmacological target search results
+  proteinInteractions:
+    stringInteractions:
+      sources:
+      - source: string
+        call: getInteractions
+        path: $passthrough
+        rank: 1
+      reason: STRING — protein-protein interaction network with combined confidence scores
+    biogridInteractions:
+      sources:
+      - source: biogrid
+        call: searchInteractions
+        path: $passthrough
+        rank: 2
+      reason: BioGRID — experimentally validated protein and genetic interactions
+  chemicalProteinInteractions:
+    stitchInteractions:
+      sources:
+      - source: stitch
+        call: getInteractions
+        path: $passthrough
+        rank: 1
+      reason: STITCH — chemical-protein interaction partners with combined confidence scores
+  targetInfo:
+    chemblTargets:
+      sources:
+      - source: chembl
+        call: searchTarget
+        path: targets
+        rank: 1
+      reason: ChEMBL target search — drug targets with type, organism, and accession data
+validators:
+  contains-drug-name:
+    description: Confirm queried drug name appears in returned adverse event records
+    action: discard

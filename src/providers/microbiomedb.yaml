@@ -1,13 +1,19 @@
 name: microbiomedb
 displayName: MicrobiomeDB
 description: MicrobiomeDB — microbiome study data including taxonomic and functional profiling
-tags: [microbiome, metagenomics, taxonomy, microbial-ecology, studies]
+tags:
+- microbiome
+- metagenomics
+- taxonomy
+- microbial-ecology
+- studies
 baseUrl: https://microbiomedb.org/mbio/service
-
 tools:
   search:
     description: Search all microbiome datasets in MicrobiomeDB
-    tags: [dataset-search, study-search]
+    tags:
+    - dataset-search
+    - study-search
     method: GET
     path: /record-types/dataset/searches/AllDatasets/reports/standard
     params:
@@ -18,32 +24,34 @@ tools:
     response:
       format: json
       fields:
-        - records[].displayName
-        - records[].recordClassName
-        - records[].id[].name
-        - records[].id[].value
-        - records[].attributes
-
+      - records[].displayName
+      - records[].recordClassName
+      - records[].id[].name
+      - records[].id[].value
+      - records[].attributes
+    entity: dataset
   getTaxonomy:
     description: Search taxon records in MicrobiomeDB
-    tags: [taxonomy-search, microbial-taxonomy]
+    tags:
+    - taxonomy-search
+    - microbial-taxonomy
     method: GET
     path: /record-types/taxon/searches
     params: {}
     response:
       format: json
-
+    entity: organism
 tests:
   search:
-    - name: searches all datasets
-      params:
-        searchConfig: "{}"
-      assert:
-        - minLength: 1
-      allowError: true
+  - name: searches all datasets
+    params:
+      searchConfig: '{}'
+    assert:
+    - minLength: 1
+    allowError: true
   getTaxonomy:
-    - name: lists taxon search endpoints
-      params: {}
-      assert:
-        - minLength: 1
-      allowError: true
+  - name: lists taxon search endpoints
+    params: {}
+    assert:
+    - minLength: 1
+    allowError: true

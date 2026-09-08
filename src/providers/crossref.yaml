@@ -2,18 +2,21 @@ name: crossref
 displayName: Crossref
 description: Crossref — scholarly metadata for publications, journals, funders, and DOIs
 tags:
-  - publications
-  - doi
-  - journals
-  - scholarly
-  - citations
+- literature
+- doi
+- citation
+- crossref
+# NOTE: Crossref rate-limits unauthenticated requests. Set LS_CROSSREF_MAILTO
+# to your email to join the polite pool (higher rate limits).
 baseUrl: https://api.crossref.org
+rateLimit:
+  requestsPerSecond: 1
 tools:
   searchWorks:
     description: Search for scholarly works (articles, books, datasets) by keyword
     tags:
-      - publication-search
-      - article-search
+    - publication-search
+    - article-search
     method: GET
     path: /works
     params:
@@ -25,6 +28,10 @@ tools:
         type: integer
         default: 10
         description: Number of results
+      mailto:
+        type: string
+        default: lifescience-mcp@example.org
+        description: Email for Crossref polite pool (higher rate limits)
       filter:
         type: string
         description: Filters (e.g. from-pub-date:2023-01-01, type:journal-article)
@@ -34,17 +41,18 @@ tools:
     response:
       format: json
       fields:
-        - message.total-results
-        - message.items[].DOI
-        - message.items[].title
-        - message.items[].author[].family
-        - message.items[].published.date-parts
-        - message.items[].is-referenced-by-count
+      - message.total-results
+      - message.items[].DOI
+      - message.items[].title
+      - message.items[].author[].family
+      - message.items[].published.date-parts
+      - message.items[].is-referenced-by-count
+    entity: publication
   getWork:
     description: Get metadata for a specific work by DOI
     tags:
-      - publication-info
-      - doi-info
+    - publication-info
+    - doi-info
     method: GET
     path: /works/{doi}
     params:
@@ -55,14 +63,65 @@ tools:
     response:
       format: json
       fields:
-        - message.DOI
-        - message.title
-        - message.author[].family
-        - message.abstract
+      - message.DOI
+      - message.title
+      - message.author[].family
+      - message.abstract
+    entity: publication
+  searchByAuthor:
+    description: Search for works by a specific author name
+    tags:
+    - author-search
+    - publication-search
+    method: GET
+    path: /works
+    params:
+      author:
+        type: string
+        required: true
+        description: Author name to search for (e.g. Jennifer Doudna, Feng Zhang)
+        mapsTo: query.author
+      rows:
+        type: integer
+        default: 10
+        description: Number of results
+    response:
+      format: json
+      fields:
+      - message.total-results
+      - message.items[].DOI
+      - message.items[].title
+      - message.items[].author[].given
+      - message.items[].author[].family
+      - message.items[].published.date-parts
+      - message.items[].container-title
+    entity: publication
+  getFunder:
+    description: Get metadata for a specific funder by Funder ID
+    tags:
+    - funder-info
+    - funding
+    method: GET
+    path: /funders/{funderId}
+    params:
+      funderId:
+        type: string
+        required: true
+        description: CrossRef Funder ID (e.g. 100000002 for NIH, 501100000266 for EPSRC)
+    response:
+      format: json
+      fields:
+      - message.id
+      - message.name
+      - message.alt-names
+      - message.uri
+      - message.location
+      - message.work-count
+    entity: dataset
   searchJournals:
     description: Search for journals by title
     tags:
-      - journal-search
+    - journal-search
     method: GET
     path: /journals
     params:
@@ -77,24 +136,45 @@ tools:
     response:
       format: json
       fields:
-        - message.total-results
-        - message.items[].title
-        - message.items[].ISSN
-        - message.items[].publisher
+      - message.total-results
+      - message.items[].title
+      - message.items[].ISSN
+      - message.items[].publisher
+    entity: publication
 tests:
   searchWorks:
-    - name: searches for BRCA1 publications
-      params:
-        query: BRCA1
-        rows: 2
-      assert:
-        - path: message.total-results
-        - path: message.items
-          minLength: 1
+  - name: searches for BRCA1 publications
+    params:
+      query: BRCA1
+      rows: 2
+    assert:
+    - path: message.total-results
+    - path: message.items
+      minLength: 1
+    allowError: true
+  searchByAuthor:
+  - name: searches for works by Jennifer Doudna
+    params:
+      author: Jennifer Doudna
+      rows: 3
+    assert:
+    - path: message.total-results
+    - path: message.items
+      minLength: 1
+    allowError: true
+  getFunder:
+  - name: gets NIH funder metadata
+    params:
+      funderId: '100000002'
+    assert:
+    - path: message.name
+    - path: message.id
+    allowError: true
   searchJournals:
-    - name: searches for bioinformatics journals
-      params:
-        query: bioinformatics
-        rows: 2
-      assert:
-        - path: message.total-results
+  - name: searches for bioinformatics journals
+    params:
+      query: bioinformatics
+      rows: 2
+    assert:
+    - path: message.total-results
+    allowError: true

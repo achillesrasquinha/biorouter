@@ -2,19 +2,18 @@ name: cdd
 displayName: CDD
 description: NCBI Conserved Domain Database — identify conserved domains in protein sequences
 tags:
-  - protein-domains
-  - conserved-domains
-  - protein-families
-  - ncbi
-  - sequence-analysis
+- protein-domains
+- conserved-domains
+- protein-families
+- ncbi
+- sequence-analysis
 baseUrl: https://www.ncbi.nlm.nih.gov/Structure/bwrpsb/bwrpsb.cgi
-
 tools:
   search:
     description: Submit a protein sequence for conserved domain search
     tags:
-      - domain-search
-      - sequence-search
+    - domain-search
+    - sequence-search
     method: GET
     path: /
     params:
@@ -44,12 +43,12 @@ tools:
         description: Display mode (full, rep, std)
     response:
       format: json
-
+    entity: protein
   getHits:
     description: Retrieve conserved domain hits for a completed search job
     tags:
-      - domain-results
-      - hit-retrieval
+    - domain-results
+    - hit-retrieval
     method: GET
     path: /
     params:
@@ -67,19 +66,19 @@ tools:
         description: Display mode (rep for representative, full for all)
     response:
       format: json
-
+    entity: protein
 tests:
   search:
-    - name: searches for conserved domains in a protein
-      params:
-        queries: NP_000509.1
-      assert:
-        - {}
-      allowError: true
+  - name: searches for conserved domains in a protein
+    params:
+      queries: NP_000509.1
+    assert:
+    - {}
+    allowError: true
   getHits:
-    - name: retrieves hits for a job
-      params:
-        cdsid: QM3-qcdsearch-0000000000-0000000
-      assert:
-        - {}
-      allowError: true
+  - name: retrieves hits for a job
+    params:
+      cdsid: QM3-qcdsearch-0000000000-0000000
+    assert:
+    - {}
+    allowError: true

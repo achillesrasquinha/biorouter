@@ -2,32 +2,33 @@ name: metexplore
 displayName: MetExplore
 description: MetExplore — metabolic network analysis platform with 349 organism models
 tags:
-  - metabolism
-  - metabolic-network
-  - pathway
-  - metexplore
-  - systems-biology
+- metabolism
+- metabolic-network
+- pathway
+- metexplore
+- systems-biology
 baseUrl: https://metexplore.toulouse.inrae.fr/metexplore-api
 tools:
   listBiosources:
     description: List all available organism metabolic networks
     tags:
-      - organism-list
-      - metabolic-networks
+    - organism-list
+    - metabolic-networks
     method: GET
     path: /biosources/
     params: {}
     response:
       format: json
       fields:
-        - "[].id"
-        - "[].NomComplet"
-        - "[].type"
+      - '[].id'
+      - '[].NomComplet'
+      - '[].type'
+    entity: organism
   getPathways:
     description: Get metabolic pathways for a specific organism
     tags:
-      - pathway-list
-      - metabolism
+    - pathway-list
+    - metabolism
     method: GET
     path: /{biosourceId}/pathway/
     params:
@@ -37,11 +38,12 @@ tools:
         description: Biosource ID from listBiosources (e.g. 3232 for E. coli K-12)
     response:
       format: json
+    entity: pathway
   getMetabolites:
     description: Get metabolites in a specific organism's metabolic network
     tags:
-      - metabolite-list
-      - metabolism
+    - metabolite-list
+    - metabolism
     method: GET
     path: /{biosourceId}/metabolite/
     params:
@@ -51,11 +53,12 @@ tools:
         description: Biosource ID from listBiosources
     response:
       format: json
+    entity: compound
   getReactions:
     description: Get reactions in a specific organism's metabolic network
     tags:
-      - reaction-list
-      - metabolism
+    - reaction-list
+    - metabolism
     method: GET
     path: /{biosourceId}/reaction/
     params:
@@ -65,11 +68,12 @@ tools:
         description: Biosource ID from listBiosources
     response:
       format: json
+    entity: reaction
   getGenes:
     description: Get genes in a specific organism's metabolic network
     tags:
-      - gene-list
-      - metabolism
+    - gene-list
+    - metabolism
     method: GET
     path: /{biosourceId}/gene/
     params:
@@ -79,11 +83,12 @@ tools:
         description: Biosource ID from listBiosources
     response:
       format: json
+    entity: gene
   fuzzySearch:
     description: Fuzzy search for metabolites, genes, reactions, or enzymes
     tags:
-      - search
-      - fuzzy-search
+    - search
+    - fuzzy-search
     method: GET
     path: /fuzzysearch/{biosourceId}/{type}/{name}/
     params:
@@ -101,12 +106,13 @@ tools:
         description: Name to search for (fuzzy matching)
     response:
       format: json
+    entity: gene
 tests:
   listBiosources:
-    - name: lists available organism metabolic networks
-      params: {}
-      assert:
-        - path: ""
-          minLength: 1
-        - path: "0.id"
-        - path: "0.NomComplet"
+  - name: lists available organism metabolic networks
+    params: {}
+    assert:
+    - path: ''
+      minLength: 1
+    - path: 0.id
+    - path: 0.NomComplet

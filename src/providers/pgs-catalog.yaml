@@ -2,17 +2,17 @@ name: pgs-catalog
 displayName: PGS Catalog
 description: PGS Catalog — Polygenic Score Catalog for risk prediction scores and trait associations
 tags:
-  - polygenic-score
-  - risk-prediction
-  - gwas
-  - traits
+- polygenic-score
+- risk-prediction
+- gwas
+- traits
 baseUrl: https://www.pgscatalog.org/rest
 tools:
   searchTraits:
     description: Search for traits in the PGS Catalog
     tags:
-      - trait-search
-      - pgs-trait
+    - trait-search
+    - pgs-trait
     method: GET
     path: /trait/search
     params:
@@ -27,15 +27,16 @@ tools:
     response:
       format: json
       fields:
-        - count
-        - results[].id
-        - results[].label
-        - results[].description
+      - count
+      - results[].id
+      - results[].label
+      - results[].description
+    entity: disease
   getScore:
     description: Get details of a polygenic score by PGS ID
     tags:
-      - score-info
-      - pgs-details
+    - score-info
+    - pgs-details
     method: GET
     path: /score/{pgsId}
     params:
@@ -46,16 +47,17 @@ tools:
     response:
       format: json
       fields:
-        - id
-        - name
-        - trait_reported
-        - variants_number
-        - method_name
+      - id
+      - name
+      - trait_reported
+      - variants_number
+      - method_name
+    entity: variant
   listScores:
     description: List all polygenic scores with optional trait filter
     tags:
-      - score-list
-      - pgs-browse
+    - score-list
+    - pgs-browse
     method: GET
     path: /score/all
     params:
@@ -69,17 +71,18 @@ tools:
     response:
       format: json
       fields:
-        - count
-        - results[].id
-        - results[].name
-        - results[].trait_reported
+      - count
+      - results[].id
+      - results[].name
+      - results[].trait_reported
+    entity: variant
 tests:
   searchTraits:
-    - name: searches for breast cancer traits
-      params:
-        term: breast cancer
-        limit: 2
-      assert:
-        - path: count
-        - path: results
-          minLength: 1
+  - name: searches for breast cancer traits
+    params:
+      term: breast cancer
+      limit: 2
+    assert:
+    - path: count
+    - path: results
+      minLength: 1

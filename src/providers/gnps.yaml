@@ -2,18 +2,18 @@ name: gnps
 displayName: GNPS
 description: GNPS — molecular networking and spectral library for mass spectrometry data
 tags:
-  - mass-spectrometry
-  - metabolomics
-  - spectral-library
-  - molecular-networking
-  - natural-products
+- mass-spectrometry
+- metabolomics
+- spectral-library
+- molecular-networking
+- natural-products
 baseUrl: https://gnps.ucsd.edu/ProteoSAFe
 tools:
   searchLibrary:
     description: Search the GNPS spectral library by compound name or keyword
     tags:
-      - spectral-search
-      - compound-search
+    - spectral-search
+    - compound-search
     method: GET
     path: /LibraryServlet
     params:
@@ -28,11 +28,12 @@ tools:
         description: Library to search (default all)
     response:
       format: json
+    entity: compound
   getSpectrum:
     description: Get spectrum details and comments by spectrum ID
     tags:
-      - spectrum-info
-      - spectrum-details
+    - spectrum-info
+    - spectrum-details
     method: GET
     path: /SpectrumCommentServlet
     params:
@@ -43,29 +44,30 @@ tools:
     response:
       format: json
       fields:
-        - annotations[].Compound_Name
-        - annotations[].Ion_Source
-        - annotations[].Instrument
-        - annotations[].Adduct
-        - annotations[].Precursor_MZ
-        - annotations[].ExactMass
-        - annotations[].Smiles
-        - annotations[].SpectrumID
-        - annotations[].Ion_Mode
-        - spectruminfo.spectrum_id
-        - spectruminfo.library_membership
+      - annotations[].Compound_Name
+      - annotations[].Ion_Source
+      - annotations[].Instrument
+      - annotations[].Adduct
+      - annotations[].Precursor_MZ
+      - annotations[].ExactMass
+      - annotations[].Smiles
+      - annotations[].SpectrumID
+      - annotations[].Ion_Mode
+      - spectruminfo.spectrum_id
+      - spectruminfo.library_membership
+    entity: compound
 tests:
   searchLibrary:
-    - name: searches spectral library for aspirin
-      params:
-        query: aspirin
-      assert:
-        - minLength: 1
-      allowError: true
+  - name: searches spectral library for aspirin
+    params:
+      query: aspirin
+    assert:
+    - minLength: 1
+    allowError: true
   getSpectrum:
-    - name: gets spectrum details by ID
-      params:
-        SpectrumID: CCMSLIB00005436077
-      assert:
-        - minLength: 1
-      allowError: true
+  - name: gets spectrum details by ID
+    params:
+      SpectrumID: CCMSLIB00005436077
+    assert:
+    - minLength: 1
+    allowError: true

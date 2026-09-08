@@ -2,18 +2,18 @@ name: ena-portal
 displayName: ENA Portal
 description: ENA Portal API — advanced search across ENA studies, samples, experiments, and assemblies
 tags:
-  - ena
-  - nucleotide
-  - sequencing
-  - studies
-  - ebi
+- ena
+- nucleotide
+- sequencing
+- studies
+- ebi
 baseUrl: https://www.ebi.ac.uk/ena/portal/api
 tools:
   search:
     description: Search ENA for studies, samples, experiments, or assemblies
     tags:
-      - ena-search
-      - study-search
+    - ena-search
+    - study-search
     method: GET
     path: /search
     params:
@@ -38,11 +38,12 @@ tools:
         description: Maximum results
     response:
       format: json
+    entity: sample
   returnFields:
     description: List available return fields for a result type
     tags:
-      - metadata
-      - fields
+    - metadata
+    - fields
     method: GET
     path: /returnFields
     params:
@@ -52,14 +53,15 @@ tools:
         description: Result type (study, sample, experiment, assembly)
     response:
       format: json
+    entity: dataset
 tests:
   search:
-    - name: searches for a study
-      params:
-        query: study_accession="PRJNA100001"
-        result: study
-        fields: study_accession,study_title
-        format: json
-        limit: 2
-      assert:
-        - minLength: 1
+  - name: searches for a study
+    params:
+      query: study_accession="PRJNA100001"
+      result: study
+      fields: study_accession,study_title
+      format: json
+      limit: 2
+    assert:
+    - minLength: 1

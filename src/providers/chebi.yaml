@@ -2,18 +2,18 @@ name: chebi
 displayName: ChEBI (via OLS4)
 description: Chemical Entities of Biological Interest — ontology lookup via EBI OLS4
 tags:
-  - chemical
-  - compound
-  - ontology
-  - chebi
-  - molecule
+- chemical
+- compound
+- ontology
+- chebi
+- molecule
 baseUrl: https://www.ebi.ac.uk/ols4/api
 tools:
   search:
     description: Search ChEBI ontology for chemical entities by keyword
     tags:
-      - chemical-search
-      - compound-search
+    - chemical-search
+    - compound-search
     method: GET
     path: /search
     params:
@@ -33,18 +33,19 @@ tools:
     response:
       format: json
       fields:
-        - response.numFound
-        - response.docs[].short_form
-        - response.docs[].label
-        - response.docs[].description
-        - response.docs[].obo_id
-        - response.docs[].ontology_name
-        - response.docs[].iri
+      - response.numFound
+      - response.docs[].short_form
+      - response.docs[].label
+      - response.docs[].description
+      - response.docs[].obo_id
+      - response.docs[].ontology_name
+      - response.docs[].iri
+    entity: compound
   getTerm:
     description: Get a ChEBI term by short form identifier
     tags:
-      - chemical-info
-      - term-info
+    - chemical-info
+    - term-info
     method: GET
     path: /ontologies/chebi/terms
     params:
@@ -56,23 +57,24 @@ tools:
     response:
       format: json
       fields:
-        - _embedded.terms[].iri
-        - _embedded.terms[].label
-        - _embedded.terms[].description
-        - _embedded.terms[].synonyms
-        - _embedded.terms[].obo_id
-        - _embedded.terms[].annotation.database_cross_reference
+      - _embedded.terms[].iri
+      - _embedded.terms[].label
+      - _embedded.terms[].description
+      - _embedded.terms[].synonyms
+      - _embedded.terms[].obo_id
+      - _embedded.terms[].annotation.database_cross_reference
+    entity: ontology-term
 tests:
   search:
-    - name: searches for aspirin in ChEBI ontology
-      params:
-        query: aspirin
-      assert:
-        - path: response.numFound
-          gt: 0
-        - path: response.docs.0.label
+  - name: searches for aspirin in ChEBI ontology
+    params:
+      query: aspirin
+    assert:
+    - path: response.numFound
+      gt: 0
+    - path: response.docs.0.label
   getTerm:
-    - name: gets aspirin term by short form CHEBI_15365
-      params:
-        shortForm: CHEBI_15365
-      assert: []
+  - name: gets aspirin term by short form CHEBI_15365
+    params:
+      shortForm: CHEBI_15365
+    assert: []

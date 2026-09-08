@@ -2,29 +2,32 @@ name: faostat
 displayName: FAOSTAT
 description: FAO Statistics — food and agriculture data from the UN FAO
 tags:
-  - agriculture
-  - food
-  - statistics
-  - fao
-  - crop
-  - livestock
+- agriculture
+- food
+- statistics
+- fao
+- crop
+- livestock
+# NOTE: FAOSTAT API may return HTTP 521 (Cloudflare Web Server is Down)
+# intermittently due to server-side issues.
 baseUrl: https://fenixservices.fao.org/faostat/api/v1/en
 tools:
   getDomains:
     description: List available data domains
     tags:
-      - domain-list
-      - data-catalog
+    - domain-list
+    - data-catalog
     method: GET
     path: /domains
     params: {}
     response:
       format: json
-  getData:
+    entity: protein
+  getStatistics:
     description: Get statistical data for a domain
     tags:
-      - statistical-data
-      - agriculture-data
+    - statistical-data
+    - agriculture-data
     method: GET
     path: /data/{domainCode}
     params:
@@ -43,10 +46,12 @@ tools:
         description: Year e.g. '2020'
     response:
       format: json
+    entity: dataset
 tests:
   getDomains:
-    - name: lists available data domains
-      params: {}
-      assert:
-        - path: data
-          minLength: 1
+  - name: lists available data domains
+    params: {}
+    assert:
+    - path: data
+      minLength: 1
+    allowError: true

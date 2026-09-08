@@ -2,19 +2,19 @@ name: orangebook
 displayName: FDA Orange Book
 description: FDA Orange Book drug patent and exclusivity data via openFDA
 tags:
-  - drugs
-  - patents
-  - fda
-  - exclusivity
-  - generic-drugs
-  - orange-book
+- drugs
+- patents
+- fda
+- exclusivity
+- generic-drugs
+- orange-book
 baseUrl: https://api.fda.gov/drug
 tools:
   searchDrug:
     description: Search FDA-approved drugs by brand name
     tags:
-      - drug-search
-      - brand-name
+    - drug-search
+    - brand-name
     method: GET
     path: /drugsfda.json
     params:
@@ -31,17 +31,18 @@ tools:
     response:
       format: json
       fields:
-        - results[].products[].brand_name
-        - results[].products[].active_ingredients
-        - results[].products[].dosage_form
-        - results[].products[].route
-        - results[].application_number
-        - results[].sponsor_name
+      - results[].products[].brand_name
+      - results[].products[].active_ingredients
+      - results[].products[].dosage_form
+      - results[].products[].route
+      - results[].application_number
+      - results[].sponsor_name
+    entity: compound
   getPatents:
     description: Search drug patent information by active ingredient name
     tags:
-      - patent-search
-      - active-ingredient
+    - patent-search
+    - active-ingredient
     method: GET
     path: /drugsfda.json
     params:
@@ -53,26 +54,27 @@ tools:
     response:
       format: json
       fields:
-        - results[].products[].active_ingredients
-        - results[].products[].brand_name
-        - results[].application_number
-        - results[].openfda.patent_number
-        - results[].openfda.patent_expiration_date
+      - results[].products[].active_ingredients
+      - results[].products[].brand_name
+      - results[].application_number
+      - results[].openfda.patent_number
+      - results[].openfda.patent_expiration_date
+    entity: compound
 tests:
   searchDrug:
-    - name: searches for lipitor by brand name
-      params:
-        query: "brand_name:lipitor"
-        limit: 5
-      assert:
-        - path: results
-          minLength: 1
-      allowError: true
+  - name: searches for lipitor by brand name
+    params:
+      query: brand_name:lipitor
+      limit: 5
+    assert:
+    - path: results
+      minLength: 1
+    allowError: true
   getPatents:
-    - name: searches patents for atorvastatin
-      params:
-        query: "products.active_ingredients.name:atorvastatin"
-      assert:
-        - path: results
-          minLength: 1
-      allowError: true
+  - name: searches patents for atorvastatin
+    params:
+      query: products.active_ingredients.name:atorvastatin
+    assert:
+    - path: results
+      minLength: 1
+    allowError: true

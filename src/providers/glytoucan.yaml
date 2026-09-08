@@ -1,47 +1,41 @@
 name: glytoucan
 displayName: GlyTouCan
-description: GlyTouCan — international glycan structure repository
+description: GlyTouCan — international glycan structure repository (via GlyCosmos SPARQL endpoint)
 tags:
-  - glycomics
-  - glycan-structure
-  - glytoucan
-  - carbohydrate
-  - glycobiology
-baseUrl: https://api.glycosmos.org
+- glycomics
+- glycan-structure
+- glytoucan
+- carbohydrate
+- glycobiology
+baseUrl: https://ts.glycosmos.org
 tools:
-  listGlycans:
-    description: List glycan entries from the GlyTouCan repository
-    tags:
-      - glycan-list
-      - glycan-browse
-    method: GET
-    path: /sparqlist/api/gtc_list_glycan
-    params: {}
-    response:
-      format: json
   getGlycan:
-    description: Get detailed glycan information by GlyTouCan accession number
+    description: Get glycan WURCS sequence and metadata by GlyTouCan accession number via SPARQL
     tags:
-      - glycan-detail
-      - glycan-info
+    - glycan-detail
+    - glycan-info
     method: GET
-    path: /sparqlist/api/gtc_glycan_detail
+    path: /sparql
     params:
       accession_number:
         type: string
         required: true
         description: GlyTouCan accession number (e.g. G00055MO)
+        mapsTo: query
+        prefix: "PREFIX glycan: <http://purl.jp/bio/12/glyco/glycan#> PREFIX glytoucan: <http://www.glytoucan.org/glyco/owl/glytoucan#> SELECT ?wurcs ?mass WHERE { <http://rdf.glycoinfo.org/glycan/"
+        suffix: "> glytoucan:has_primary_id ?id . OPTIONAL { <http://rdf.glycoinfo.org/glycan/{value}> glytoucan:has_mass ?mass } OPTIONAL { <http://rdf.glycoinfo.org/glycan/{value}> glycan:has_glycosequence ?seq . ?seq glycan:has_sequence ?wurcs . ?seq glycan:in_carbohydrate_format glycan:carbohydrate_format_wurcs } } LIMIT 1"
+    headers:
+      Accept: application/json
     response:
       format: json
+      fields:
+      - results.bindings[].wurcs.value
+      - results.bindings[].mass.value
+    entity: compound
 tests:
-  listGlycans:
-    - name: lists glycan entries
-      params: {}
-      assert:
-        - {}
   getGlycan:
-    - name: gets glycan G00055MO details
-      params:
-        accession_number: G00055MO
-      assert:
-        - {}
+  - name: gets glycan G00055MO details via SPARQL
+    params:
+      accession_number: G00055MO
+    assert:
+    - {}

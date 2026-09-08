@@ -1,0 +1,672 @@
+description: Analyze protein structure — 3D coordinates, domains, disorder, AlphaFold predictions, and classification
+tags:
+- protein
+- structure
+- 3d
+- domains
+- disorder
+- biorouter
+input:
+  query:
+    type: string
+    required: true
+    description: Gene symbol, UniProt accession, PDB ID, or protein name
+phases:
+- name: resolve
+  parallel: false
+  calls:
+  - source: mygene
+    tool: search
+    params:
+      query: '{input.query}'
+      species: human
+      size: 5
+    pick_best:
+      array: hits
+      match_field: symbol
+      against: input.query
+      as: best_hit
+    extract:
+      entrez_id: best_hit._id
+      symbol: best_hit.symbol
+      name: best_hit.name
+    provides: []
+  - source: uniprot
+    tool: search
+    params:
+      query: '{input.query} AND organism_id:9606'
+      size: 3
+    pick_best:
+      array: results
+      match_field: genes[0].geneName.value
+      against: input.query
+      as: best_uniprot
+    extract:
+      uniprot_ac: best_uniprot.primaryAccession
+    provides: []
+  - source: ensembl
+    tool: lookupSymbol
+    params:
+      symbol: '{input.query}'
+    skip_if: '!input.query'
+    extract:
+      ensembl_id: id
+    provides: []
+  - source: pdbe-graph
+    tool: getUniprotSummary
+    params:
+      accession: '{resolved.uniprot_ac}'
+    skip_if: '!resolved.uniprot_ac'
+    extract:
+      pdb_ids: keys(@)
+    provides: []
+  - source: pdb
+    tool: searchStructures
+    params:
+      query: '{input.query}'
+      rows: 5
+    extract:
+      pdb_id_from_search: result_set[0].identifier
+    provides: []
+- name: fetch
+  parallel: true
+  calls:
+  - source: uniprot
+    tool: getEntry
+    params:
+      accession: '{resolved.uniprot_ac}'
+    skip_if: '!resolved.uniprot_ac'
+    provides:
+    - proteinEntry
+  - source: alphafold
+    tool: getPrediction
+    params:
+      accession: '{resolved.uniprot_ac}'
+    skip_if: '!resolved.uniprot_ac'
+    provides:
+    - predictedStructure
+  - source: alphafold
+    tool: getConfidence
+    params:
+      accession: '{resolved.uniprot_ac}'
+    skip_if: '!resolved.uniprot_ac'
+    provides:
+    - predictedStructure
+  - source: interpro
+    tool: getProteinEntries
+    params:
+      accession: '{resolved.uniprot_ac}'
+    skip_if: '!resolved.uniprot_ac'
+    provides:
+    - domainClassification
+  - source: mobidb
+    tool: getEntry
+    params:
+      acc: '{resolved.uniprot_ac}'
+    skip_if: '!resolved.uniprot_ac'
+    provides:
+    - disorder
+  - source: disprot
+    tool: search
+    params:
+      q: '{input.query}'
+    provides:
+    - disorder
+  - source: proteinatlas
+    tool: getGene
+    params:
+      ensemblId: '{resolved.ensembl_id}'
+    skip_if: '!resolved.ensembl_id'
+    provides:
+    - expressionLocalization
+  - source: reactome
+    tool: search
+    params:
+      query: '{resolved.symbol}'
+    skip_if: '!resolved.symbol'
+    provides:
+    - pathways
+  - source: opentargets
+    tool: getTarget
+    params:
+      ensemblId: '{resolved.ensembl_id}'
+    skip_if: '!resolved.ensembl_id'
+    provides:
+    - targetInfo
+  - source: gnomad
+    tool: searchVariant
+    params:
+      geneSymbol: '{resolved.symbol}'
+    skip_if: '!resolved.symbol'
+    provides:
+    - geneticConstraint
+  - source: europepmc
+    tool: search
+    params:
+      query: '{input.query} structure crystal cryo-EM domain'
+      pageSize: 5
+    provides:
+    - literature
+  - source: pdb
+    tool: getEntry
+    params:
+      entryId: '{resolved.pdb_id_from_search}'
+    skip_if: '!resolved.pdb_id_from_search'
+    provides:
+    - experimentalStructures
+  - source: pdbe
+    tool: getSummary
+    params:
+      pdbId: '{resolved.pdb_id_from_search}'
+    skip_if: '!resolved.pdb_id_from_search'
+    provides:
+    - structureSummary
+  - source: cath
+    tool: getDomain
+    params:
+      domainId: '{resolved.pdb_id_from_search}'
+    skip_if: '!resolved.pdb_id_from_search'
+    provides:
+    - foldClassification
+  - source: swiss-model
+    tool: getModels
+    params:
+      accession: '{resolved.uniprot_ac}'
+    skip_if: '!resolved.uniprot_ac'
+    provides:
+    - homologyModels
+  - source: emdb
+    tool: search
+    params:
+      query: '{resolved.symbol}'
+      rows: 10
+    skip_if: '!resolved.symbol'
+    provides:
+    - cryoemMaps
+  - source: pride
+    tool: searchProjects
+    params:
+      query: '{resolved.symbol}'
+      limit: 10
+    skip_if: '!resolved.symbol'
+    provides:
+    - proteomicsData
+  - source: peptideatlas
+    tool: getProtein
+    params:
+      protein_name: '{resolved.uniprot_ac}'
+      atlas_build_id: 570
+    skip_if: '!resolved.uniprot_ac'
+    provides:
+    - observedPeptides
+  - source: elm
+    tool: getInstances
+    params:
+      q: '{resolved.uniprot_ac}'
+    skip_if: '!resolved.uniprot_ac'
+    provides:
+    - structuralMotifs
+  - source: glygen
+    tool: getProtein
+    params:
+      accession: '{resolved.uniprot_ac}'
+    skip_if: '!resolved.uniprot_ac'
+    provides:
+    - glycosylationStructure
+  - source: pdb
+    tool: getAssembly
+    params:
+      entry_id: '{resolved.pdb_id_from_search}'
+    skip_if: '!resolved.pdb_id_from_search'
+    provides:
+    - biologicalAssembly
+  - source: pdb
+    tool: getBranchedEntity
+    params:
+      entry_id: '{resolved.pdb_id_from_search}'
+      entity_id: '1'
+    skip_if: '!resolved.pdb_id_from_search'
+    allowError: true
+    provides:
+    - branchedEntity
+  - source: pdb
+    tool: getEntryPubmed
+    params:
+      entry_id: '{resolved.pdb_id_from_search}'
+    skip_if: '!resolved.pdb_id_from_search'
+    provides:
+    - structurePublication
+  - source: pdb
+    tool: getExperimentalData
+    params:
+      entry_id: '{resolved.pdb_id_from_search}'
+    skip_if: '!resolved.pdb_id_from_search'
+    provides:
+    - experimentalDetails
+  - source: pdb
+    tool: getLigand
+    params:
+      entry_id: '{resolved.pdb_id_from_search}'
+    skip_if: '!resolved.pdb_id_from_search'
+    allowError: true
+    provides:
+    - ligandInfo
+  - source: pdb
+    tool: getPolymerEntity
+    params:
+      entryId: '{resolved.pdb_id_from_search}'
+      entityId: '1'
+    skip_if: '!resolved.pdb_id_from_search'
+    provides:
+    - polymerEntity
+  - source: pdb
+    tool: getUniprotMapping
+    params:
+      entry_id: '{resolved.pdb_id_from_search}'
+    skip_if: '!resolved.pdb_id_from_search'
+    provides:
+    - pdbUniprotMapping
+  - source: pdbe
+    tool: getBindingSites
+    params:
+      pdbId: '{resolved.pdb_id_from_search}'
+    skip_if: '!resolved.pdb_id_from_search'
+    allowError: true
+    provides:
+    - bindingSites
+  - source: pdbe
+    tool: getExperiment
+    params:
+      pdbId: '{resolved.pdb_id_from_search}'
+    skip_if: '!resolved.pdb_id_from_search'
+    provides:
+    - pdbeExperiment
+  - source: pdbe
+    tool: getLigands
+    params:
+      pdbId: '{resolved.pdb_id_from_search}'
+    skip_if: '!resolved.pdb_id_from_search'
+    provides:
+    - pdbeLigands
+  - source: pdbe
+    tool: getMolecules
+    params:
+      pdbId: '{resolved.pdb_id_from_search}'
+    skip_if: '!resolved.pdb_id_from_search'
+    provides:
+    - pdbeMolecules
+  - source: pdbe
+    tool: getPublications
+    params:
+      pdbId: '{resolved.pdb_id_from_search}'
+    skip_if: '!resolved.pdb_id_from_search'
+    provides:
+    - pdbePublications
+  - source: pdbe
+    tool: getSecondaryStructure
+    params:
+      pdbId: '{resolved.pdb_id_from_search}'
+    skip_if: '!resolved.pdb_id_from_search'
+    provides:
+    - secondaryStructure
+  - source: pdbe
+    tool: getUniprotMapping
+    params:
+      pdbId: '{resolved.pdb_id_from_search}'
+    skip_if: '!resolved.pdb_id_from_search'
+    provides:
+    - pdbeUniprotMapping
+  - source: pdbe-graph
+    tool: getMolecules
+    params:
+      pdbId: '{resolved.pdb_id_from_search}'
+    skip_if: '!resolved.pdb_id_from_search'
+    provides:
+    - graphMolecules
+  - source: peptideatlas
+    tool: search
+    params:
+      protein_name_constraint: '{resolved.symbol}'
+    skip_if: '!resolved.symbol'
+    allowError: true
+    provides:
+    - peptideatlasSearch
+output:
+  identity:
+    symbol:
+      from: resolved.symbol
+    name:
+      from: resolved.name
+    ids:
+      from: resolved
+      fields:
+      - entrez_id
+      - uniprot_ac
+      - ensembl_id
+  proteinEntry:
+    recommendedName:
+      sources:
+      - source: uniprot
+        call: getEntry
+        path: proteinDescription.recommendedName.fullName.value
+        rank: 1
+    sequenceLength:
+      sources:
+      - source: uniprot
+        call: getEntry
+        path: sequence.length
+        rank: 1
+    organism:
+      sources:
+      - source: uniprot
+        call: getEntry
+        path: organism.scientificName
+        rank: 1
+  sequenceFeatures:
+    allFeatures:
+      sources:
+      - source: uniprot
+        call: getEntry
+        path: features
+        rank: 1
+      reason: UniProt curated features — domains, active sites, binding sites, disulfide bonds, PTMs, variants, signal peptides
+  predictedStructure:
+    alphafoldModel:
+      sources:
+      - source: alphafold
+        call: getPrediction
+        path: $passthrough
+        rank: 1
+      reason: AlphaFold2 AI-predicted 3D structure — model URLs, global pLDDT confidence
+    confidenceScores:
+      sources:
+      - source: alphafold
+        call: getConfidence
+        path: $passthrough
+        rank: 1
+      reason: Per-residue pLDDT confidence fractions — very high, confident, low, very low
+  domainClassification:
+    interproDomains:
+      sources:
+      - source: interpro
+        call: getProteinEntries
+        path: results
+        rank: 1
+      reason: InterPro integrated domain/family/site classification — Pfam, PROSITE, SMART, CDD, PANTHER
+  disorder:
+    mobidbRegions:
+      sources:
+      - source: mobidb
+        call: getEntry
+        path: $passthrough
+        rank: 1
+      reason: MobiDB consensus disordered regions — combines predictions and experimental data
+    disprotAnnotations:
+      sources:
+      - source: disprot
+        call: search
+        path: data
+        rank: 1
+      reason: DisProt experimentally validated intrinsically disordered regions
+  expressionLocalization:
+    subcellularLocation:
+      sources:
+      - source: proteinatlas
+        call: getGene
+        path: Subcellular location
+        rank: 1
+    proteinClass:
+      sources:
+      - source: proteinatlas
+        call: getGene
+        path: Protein class
+        rank: 1
+  targetInfo:
+    approvedSymbol:
+      sources:
+      - source: opentargets
+        call: getTarget
+        path: target.approvedSymbol
+        rank: 1
+    approvedName:
+      sources:
+      - source: opentargets
+        call: getTarget
+        path: target.approvedName
+        rank: 1
+    diseaseCount:
+      sources:
+      - source: opentargets
+        call: getTarget
+        path: target.associatedDiseases.count
+        rank: 1
+  geneticConstraint:
+    gnomadConstraint:
+      sources:
+      - source: gnomad
+        call: searchVariant
+        path: gene.gnomad_constraint
+        rank: 1
+      reason: gnomAD constraint metrics — pLI (loss-of-function intolerance), o/e ratios for structural importance
+  pathways:
+    reactomePathways:
+      sources:
+      - source: reactome
+        call: search
+        path: results
+        rank: 1
+      reason: Reactome pathways — structural and functional context for this protein
+  literature:
+    structurePublications:
+      sources:
+      - source: europepmc
+        call: search
+        path: resultList.result
+        rank: 1
+      reason: Recent structural biology publications — crystal structures, cryo-EM, domain analyses
+    publicationCount:
+      sources:
+      - source: europepmc
+        call: search
+        path: hitCount
+        rank: 1
+  experimentalStructures:
+    pdbEntry:
+      sources:
+      - source: pdb
+        call: getEntry
+        path: $passthrough
+        rank: 1
+      reason: RCSB PDB experimental 3D structure — X-ray crystallography, cryo-EM, NMR method and resolution
+  structureSummary:
+    pdbeEntry:
+      sources:
+      - source: pdbe
+        call: getSummary
+        path: $passthrough
+        rank: 1
+      reason: PDBe structure summary — method, resolution, deposition date, authors, ligands, assemblies
+  foldClassification:
+    cathDomain:
+      sources:
+      - source: cath
+        call: getDomain
+        path: $passthrough
+        rank: 1
+      reason: CATH hierarchical domain classification — Class, Architecture, Topology, Homologous superfamily
+  homologyModels:
+    swissModelStructures:
+      sources:
+      - source: swiss-model
+        call: getModels
+        path: result.structures
+        rank: 1
+      reason: SWISS-MODEL homology models — template PDB, identity, coverage, QMEAN quality score
+  cryoemMaps:
+    emdbEntries:
+      sources:
+      - source: emdb
+        call: search
+        path: $passthrough
+        rank: 1
+      reason: EMDB cryo-EM density maps and 3D reconstructions — EMDB IDs, resolution, deposition dates
+  proteomicsData:
+    prideProjects:
+      sources:
+      - source: pride
+        call: searchProjects
+        path: $passthrough
+        rank: 1
+      reason: PRIDE mass spectrometry proteomics projects — experimental PTM validation, structural proteomics
+  observedPeptides:
+    peptideatlasPeptides:
+      sources:
+      - source: peptideatlas
+        call: getProtein
+        path: $passthrough
+        rank: 1
+      reason: PeptideAtlas observed peptides — mass spec validated peptides, coverage of protein sequence
+  structuralMotifs:
+    elmStructuralMotifs:
+      sources:
+      - source: elm
+        call: getInstances
+        path: $passthrough
+        rank: 1
+      reason: ELM linear motifs in disordered regions — functional sites outside structured domains
+  glycosylationStructure:
+    glygenStructuralGlycans:
+      sources:
+      - source: glygen
+        call: getProtein
+        path: $passthrough
+        rank: 1
+      reason: GlyGen glycosylation with structural context — glycan attachment sites, glycan structures
+  biologicalAssembly:
+    pdbAssembly:
+      sources:
+      - source: pdb
+        call: getAssembly
+        path: $passthrough
+        rank: 1
+      reason: RCSB PDB biological assembly — quaternary structure, polymer entity count, and stoichiometry
+  branchedEntity:
+    pdbBranchedEntity:
+      sources:
+      - source: pdb
+        call: getBranchedEntity
+        path: $passthrough
+        rank: 1
+      reason: RCSB PDB branched entity — carbohydrate/glycan moiety description and molecular weight
+  structurePublication:
+    pdbPubmed:
+      sources:
+      - source: pdb
+        call: getEntryPubmed
+        path: $passthrough
+        rank: 1
+      reason: RCSB PDB associated publication — PubMed abstract, MeSH descriptors for the structure determination
+  experimentalDetails:
+    pdbExperimental:
+      sources:
+      - source: pdb
+        call: getExperimentalData
+        path: $passthrough
+        rank: 1
+      reason: RCSB PDB experimental details — resolution, method, atom count, and deposition date
+  ligandInfo:
+    pdbLigand:
+      sources:
+      - source: pdb
+        call: getLigand
+        path: $passthrough
+        rank: 1
+      reason: RCSB PDB ligand — non-polymer entity description, formula weight, and compound ID
+  polymerEntity:
+    pdbPolymerEntity:
+      sources:
+      - source: pdb
+        call: getPolymerEntity
+        path: $passthrough
+        rank: 1
+      reason: RCSB PDB polymer entity — chain sequence, organism, polymer type, and strand identifiers
+  pdbUniprotMapping:
+    pdbToUniprot:
+      sources:
+      - source: pdb
+        call: getUniprotMapping
+        path: $passthrough
+        rank: 1
+      reason: RCSB PDB UniProt mapping — structure-to-sequence correspondence for functional annotation
+  bindingSites:
+    pdbeBindingSites:
+      sources:
+      - source: pdbe
+        call: getBindingSites
+        path: $passthrough
+        rank: 1
+      reason: PDBe binding sites — ligand-contacting residues and interaction geometry
+  pdbeExperiment:
+    pdbeExperimentalDetails:
+      sources:
+      - source: pdbe
+        call: getExperiment
+        path: $passthrough
+        rank: 1
+      reason: PDBe experimental details — resolution, R-factor, space group, and data collection statistics
+  pdbeLigands:
+    pdbeLigandMonomers:
+      sources:
+      - source: pdbe
+        call: getLigands
+        path: $passthrough
+        rank: 1
+      reason: PDBe ligand monomers — small molecule components, chemical identifiers, and binding information
+  pdbeMolecules:
+    pdbeMoleculeInfo:
+      sources:
+      - source: pdbe
+        call: getMolecules
+        path: $passthrough
+        rank: 1
+      reason: PDBe molecule details — chain-level entity information, molecule names, and source organisms
+  pdbePublications:
+    pdbePublicationInfo:
+      sources:
+      - source: pdbe
+        call: getPublications
+        path: $passthrough
+        rank: 1
+      reason: PDBe publications — associated literature with titles, authors, and journal references
+  secondaryStructure:
+    pdbeSecondaryStructure:
+      sources:
+      - source: pdbe
+        call: getSecondaryStructure
+        path: $passthrough
+        rank: 1
+      reason: PDBe secondary structure — helix and strand assignments for structural topology analysis
+  pdbeUniprotMapping:
+    pdbeSiftsMapping:
+      sources:
+      - source: pdbe
+        call: getUniprotMapping
+        path: $passthrough
+        rank: 1
+      reason: PDBe SIFTS UniProt mapping — residue-level structure-to-sequence correspondence
+  graphMolecules:
+    pdbeGraphMolecules:
+      sources:
+      - source: pdbe-graph
+        call: getMolecules
+        path: $passthrough
+        rank: 1
+      reason: PDBe Graph molecule details — entity-level information from the PDBe Graph API
+  peptideatlasSearch:
+    peptideatlasProteinSearch:
+      sources:
+      - source: peptideatlas
+        call: search
+        path: $passthrough
+        rank: 1
+      reason: PeptideAtlas protein search — mass spectrometry validated proteins and peptide coverage

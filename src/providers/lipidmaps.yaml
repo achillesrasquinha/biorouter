@@ -2,18 +2,18 @@ name: lipidmaps
 displayName: LIPID MAPS
 description: LIPID MAPS Structure Database for lipid classification and structures
 tags:
-  - lipids
-  - lipidomics
-  - metabolites
-  - structures
-  - chemistry
+- lipids
+- lipidomics
+- metabolites
+- structures
+- chemistry
 baseUrl: https://www.lipidmaps.org/rest
 tools:
   getCompound:
     description: Get lipid compound details by LIPID MAPS ID
     tags:
-      - lipid-info
-      - compound-info
+    - lipid-info
+    - compound-info
     method: GET
     path: /compound/lm_id/{lmId}/all/json
     params:
@@ -24,19 +24,20 @@ tools:
     response:
       format: json
       fields:
-        - lm_id
-        - name
-        - sys_name
-        - formula
-        - exactmass
-        - abbrev
-        - core
-        - main_class
+      - lm_id
+      - name
+      - sys_name
+      - formula
+      - exactmass
+      - abbrev
+      - core
+      - main_class
+    entity: compound
   getByName:
     description: Search lipids by abbreviated chain name
     tags:
-      - lipid-search
-      - name-search
+    - lipid-search
+    - name-search
     method: GET
     path: /compound/abbrev_chains/{name}/all/json
     params:
@@ -47,19 +48,20 @@ tools:
     response:
       format: json
       fields:
-        - lm_id
-        - name
-        - sys_name
-        - formula
-        - exactmass
-        - abbrev
-        - core
-        - main_class
+      - lm_id
+      - name
+      - sys_name
+      - formula
+      - exactmass
+      - abbrev
+      - core
+      - main_class
+    entity: compound
   searchByName:
     description: Search lipids by common name
     tags:
-      - lipid-search
-      - name-search
+    - lipid-search
+    - name-search
     method: GET
     path: /compound/name/{name}/all/json
     params:
@@ -70,32 +72,33 @@ tools:
     response:
       format: json
       fields:
-        - "[].lm_id"
-        - "[].name"
-        - "[].systematic_name"
-        - "[].main_class"
-        - "[].formula"
-        - "[].exactmass"
+      - '[].lm_id'
+      - '[].name'
+      - '[].systematic_name'
+      - '[].main_class'
+      - '[].formula'
+      - '[].exactmass'
+    entity: compound
 tests:
   getCompound:
-    - name: gets compound by LIPID MAPS ID
-      params:
-        lmId: LMFA01010001
-      assert:
-        - {}
-        - anyOf:
-            - isArray: true
-              minLength: 1
-            - path: name
+  - name: gets compound by LIPID MAPS ID
+    params:
+      lmId: LMFA01010001
+    assert:
+    - {}
+    - anyOf:
+      - isArray: true
+        minLength: 1
+      - path: name
   searchByName:
-    - name: searches lipids by name cholesterol
-      params:
-        name: cholesterol
-      assert:
-        - {}
+  - name: searches lipids by name cholesterol
+    params:
+      name: cholesterol
+    assert:
+    - {}
   getByName:
-    - name: searches lipids by abbreviated chain name
-      params:
-        name: DHA
-      assert:
-        - {}
+  - name: searches lipids by abbreviated chain name
+    params:
+      name: DHA
+    assert:
+    - {}

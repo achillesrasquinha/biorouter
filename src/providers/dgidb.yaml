@@ -2,33 +2,22 @@ name: dgidb
 displayName: DGIdb
 description: Drug-Gene Interaction Database — mining drug-gene interaction data
 tags:
-  - drug
-  - gene
-  - interaction
-  - pharmacogenomics
-  - druggable-genome
+- drug
+- gene
+- interaction
+- pharmacogenomics
+- druggable-genome
 baseUrl: https://dgidb.org/api/graphql
 protocol: graphql
 tools:
   search:
     description: Search for drug-gene interactions by gene name
     tags:
-      - drug-gene-search
-      - interaction-search
-    query: |
-      query ($names: [String!]!) {
-        genes(names: $names) {
-          nodes {
-            name
-            longName
-            interactions {
-              drug { name conceptId }
-              interactionTypes { type directionality }
-              evidenceScore
-            }
-          }
-        }
-      }
+    - drug-gene-search
+    - interaction-search
+    query: "query ($names: [String!]!) {\n  genes(names: $names) {\n    nodes {\n      name\n      longName\n      interactions\
+      \ {\n        drug { name conceptId }\n        interactionTypes { type directionality }\n        evidenceScore\n    \
+      \  }\n    }\n  }\n}\n"
     params:
       names:
         type: array
@@ -37,32 +26,21 @@ tools:
     response:
       format: json
       fields:
-        - "genes.nodes[].name"
-        - "genes.nodes[].longName"
-        - "genes.nodes[].interactions[].drug.name"
-        - "genes.nodes[].interactions[].drug.conceptId"
-        - "genes.nodes[].interactions[].interactionTypes[].type"
-        - "genes.nodes[].interactions[].interactionTypes[].directionality"
-        - "genes.nodes[].interactions[].evidenceScore"
+      - genes.nodes[].name
+      - genes.nodes[].longName
+      - genes.nodes[].interactions[].drug.name
+      - genes.nodes[].interactions[].drug.conceptId
+      - genes.nodes[].interactions[].interactionTypes[].type
+      - genes.nodes[].interactions[].interactionTypes[].directionality
+      - genes.nodes[].interactions[].evidenceScore
+    entity: gene
   getGene:
     description: Get gene details including drug interactions
     tags:
-      - gene-info
-      - drug-gene-info
-    query: |
-      query ($names: [String!]!) {
-        genes(names: $names) {
-          nodes {
-            name
-            longName
-            geneCategories { name }
-            interactions {
-              drug { name conceptId }
-              evidenceScore
-            }
-          }
-        }
-      }
+    - gene-info
+    - drug-gene-info
+    query: "query ($names: [String!]!) {\n  genes(names: $names) {\n    nodes {\n      name\n      longName\n      geneCategories\
+      \ { name }\n      interactions {\n        drug { name conceptId }\n        evidenceScore\n      }\n    }\n  }\n}\n"
     params:
       names:
         type: array
@@ -71,26 +49,20 @@ tools:
     response:
       format: json
       fields:
-        - "genes.nodes[].name"
-        - "genes.nodes[].longName"
-        - "genes.nodes[].geneCategories[].name"
-        - "genes.nodes[].interactions[].drug.name"
-        - "genes.nodes[].interactions[].drug.conceptId"
-        - "genes.nodes[].interactions[].evidenceScore"
+      - genes.nodes[].name
+      - genes.nodes[].longName
+      - genes.nodes[].geneCategories[].name
+      - genes.nodes[].interactions[].drug.name
+      - genes.nodes[].interactions[].drug.conceptId
+      - genes.nodes[].interactions[].evidenceScore
+    entity: gene
   getCategories:
     description: Get gene categories for a gene
     tags:
-      - gene-categories
-      - druggable-genome
-    query: |
-      query ($names: [String!]!) {
-        genes(names: $names) {
-          nodes {
-            name
-            geneCategories { name }
-          }
-        }
-      }
+    - gene-categories
+    - druggable-genome
+    query: "query ($names: [String!]!) {\n  genes(names: $names) {\n    nodes {\n      name\n      geneCategories { name }\n\
+      \    }\n  }\n}\n"
     params:
       names:
         type: array
@@ -99,24 +71,16 @@ tools:
     response:
       format: json
       fields:
-        - "genes.nodes[].name"
-        - "genes.nodes[].geneCategories[].name"
+      - genes.nodes[].name
+      - genes.nodes[].geneCategories[].name
+    entity: gene
   getDrugApplications:
     description: Get drug details and application information
     tags:
-      - drug-info
-      - drug-applications
-    query: |
-      query ($names: [String!]!) {
-        drugs(names: $names) {
-          nodes {
-            name
-            conceptId
-            approved
-            drugApplications { appNo }
-          }
-        }
-      }
+    - drug-info
+    - drug-applications
+    query: "query ($names: [String!]!) {\n  drugs(names: $names) {\n    nodes {\n      name\n      conceptId\n      approved\n\
+      \      drugApplications { appNo }\n    }\n  }\n}\n"
     params:
       names:
         type: array
@@ -125,46 +89,47 @@ tools:
     response:
       format: json
       fields:
-        - "drugs.nodes[].name"
-        - "drugs.nodes[].conceptId"
-        - "drugs.nodes[].approved"
-        - "drugs.nodes[].drugApplications[].appNo"
+      - drugs.nodes[].name
+      - drugs.nodes[].conceptId
+      - drugs.nodes[].approved
+      - drugs.nodes[].drugApplications[].appNo
+    entity: compound
 tests:
   search:
-    - name: searches for EGFR drug-gene interactions
-      params:
-        names:
-          - EGFR
-      assert:
-        - path: genes.nodes
-          minLength: 1
-        - path: genes.nodes.0.interactions
-          minLength: 1
+  - name: searches for EGFR drug-gene interactions
+    params:
+      names:
+      - EGFR
+    assert:
+    - path: genes.nodes
+      minLength: 1
+    - path: genes.nodes.0.interactions
+      minLength: 1
   getGene:
-    - name: gets gene details for BRAF
-      params:
-        names:
-          - BRAF
-      assert:
-        - path: genes.nodes
-          minLength: 1
-        - path: genes.nodes.0.name
-          equals: BRAF
+  - name: gets gene details for BRAF
+    params:
+      names:
+      - BRAF
+    assert:
+    - path: genes.nodes
+      minLength: 1
+    - path: genes.nodes.0.name
+      equals: BRAF
   getCategories:
-    - name: gets gene categories for EGFR
-      params:
-        names:
-          - EGFR
-      assert:
-        - path: genes.nodes
-          minLength: 1
-        - path: genes.nodes.0.geneCategories
-          minLength: 1
+  - name: gets gene categories for EGFR
+    params:
+      names:
+      - EGFR
+    assert:
+    - path: genes.nodes
+      minLength: 1
+    - path: genes.nodes.0.geneCategories
+      minLength: 1
   getDrugApplications:
-    - name: gets drug info for ERLOTINIB
-      params:
-        names:
-          - ERLOTINIB
-      assert:
-        - path: drugs.nodes
-          minLength: 1
+  - name: gets drug info for ERLOTINIB
+    params:
+      names:
+      - ERLOTINIB
+    assert:
+    - path: drugs.nodes
+      minLength: 1

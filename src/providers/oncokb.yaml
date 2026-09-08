@@ -1,0 +1,151 @@
+name: oncokb
+displayName: OncoKB
+description: Precision oncology knowledge base — cancer variant actionability and treatment implications
+tags:
+- cancer
+- precision-medicine
+- variant-actionability
+- oncokb
+# NOTE: Most OncoKB endpoints require an API key (HTTP 401 without one).
+# Register at https://www.oncokb.org/apiAccess to obtain a token.
+# Set env var LS_ONCOKB_API_KEY to your Bearer token.
+auth:
+  type: bearer
+  env: LS_ONCOKB_API_KEY
+baseUrl: https://www.oncokb.org/api/v1
+tools:
+  searchByGene:
+    description: Get all annotated variants for a specific gene
+    tags:
+    - gene-variants
+    - annotated-variants
+    method: GET
+    path: /utils/allAnnotatedVariants
+    params:
+      gene:
+        type: string
+        required: true
+        description: Hugo gene symbol to filter annotated variants (e.g. BRAF, EGFR)
+    response:
+      format: json
+      fields:
+      - '[].gene'
+      - '[].variant'
+      - '[].oncogenicity'
+      - '[].mutationEffect'
+      - '[].highestSensitiveLevel'
+      - '[].highestResistanceLevel'
+    entity: gene
+  getVariantAnnotation:
+    description: Annotate a mutation by protein change and gene symbol
+    tags:
+    - variant-annotation
+    - protein-change
+    method: GET
+    path: /annotate/mutations/byProteinChange
+    params:
+      gene:
+        type: string
+        required: true
+        mapsTo: hugoSymbol
+        description: Hugo gene symbol (e.g. BRAF, EGFR)
+      alteration:
+        type: string
+        required: true
+        description: Protein change alteration (e.g. V600E, T790M)
+    response:
+      format: json
+      fields:
+      - query.hugoSymbol
+      - query.alteration
+      - oncogenic
+      - mutationEffect.knownEffect
+      - mutationEffect.description
+      - highestSensitiveLevel
+      - highestResistanceLevel
+      - treatments[].level
+      - treatments[].drugs[].drugName
+      - treatments[].alterations
+    entity: variant
+  searchByHgvs:
+    description: Annotate a mutation by HGVSg genomic notation
+    tags:
+    - variant-annotation
+    - hgvsg
+    method: GET
+    path: /annotate/mutations/byHGVSg
+    params:
+      hgvsg:
+        type: string
+        required: true
+        description: HGVSg genomic notation (e.g. 7:g.140453136A>T)
+    response:
+      format: json
+      fields:
+      - query.hgvsg
+      - oncogenic
+      - mutationEffect.knownEffect
+      - mutationEffect.description
+      - highestSensitiveLevel
+      - highestResistanceLevel
+      - treatments[].level
+      - treatments[].drugs[].drugName
+    entity: variant
+  getCancerGeneList:
+    description: Get the curated list of cancer genes from OncoKB
+    tags:
+    - cancer-gene-list
+    - curated-genes
+    method: GET
+    path: /utils/cancerGeneList
+    params:
+      _placeholder:
+        type: string
+        description: No parameters required; returns full cancer gene list
+    response:
+      format: json
+      fields:
+      - '[].entrezGeneId'
+      - '[].hugoSymbol'
+      - '[].oncogene'
+      - '[].tsg'
+      - '[].highestSensitiveLevel'
+      - '[].highestResistanceLevel'
+    entity: gene
+tests:
+  searchByGene:
+  - name: gets annotated variants for BRAF
+    params:
+      gene: BRAF
+    assert:
+    - isArray: true
+    - path: 0.gene
+      equals: BRAF
+    - path: 0.variant
+    allowError: true
+  getVariantAnnotation:
+  - name: annotates BRAF V600E protein change
+    params:
+      gene: BRAF
+      alteration: V600E
+    assert:
+    - path: query.alteration
+      equals: V600E
+    - path: oncogenic
+    allowError: true
+  searchByHgvs:
+  - name: annotates variant by HGVSg notation
+    params:
+      hgvsg: 7:g.140453136A>T
+    assert:
+    - path: query.hgvsg
+    - path: oncogenic
+    allowError: true
+  getCancerGeneList:
+  - name: retrieves the full cancer gene list
+    params: {}
+    assert:
+    - isArray: true
+    - minLength: 1
+    - path: 0.hugoSymbol
+    allowError: true

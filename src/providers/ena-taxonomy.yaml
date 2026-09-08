@@ -2,18 +2,18 @@ name: ena-taxonomy
 displayName: ENA Taxonomy
 description: EBI ENA Taxonomy — taxonomic classification lookup with lineage and common names
 tags:
-  - taxonomy
-  - species
-  - classification
-  - ena
-  - lineage
+- taxonomy
+- species
+- classification
+- ena
+- lineage
 baseUrl: https://www.ebi.ac.uk/ena/taxonomy/rest
 tools:
   getByTaxId:
     description: Get taxonomy information by NCBI taxon ID
     tags:
-      - taxon-lookup
-      - tax-id
+    - taxon-lookup
+    - tax-id
     method: GET
     path: /tax-id/{taxId}
     params:
@@ -24,17 +24,18 @@ tools:
     response:
       format: json
       fields:
-        - taxId
-        - scientificName
-        - commonName
-        - rank
-        - division
-        - lineage
+      - taxId
+      - scientificName
+      - commonName
+      - rank
+      - division
+      - lineage
+    entity: organism
   searchByName:
     description: Search taxonomy by scientific name
     tags:
-      - name-search
-      - species-search
+    - name-search
+    - species-search
     method: GET
     path: /scientific-name/{name}
     params:
@@ -45,17 +46,18 @@ tools:
     response:
       format: json
       fields:
-        - "[].taxId"
-        - "[].scientificName"
-        - "[].commonName"
-        - "[].rank"
-        - "[].division"
-        - "[].lineage"
+      - '[].taxId'
+      - '[].scientificName'
+      - '[].commonName'
+      - '[].rank'
+      - '[].division'
+      - '[].lineage'
+    entity: organism
   suggest:
     description: Suggest taxonomy names for autocomplete search
     tags:
-      - suggest
-      - autocomplete
+    - suggest
+    - autocomplete
     method: GET
     path: /suggest-for-search/{term}
     params:
@@ -66,24 +68,25 @@ tools:
     response:
       format: json
       fields:
-        - "[].taxId"
-        - "[].scientificName"
-        - "[].commonName"
+      - '[].taxId'
+      - '[].scientificName'
+      - '[].commonName'
+    entity: organism
 tests:
   getByTaxId:
-    - name: gets human taxonomy
-      params:
-        taxId: 9606
-      assert:
-        - path: taxId
-          equals: "9606"
-        - path: scientificName
-          equals: Homo sapiens
+  - name: gets human taxonomy
+    params:
+      taxId: 9606
+    assert:
+    - path: taxId
+      equals: '9606'
+    - path: scientificName
+      equals: Homo sapiens
   suggest:
-    - name: suggests for human
-      params:
-        term: human
-      assert:
-        - path: ""
-          minLength: 1
-        - path: "0.scientificName"
+  - name: suggests for human
+    params:
+      term: human
+    assert:
+    - path: ''
+      minLength: 1
+    - path: 0.scientificName

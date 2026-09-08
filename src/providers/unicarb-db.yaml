@@ -2,18 +2,18 @@ name: unicarb-db
 displayName: UniCarb-DB
 description: UniCarb-DB — glycan structure database with experimentally determined carbohydrate structures
 tags:
-  - glycan
-  - carbohydrate
-  - structure
-  - mass-spectrometry
-  - unicarb
+- glycan
+- carbohydrate
+- structure
+- mass-spectrometry
+- unicarb
 baseUrl: https://unicarb-db.expasy.org/api
 tools:
   search:
     description: Search UniCarb-DB for glycan structures by keyword or composition
     tags:
-      - glycan-search
-      - structure-search
+    - glycan-search
+    - structure-search
     method: GET
     path: /structures
     params:
@@ -23,11 +23,12 @@ tools:
         description: Search term for glycan structures (e.g. "Hex5HexNAc4")
     response:
       format: json
+    entity: structure
   getStructure:
     description: Get detailed information for a specific glycan structure by ID
     tags:
-      - structure-detail
-      - glycan-detail
+    - structure-detail
+    - glycan-detail
     method: GET
     path: /structures/{id}
     params:
@@ -37,18 +38,19 @@ tools:
         description: UniCarb-DB structure identifier
     response:
       format: json
+    entity: structure
 tests:
   search:
-    - name: searches for glycan structures
-      params:
-        query: Hex5HexNAc4
-      assert:
-        - {}
-      allowError: true
+  - name: searches for glycan structures
+    params:
+      query: Hex5HexNAc4
+    assert:
+    - {}
+    allowError: true
   getStructure:
-    - name: gets structure by ID
-      params:
-        id: 1
-      assert:
-        - {}
-      allowError: true
+  - name: gets structure by ID
+    params:
+      id: 1
+    assert:
+    - {}
+    allowError: true

@@ -2,18 +2,18 @@ name: oma
 displayName: OMA
 description: Orthologous Matrix — comprehensive ortholog database
 tags:
-  - ortholog
-  - evolution
-  - comparative-genomics
-  - oma
-  - homolog
+- ortholog
+- evolution
+- comparative-genomics
+- oma
+- homolog
 baseUrl: https://omabrowser.org/api
 tools:
   getProtein:
     description: Get protein info with orthologs
     tags:
-      - protein
-      - ortholog-lookup
+    - protein
+    - ortholog-lookup
     method: GET
     path: /protein/{proteinId}/
     params:
@@ -24,21 +24,22 @@ tools:
     response:
       format: json
       fields:
-        - entry_nr
-        - omaid
-        - canonicalid
-        - sequence_length
-        - species.species
-        - species.taxon_id
-        - oma_group
-        - oma_hog_id
-        - chromosome
-        - description
+      - entry_nr
+      - omaid
+      - canonicalid
+      - sequence_length
+      - species.species
+      - species.taxon_id
+      - oma_group
+      - oma_hog_id
+      - chromosome
+      - description
+    entity: protein
   getOrthologs:
     description: Get orthologs for a protein
     tags:
-      - ortholog-list
-      - comparative
+    - ortholog-list
+    - comparative
     method: GET
     path: /protein/{proteinId}/orthologs/
     params:
@@ -49,20 +50,21 @@ tools:
     response:
       format: json
       fields:
-        - '[].entry_nr'
-        - '[].omaid'
-        - '[].canonicalid'
-        - '[].sequence_length'
-        - '[].species.species'
-        - '[].species.taxon_id'
-        - '[].rel_type'
-        - '[].distance'
-        - '[].score'
+      - '[].entry_nr'
+      - '[].omaid'
+      - '[].canonicalid'
+      - '[].sequence_length'
+      - '[].species.species'
+      - '[].species.taxon_id'
+      - '[].rel_type'
+      - '[].distance'
+      - '[].score'
+    entity: gene
   getHOG:
     description: Get hierarchical orthologous group details
     tags:
-      - hog
-      - ortholog-group
+    - hog
+    - ortholog-group
     method: GET
     path: /hog/{hogId}/
     params:
@@ -73,16 +75,17 @@ tools:
     response:
       format: json
       fields:
-        - '[].hog_id'
-        - '[].level'
-        - '[].levels_url'
-        - '[].members_url'
-        - '[].alternative_levels'
+      - '[].hog_id'
+      - '[].level'
+      - '[].levels_url'
+      - '[].members_url'
+      - '[].alternative_levels'
+    entity: gene
   getGenome:
     description: Get genome information by genome identifier
     tags:
-      - genome-info
-      - species-genome
+    - genome-info
+    - species-genome
     method: GET
     path: /genome/{genomeId}/
     params:
@@ -93,23 +96,25 @@ tools:
     response:
       format: json
       fields:
-        - species.species
-        - species.genome
-        - nr_entries
+      - code
+      - species
+      - taxon_id
+      - nr_entries
+    entity: organism
 tests:
   getProtein:
-    - name: gets protein info for P04637
-      params:
-        proteinId: P04637
-      assert:
-        - {}
-        - anyOf:
-            - entry_nr
-            - sequence
+  - name: gets protein info for P04637
+    params:
+      proteinId: P04637
+    assert:
+    - {}
+    - anyOf:
+      - entry_nr
+      - sequence
   getGenome:
-    - name: gets genome info for HUMAN
-      params:
-        genomeId: HUMAN
-      assert:
-        - path: species.species
-        - path: nr_entries
+  - name: gets genome info for HUMAN
+    params:
+      genomeId: HUMAN
+    assert:
+    - path: species
+    - path: nr_entries

@@ -2,32 +2,21 @@ name: pharos
 displayName: Pharos
 description: Illuminating the Druggable Genome — comprehensive target, disease, and ligand knowledge base
 tags:
-  - drug-targets
-  - druggable-genome
-  - pharos
-  - ligands
-  - diseases
+- drug-targets
+- druggable-genome
+- pharos
+- ligands
+- diseases
 baseUrl: https://pharos-api.ncats.io/graphql
 protocol: graphql
 tools:
   searchTargets:
     description: Search drug targets by name or keyword
     tags:
-      - target-search
-      - druggable-genome
-    query: |
-      query($term: String!, $top: Int) {
-        targets(filter: { term: $term }, top: $top) {
-          targets {
-            name
-            uniprot
-            tdl
-            sym
-            description
-            fam
-          }
-        }
-      }
+    - target-search
+    - druggable-genome
+    query: "query($term: String!, $top: Int) {\n  targets(filter: { term: $term }, top: $top) {\n    targets {\n      name\n\
+      \      uniprot\n      tdl\n      sym\n      description\n      fam\n    }\n  }\n}\n"
     params:
       term:
         type: string
@@ -40,35 +29,20 @@ tools:
     response:
       format: json
       fields:
-        - targets.targets[].name
-        - targets.targets[].uniprot
-        - targets.targets[].tdl
-        - targets.targets[].sym
-        - targets.targets[].description
-        - targets.targets[].fam
+      - targets.targets[].name
+      - targets.targets[].uniprot
+      - targets.targets[].tdl
+      - targets.targets[].sym
+      - targets.targets[].description
+      - targets.targets[].fam
+    entity: protein
   getTarget:
     description: Get detailed info for a target by UniProt accession
     tags:
-      - target-info
-      - uniprot
-    query: |
-      query($uniprot: String!) {
-        target(q: { uniprot: $uniprot }) {
-          name
-          uniprot
-          tdl
-          sym
-          description
-          fam
-          novelty
-          diseases {
-            name
-          }
-          ligands {
-            name
-          }
-        }
-      }
+    - target-info
+    - uniprot
+    query: "query($uniprot: String!) {\n  target(q: { uniprot: $uniprot }) {\n    name\n    uniprot\n    tdl\n    sym\n  \
+      \  description\n    fam\n    novelty\n    diseases {\n      name\n    }\n    ligands {\n      name\n    }\n  }\n}\n"
     params:
       uniprot:
         type: string
@@ -77,32 +51,33 @@ tools:
     response:
       format: json
       fields:
-        - target.name
-        - target.uniprot
-        - target.tdl
-        - target.sym
-        - target.description
-        - target.novelty
-        - target.diseases[].name
-        - target.ligands[].name
+      - target.name
+      - target.uniprot
+      - target.tdl
+      - target.sym
+      - target.description
+      - target.novelty
+      - target.diseases[].name
+      - target.ligands[].name
+    entity: protein
 tests:
   searchTargets:
-    - name: searches for EGFR targets
-      params:
-        term: EGFR
-        top: 5
-      assert:
-        - path: targets.targets
-          minLength: 1
-        - path: targets.targets.0.name
-        - path: targets.targets.0.uniprot
+  - name: searches for EGFR targets
+    params:
+      term: EGFR
+      top: 5
+    assert:
+    - path: targets.targets
+      minLength: 1
+    - path: targets.targets.0.name
+    - path: targets.targets.0.uniprot
   getTarget:
-    - name: gets target details for TP53
-      params:
-        uniprot: P04637
-      assert:
-        - path: target.name
-        - path: target.uniprot
-          equals: P04637
-        - path: target.sym
-          equals: TP53
+  - name: gets target details for TP53
+    params:
+      uniprot: P04637
+    assert:
+    - path: target.name
+    - path: target.uniprot
+      equals: P04637
+    - path: target.sym
+      equals: TP53

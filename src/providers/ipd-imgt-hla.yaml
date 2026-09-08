@@ -2,19 +2,18 @@ name: ipd-imgt-hla
 displayName: IPD-IMGT/HLA
 description: IPD-IMGT/HLA allele database — HLA allele sequences, nomenclature, and immunogenetics data
 tags:
-  - hla
-  - allele
-  - immunogenetics
-  - mhc
-  - nomenclature
+- hla
+- allele
+- immunogenetics
+- mhc
+- nomenclature
 baseUrl: https://www.ebi.ac.uk/ipd/imgt/hla/api
-
 tools:
   searchAlleles:
     description: Search HLA alleles by query term
     tags:
-      - allele-search
-      - hla-search
+    - allele-search
+    - hla-search
     method: GET
     path: /allele
     params:
@@ -25,12 +24,12 @@ tools:
         description: Search term for HLA alleles (e.g. "A*02:01", "B*07")
     response:
       format: json
-
+    entity: variant
   getAllele:
     description: Get a specific HLA allele by accession number
     tags:
-      - allele-detail
-      - hla-lookup
+    - allele-detail
+    - hla-lookup
     method: GET
     path: /allele/{accession}
     params:
@@ -40,12 +39,12 @@ tools:
         description: HLA allele accession number (e.g. "HLA00001")
     response:
       format: json
-
+    entity: variant
   getNomenclature:
     description: Get nomenclature information for an HLA allele
     tags:
-      - nomenclature
-      - hla-naming
+    - nomenclature
+    - hla-naming
     method: GET
     path: /nomenclature/{allele_name}
     params:
@@ -55,26 +54,26 @@ tools:
         description: HLA allele name (e.g. "A*02:01:01:01")
     response:
       format: json
-
+    entity: variant
 tests:
   searchAlleles:
-    - name: searches for HLA-A alleles
-      params:
-        query: "A*02:01"
-      assert:
-        - {}
-      allowError: true
+  - name: searches for HLA-A alleles
+    params:
+      query: A*02:01
+    assert:
+    - {}
+    allowError: true
   getAllele:
-    - name: gets allele by accession
-      params:
-        accession: HLA00001
-      assert:
-        - {}
-      allowError: true
+  - name: gets allele by accession
+    params:
+      accession: HLA00001
+    assert:
+    - {}
+    allowError: true
   getNomenclature:
-    - name: gets nomenclature for allele
-      params:
-        allele_name: "A*02:01:01:01"
-      assert:
-        - {}
-      allowError: true
+  - name: gets nomenclature for allele
+    params:
+      allele_name: A*02:01:01:01
+    assert:
+    - {}
+    allowError: true

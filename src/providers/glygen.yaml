@@ -2,35 +2,36 @@ name: glygen
 displayName: GlyGen
 description: GlyGen — glycoscience data integration and retrieval
 tags:
-  - glycomics
-  - glycan
-  - glycoprotein
-  - glygen
-  - carbohydrate
+- glycomics
+- glycan
+- glycoprotein
+- glygen
+- carbohydrate
 baseUrl: https://api.glygen.org
 tools:
   searchGlycans:
     description: Get glycan search initialization data including organism list and mass ranges
     tags:
-      - glycan-search
-      - glycan-init
+    - glycan-search
+    - glycan-init
     method: POST
     path: /glycan/search_init/
     params: {}
     response:
       format: json
       fields:
-        - "glycan_mass.native"
-        - "glycan_mass.permethylated"
-        - "number_monosaccharides"
-        - "organism[].name"
-        - "organism[].id"
-        - "glycan_type"
+      - glycan_mass.native
+      - glycan_mass.permethylated
+      - number_monosaccharides
+      - organism[].name
+      - organism[].id
+      - glycan_type
+    entity: compound
   getProtein:
     description: Get detailed glycoprotein information by UniProt accession
     tags:
-      - protein-detail
-      - glycoprotein-info
+    - protein-detail
+    - glycoprotein-info
     method: POST
     path: /protein/detail/{accession}/
     params:
@@ -41,19 +42,20 @@ tools:
     response:
       format: json
       fields:
-        - "mass"
-        - "gene_names[].name"
-        - "gene_names[].type"
-        - "protein_names[].name"
-        - "protein_names[].type"
-        - "refseq.ac"
-        - "refseq.name"
-        - "refseq.summary"
+      - mass
+      - gene_names[].name
+      - gene_names[].type
+      - protein_names[].name
+      - protein_names[].type
+      - refseq.ac
+      - refseq.name
+      - refseq.summary
+    entity: protein
   getGlycan:
     description: Get detailed glycan information by GlyTouCan accession
     tags:
-      - glycan-detail
-      - glycan-info
+    - glycan-detail
+    - glycan-info
     method: POST
     path: /glycan/detail/{glytoucan_ac}/
     params:
@@ -64,27 +66,28 @@ tools:
     response:
       format: json
       fields:
-        - "glytoucan_ac"
-        - "mass"
-        - "species[].name"
+      - glytoucan_ac
+      - mass
+      - species[].name
+    entity: compound
 tests:
   searchGlycans:
-    - name: initializes glycan search and gets available parameters
-      params: {}
-      assert:
-        - path: organism
-        - path: organism
-          minLength: 1
+  - name: initializes glycan search and gets available parameters
+    params: {}
+    assert:
+    - path: organism
+    - path: organism
+      minLength: 1
   getProtein:
-    - name: gets protein P00734 (prothrombin) details
-      params:
-        accession: P00734
-      assert:
-        - path: mass
-        - path: refseq
+  - name: gets protein P00734 (prothrombin) details
+    params:
+      accession: P00734
+    assert:
+    - path: mass
+    - path: refseq
   getGlycan:
-    - name: gets glycan details for G17689DH
-      params:
-        glytoucan_ac: G17689DH
-      assert:
-        - path: glytoucan_ac
+  - name: gets glycan details for G17689DH
+    params:
+      glytoucan_ac: G17689DH
+    assert:
+    - path: glytoucan_ac

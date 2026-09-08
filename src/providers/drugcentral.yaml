@@ -1,13 +1,19 @@
 name: drugcentral
 displayName: DrugCentral
 description: Drug information resource integrating drug indications, mechanisms, and interactions
-tags: [drugs, drug-targets, drug-indications, pharmacology, repurposing]
+tags:
+- drugs
+- drug-targets
+- drug-indications
+- pharmacology
+- repurposing
 baseUrl: https://unmtid-shinyapps.net/download/DrugCentral
-
 tools:
   search:
     description: Search DrugCentral for drug information
-    tags: [drug-search, drug-info]
+    tags:
+    - drug-search
+    - drug-info
     method: GET
     path: /drugcentral.json
     params:
@@ -18,12 +24,12 @@ tools:
         description: Drug name to search (e.g. metformin, imatinib)
     response:
       format: json
-
+    entity: compound
 tests:
   search:
-    - name: searches for metformin
-      params:
-        query: metformin
-      assert:
-        - minLength: 1
-      allowError: true
+  - name: searches for metformin
+    params:
+      query: metformin
+    assert:
+    - minLength: 1
+    allowError: true

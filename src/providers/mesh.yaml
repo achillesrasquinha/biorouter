@@ -2,18 +2,18 @@ name: mesh
 displayName: MeSH
 description: Medical Subject Headings vocabulary for indexing biomedical literature
 tags:
-  - mesh
-  - medical-terminology
-  - vocabulary
-  - ncbi
-  - controlled-vocabulary
+- mesh
+- medical-terminology
+- vocabulary
+- ncbi
+- controlled-vocabulary
 baseUrl: https://eutils.ncbi.nlm.nih.gov/entrez/eutils
 tools:
   search:
     description: Search MeSH for medical subject headings and descriptors
     tags:
-      - mesh-search
-      - terminology-search
+    - mesh-search
+    - terminology-search
     method: GET
     path: /esearch.fcgi
     params:
@@ -35,14 +35,15 @@ tools:
     response:
       format: json
       fields:
-        - esearchresult.count
-        - esearchresult.idlist
-        - esearchresult.querytranslation
+      - esearchresult.count
+      - esearchresult.idlist
+      - esearchresult.querytranslation
+    entity: dataset
   getSummary:
     description: Get MeSH descriptor summary by MeSH ID
     tags:
-      - mesh-info
-      - descriptor-info
+    - mesh-info
+    - descriptor-info
     method: GET
     path: /esummary.fcgi
     params:
@@ -58,17 +59,18 @@ tools:
         default: json
     response:
       format: json
+    entity: dataset
 tests:
   search:
-    - name: searches for asthma MeSH terms
-      params:
-        query: asthma
-      assert:
-        - path: esearchresult.idlist
-          minLength: 1
+  - name: searches for asthma MeSH terms
+    params:
+      query: asthma
+    assert:
+    - path: esearchresult.idlist
+      minLength: 1
   getSummary:
-    - name: gets MeSH descriptor summary by ID
-      params:
-        id: "68001249"
-      assert:
-        - path: result.68001249
+  - name: gets MeSH descriptor summary by ID
+    params:
+      id: '68001249'
+    assert:
+    - path: result.68001249

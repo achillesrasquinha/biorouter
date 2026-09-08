@@ -2,30 +2,21 @@ name: civic
 displayName: CIViC
 description: Clinical Interpretations of Variants in Cancer — curated clinical evidence for variants
 tags:
-  - cancer
-  - variants
-  - clinical
-  - civic
-  - precision-medicine
+- cancer
+- variants
+- clinical
+- civic
+- precision-medicine
 baseUrl: https://civicdb.org/api/graphql
 protocol: graphql
 tools:
   searchGenes:
     description: Search for genes by Entrez symbol in the CIViC database
     tags:
-      - gene-search
-      - cancer-gene
-    query: |
-      query($symbols: [String!]!) {
-        genes(entrezSymbols: $symbols, first: 10) {
-          totalCount
-          nodes {
-            id
-            name
-            description
-          }
-        }
-      }
+    - gene-search
+    - cancer-gene
+    query: "query($symbols: [String!]!) {\n  genes(entrezSymbols: $symbols, first: 10) {\n    totalCount\n    nodes {\n  \
+      \    id\n      name\n      description\n    }\n  }\n}\n"
     params:
       symbols:
         type: array
@@ -34,30 +25,19 @@ tools:
     response:
       format: json
       fields:
-        - genes.totalCount
-        - genes.nodes[].id
-        - genes.nodes[].name
-        - genes.nodes[].description
+      - genes.totalCount
+      - genes.nodes[].id
+      - genes.nodes[].name
+      - genes.nodes[].description
+    entity: gene
   getEvidence:
     description: Get clinical evidence items by molecular profile ID
     tags:
-      - evidence
-      - clinical-evidence
-    query: |
-      query($molecularProfileId: Int!, $first: Int) {
-        evidenceItems(molecularProfileId: $molecularProfileId, first: $first) {
-          totalCount
-          nodes {
-            id
-            status
-            evidenceType
-            evidenceLevel
-            evidenceDirection
-            significance
-            description
-          }
-        }
-      }
+    - evidence
+    - clinical-evidence
+    query: "query($molecularProfileId: Int!, $first: Int) {\n  evidenceItems(molecularProfileId: $molecularProfileId, first:\
+      \ $first) {\n    totalCount\n    nodes {\n      id\n      status\n      evidenceType\n      evidenceLevel\n      evidenceDirection\n\
+      \      significance\n      description\n    }\n  }\n}\n"
     params:
       molecularProfileId:
         type: integer
@@ -70,32 +50,23 @@ tools:
     response:
       format: json
       fields:
-        - evidenceItems.totalCount
-        - evidenceItems.nodes[].id
-        - evidenceItems.nodes[].status
-        - evidenceItems.nodes[].evidenceType
-        - evidenceItems.nodes[].evidenceLevel
-        - evidenceItems.nodes[].evidenceDirection
-        - evidenceItems.nodes[].significance
-        - evidenceItems.nodes[].description
+      - evidenceItems.totalCount
+      - evidenceItems.nodes[].id
+      - evidenceItems.nodes[].status
+      - evidenceItems.nodes[].evidenceType
+      - evidenceItems.nodes[].evidenceLevel
+      - evidenceItems.nodes[].evidenceDirection
+      - evidenceItems.nodes[].significance
+      - evidenceItems.nodes[].description
+    entity: variant
   searchVariants:
     description: Search variants by gene name or variant name in CIViC
     tags:
-      - variant-search
-      - cancer-variant
-    query: |
-      query($name: String, $first: Int) {
-        variants(name: $name, first: $first) {
-          totalCount
-          nodes {
-            id
-            name
-            singleVariantMolecularProfile { id name }
-            gene { name id }
-            variantTypes { name }
-          }
-        }
-      }
+    - variant-search
+    - cancer-variant
+    query: "query($name: String, $first: Int) {\n  variants(name: $name, first: $first) {\n    totalCount\n    nodes {\n \
+      \     id\n      name\n      singleVariantMolecularProfile { id name }\n      feature { name id }\n      variantTypes\
+      \ { name }\n    }\n  }\n}\n"
     params:
       name:
         type: string
@@ -108,38 +79,24 @@ tools:
     response:
       format: json
       fields:
-        - variants.totalCount
-        - variants.nodes[].id
-        - variants.nodes[].name
-        - variants.nodes[].singleVariantMolecularProfile.id
-        - variants.nodes[].singleVariantMolecularProfile.name
-        - variants.nodes[].gene.name
-        - variants.nodes[].gene.id
-        - variants.nodes[].variantTypes[].name
+      - variants.totalCount
+      - variants.nodes[].id
+      - variants.nodes[].name
+      - variants.nodes[].singleVariantMolecularProfile.id
+      - variants.nodes[].singleVariantMolecularProfile.name
+      - variants.nodes[].feature.name
+      - variants.nodes[].feature.id
+      - variants.nodes[].variantTypes[].name
+    entity: variant
   getVariantDetails:
     description: Get full details for a specific variant by ID
     tags:
-      - variant-detail
-      - cancer-variant
-    query: |
-      query($id: Int!) {
-        variant(id: $id) {
-          id
-          name
-          gene { name id }
-          variantAliases
-          variantTypes { name soid }
-          singleVariantMolecularProfile { id name }
-          coordinates {
-            referenceBuild
-            ensemblVersion
-            chromosome
-            start
-            stop
-            representativeTranscript
-          }
-        }
-      }
+    - variant-detail
+    - cancer-variant
+    query: "query($id: Int!) {\n  variant(id: $id) {\n    id\n    name\n    feature { name id }\n    variantAliases\n    variantTypes\
+      \ { name soid }\n    singleVariantMolecularProfile { id name }\n    ... on GeneVariant {\n      coordinates {\n      \
+      \  referenceBuild\n        ensemblVersion\n        chromosome\n        start\n        stop\n        representativeTranscript\n\
+      \      }\n    }\n  }\n}\n"
     params:
       id:
         type: integer
@@ -148,32 +105,28 @@ tools:
     response:
       format: json
       fields:
-        - variant.id
-        - variant.name
-        - variant.gene.name
-        - variant.gene.id
-        - variant.variantAliases
-        - variant.variantTypes[].name
-        - variant.variantTypes[].soid
-        - variant.singleVariantMolecularProfile.id
-        - variant.singleVariantMolecularProfile.name
-        - variant.coordinates.referenceBuild
-        - variant.coordinates.chromosome
-        - variant.coordinates.start
-        - variant.coordinates.stop
-        - variant.coordinates.representativeTranscript
+      - variant.id
+      - variant.name
+      - variant.feature.name
+      - variant.feature.id
+      - variant.variantAliases
+      - variant.variantTypes[].name
+      - variant.variantTypes[].soid
+      - variant.singleVariantMolecularProfile.id
+      - variant.singleVariantMolecularProfile.name
+      - variant.coordinates.referenceBuild
+      - variant.coordinates.chromosome
+      - variant.coordinates.start
+      - variant.coordinates.stop
+      - variant.coordinates.representativeTranscript
+    entity: variant
   searchTherapies:
     description: Search therapies in the CIViC database
     tags:
-      - therapy-search
-      - cancer-therapy
-    query: |
-      query($name: String, $first: Int) {
-        therapies(name: $name, first: $first) {
-          totalCount
-          nodes { id name ncitId therapyUrl }
-        }
-      }
+    - therapy-search
+    - cancer-therapy
+    query: "query($name: String, $first: Int) {\n  therapies(name: $name, first: $first) {\n    totalCount\n    nodes { id\
+      \ name ncitId therapyUrl }\n  }\n}\n"
     params:
       name:
         type: string
@@ -186,32 +139,20 @@ tools:
     response:
       format: json
       fields:
-        - therapies.totalCount
-        - therapies.nodes[].id
-        - therapies.nodes[].name
-        - therapies.nodes[].ncitId
-        - therapies.nodes[].therapyUrl
+      - therapies.totalCount
+      - therapies.nodes[].id
+      - therapies.nodes[].name
+      - therapies.nodes[].ncitId
+      - therapies.nodes[].therapyUrl
+    entity: compound
   searchAssertions:
     description: Search clinical assertions in CIViC by disease name
     tags:
-      - assertion-search
-      - clinical-assertion
-    query: |
-      query($diseaseName: String, $first: Int) {
-        assertions(diseaseName: $diseaseName, first: $first) {
-          totalCount
-          nodes {
-            id
-            status
-            significance
-            assertionType
-            assertionDirection
-            summary
-            molecularProfile { name }
-            disease { name doid }
-          }
-        }
-      }
+    - assertion-search
+    - clinical-assertion
+    query: "query($diseaseName: String, $first: Int) {\n  assertions(diseaseName: $diseaseName, first: $first) {\n    totalCount\n\
+      \    nodes {\n      id\n      status\n      significance\n      assertionType\n      assertionDirection\n      summary\n\
+      \      molecularProfile { name }\n      disease { name doid }\n    }\n  }\n}\n"
     params:
       diseaseName:
         type: string
@@ -224,44 +165,26 @@ tools:
     response:
       format: json
       fields:
-        - assertions.totalCount
-        - assertions.nodes[].id
-        - assertions.nodes[].status
-        - assertions.nodes[].significance
-        - assertions.nodes[].assertionType
-        - assertions.nodes[].assertionDirection
-        - assertions.nodes[].summary
-        - assertions.nodes[].molecularProfile.name
-        - assertions.nodes[].disease.name
-        - assertions.nodes[].disease.doid
+      - assertions.totalCount
+      - assertions.nodes[].id
+      - assertions.nodes[].status
+      - assertions.nodes[].significance
+      - assertions.nodes[].assertionType
+      - assertions.nodes[].assertionDirection
+      - assertions.nodes[].summary
+      - assertions.nodes[].molecularProfile.name
+      - assertions.nodes[].disease.name
+      - assertions.nodes[].disease.doid
+    entity: variant
   getMolecularProfile:
     description: Get molecular profile details including evidence and assertions
     tags:
-      - molecular-profile
-      - cancer-variant
-    query: |
-      query($id: Int!) {
-        molecularProfile(id: $id) {
-          id
-          name
-          description
-          evidenceItems(first: 10) {
-            totalCount
-            nodes {
-              id
-              status
-              evidenceType
-              evidenceLevel
-              significance
-              description
-            }
-          }
-          assertions(first: 5) {
-            totalCount
-            nodes { id status assertionType significance }
-          }
-        }
-      }
+    - molecular-profile
+    - cancer-variant
+    query: "query($id: Int!) {\n  molecularProfile(id: $id) {\n    id\n    name\n    description\n    evidenceItems(first:\
+      \ 10) {\n      totalCount\n      nodes {\n        id\n        status\n        evidenceType\n        evidenceLevel\n\
+      \        significance\n        description\n      }\n    }\n    assertions(first: 5) {\n      totalCount\n      nodes\
+      \ { id status assertionType significance }\n    }\n  }\n}\n"
     params:
       id:
         type: integer
@@ -270,40 +193,29 @@ tools:
     response:
       format: json
       fields:
-        - molecularProfile.id
-        - molecularProfile.name
-        - molecularProfile.description
-        - molecularProfile.evidenceItems.totalCount
-        - molecularProfile.evidenceItems.nodes[].id
-        - molecularProfile.evidenceItems.nodes[].status
-        - molecularProfile.evidenceItems.nodes[].evidenceType
-        - molecularProfile.evidenceItems.nodes[].evidenceLevel
-        - molecularProfile.evidenceItems.nodes[].significance
-        - molecularProfile.evidenceItems.nodes[].description
-        - molecularProfile.assertions.totalCount
-        - molecularProfile.assertions.nodes[].id
-        - molecularProfile.assertions.nodes[].status
-        - molecularProfile.assertions.nodes[].assertionType
-        - molecularProfile.assertions.nodes[].significance
+      - molecularProfile.id
+      - molecularProfile.name
+      - molecularProfile.description
+      - molecularProfile.evidenceItems.totalCount
+      - molecularProfile.evidenceItems.nodes[].id
+      - molecularProfile.evidenceItems.nodes[].status
+      - molecularProfile.evidenceItems.nodes[].evidenceType
+      - molecularProfile.evidenceItems.nodes[].evidenceLevel
+      - molecularProfile.evidenceItems.nodes[].significance
+      - molecularProfile.evidenceItems.nodes[].description
+      - molecularProfile.assertions.totalCount
+      - molecularProfile.assertions.nodes[].id
+      - molecularProfile.assertions.nodes[].status
+      - molecularProfile.assertions.nodes[].assertionType
+      - molecularProfile.assertions.nodes[].significance
+    entity: variant
   getGeneDetails:
     description: Get full gene details including variants from CIViC
     tags:
-      - gene-detail
-      - cancer-gene
-    query: |
-      query($geneId: Int!) {
-        gene(id: $geneId) {
-          id
-          name
-          description
-          officialName
-          myGeneInfoId
-          variants(first: 20) {
-            totalCount
-            nodes { id name variantTypes { name } }
-          }
-        }
-      }
+    - gene-detail
+    - cancer-gene
+    query: "query($geneId: Int!) {\n  gene(id: $geneId) {\n    id\n    name\n    description\n    fullName\n    entrezId\n\
+      \    variants(first: 20) {\n      totalCount\n      nodes { id name variantTypes { name } }\n    }\n  }\n}\n"
     params:
       geneId:
         type: integer
@@ -312,39 +224,29 @@ tools:
     response:
       format: json
       fields:
-        - gene.id
-        - gene.name
-        - gene.description
-        - gene.officialName
-        - gene.myGeneInfoId
-        - gene.variants.totalCount
-        - gene.variants.nodes[].id
-        - gene.variants.nodes[].name
-        - gene.variants.nodes[].variantTypes[].name
+      - gene.id
+      - gene.name
+      - gene.description
+      - gene.fullName
+      - gene.entrezId
+      - gene.variants.totalCount
+      - gene.variants.nodes[].id
+      - gene.variants.nodes[].name
+      - gene.variants.nodes[].variantTypes[].name
+    entity: gene
   searchSources:
     description: Search literature sources by citation ID in CIViC
     tags:
-      - source-search
-      - literature
-    query: |
-      query($citationId: Int, $first: Int) {
-        sources(citationId: $citationId, first: $first) {
-          totalCount
-          nodes {
-            id
-            citation
-            citationId
-            sourceType
-            title
-            abstract
-          }
-        }
-      }
+    - source-search
+    - literature
+    query: "query($citationId: [String!], $first: Int) {\n  sources(citationId: $citationId, first: $first) {\n    totalCount\n\
+      \    nodes {\n      id\n      citation\n      citationId\n      sourceType\n      title\n      abstract\n    }\n  }\n\
+      }\n"
     params:
       citationId:
-        type: integer
+        type: array
         required: true
-        description: Citation ID (e.g. PubMed ID) to search for
+        description: Citation ID(s) as strings (e.g. ["25589621"] for PubMed ID)
       first:
         type: integer
         default: 5
@@ -352,95 +254,97 @@ tools:
     response:
       format: json
       fields:
-        - sources.totalCount
-        - sources.nodes[].id
-        - sources.nodes[].citation
-        - sources.nodes[].citationId
-        - sources.nodes[].sourceType
-        - sources.nodes[].title
-        - sources.nodes[].abstract
+      - sources.totalCount
+      - sources.nodes[].id
+      - sources.nodes[].citation
+      - sources.nodes[].citationId
+      - sources.nodes[].sourceType
+      - sources.nodes[].title
+      - sources.nodes[].abstract
+    entity: publication
 tests:
   searchGenes:
-    - name: searches for BRAF gene
-      params:
-        symbols:
-          - BRAF
-      assert:
-        - path: genes.totalCount
-          gte: 1
-        - path: genes.nodes.0.name
-          equals: BRAF
+  - name: searches for BRAF gene
+    params:
+      symbols:
+      - BRAF
+    assert:
+    - path: genes.totalCount
+      gte: 1
+    - path: genes.nodes.0.name
+      equals: BRAF
   getEvidence:
-    - name: gets evidence items for a molecular profile
-      params:
-        molecularProfileId: 1
-        first: 3
-      assert:
-        - path: evidenceItems.totalCount
-          gt: 0
-        - path: evidenceItems.nodes
-          minLength: 1
-        - path: evidenceItems.nodes.0.evidenceType
+  - name: gets evidence items for a molecular profile
+    params:
+      molecularProfileId: 1
+      first: 3
+    assert:
+    - path: evidenceItems.totalCount
+      gt: 0
+    - path: evidenceItems.nodes
+      minLength: 1
+    - path: evidenceItems.nodes.0.evidenceType
   searchVariants:
-    - name: searches for BRAF V600E variant
-      params:
-        name: V600E
-        first: 5
-      assert:
-        - path: variants.totalCount
-          gte: 1
-        - path: variants.nodes.0.name
+  - name: searches for BRAF V600E variant
+    params:
+      name: V600E
+      first: 5
+    assert:
+    - path: variants.totalCount
+      gte: 1
+    - path: variants.nodes.0.name
   getVariantDetails:
-    - name: gets details for variant ID 12
-      params:
-        id: 12
-      assert:
-        - path: variant.id
-          equals: 12
-        - path: variant.name
-        - path: variant.gene.name
+  - name: gets details for variant ID 12
+    params:
+      id: 12
+    assert:
+    - path: variant.id
+      equals: 12
+    - path: variant.name
+    - path: variant.feature.name
   searchTherapies:
-    - name: searches for Vemurafenib therapy
-      params:
-        name: Vemurafenib
-        first: 5
-      assert:
-        - path: therapies.totalCount
-          gte: 1
-        - path: therapies.nodes.0.name
+  - name: searches for Vemurafenib therapy
+    params:
+      name: Vemurafenib
+      first: 5
+    assert:
+    - path: therapies.totalCount
+      gte: 1
+    - path: therapies.nodes.0.name
   searchAssertions:
-    - name: searches assertions for lung cancer
-      params:
-        diseaseName: Lung Non-small Cell Carcinoma
-        first: 5
-      assert:
-        - path: assertions.totalCount
-          gte: 1
-        - path: assertions.nodes.0.status
+  - name: searches assertions for lung cancer
+    params:
+      diseaseName: Lung Non-small Cell Carcinoma
+      first: 5
+    assert:
+    - path: assertions.totalCount
+      gte: 1
+    - path: assertions.nodes.0.status
   getMolecularProfile:
-    - name: gets molecular profile by ID
-      params:
-        id: 1
-      assert:
-        - path: molecularProfile.id
-          equals: 1
-        - path: molecularProfile.name
+  - name: gets molecular profile by ID
+    params:
+      id: 1
+    assert:
+    - path: molecularProfile.id
+      equals: 1
+    - path: molecularProfile.name
   getGeneDetails:
-    - name: gets full gene details by ID
-      params:
-        geneId: 5
-      assert:
-        - path: gene.id
-          equals: 5
-        - path: gene.name
-        - path: gene.variants.totalCount
-          gte: 1
+  - name: gets full gene details by ID
+    params:
+      geneId: 5
+    assert:
+    - path: gene.id
+      equals: 5
+    - path: gene.name
+    - path: gene.variants.totalCount
+      gte: 1
   searchSources:
-    - name: searches sources by PubMed citation ID
-      params:
-        citationId: 25589621
-        first: 3
-      assert:
-        - path: sources.totalCount
-          gte: 1
-        - path: sources.nodes.0.citationId
+  - name: searches sources by PubMed citation ID
+    params:
+      citationId:
+      - '25589621'
+      first: 3
+    assert:
+    - path: sources.totalCount
+      gte: 1
+    - path: sources.nodes.0.citationId

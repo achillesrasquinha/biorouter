@@ -2,18 +2,18 @@ name: quickgo
 displayName: QuickGO
 description: Gene Ontology browser — fast access to GO term information (EBI)
 tags:
-  - gene-ontology
-  - go
-  - annotation
-  - function
-  - quickgo
+- gene-ontology
+- go
+- annotation
+- function
+- quickgo
 baseUrl: https://www.ebi.ac.uk/QuickGO/services
 tools:
   search:
     description: Search Gene Ontology terms by keyword
     tags:
-      - go-search
-      - ontology-search
+    - go-search
+    - ontology-search
     method: GET
     path: /ontology/go/search
     params:
@@ -29,17 +29,18 @@ tools:
     response:
       format: json
       fields:
-        - numberOfHits
-        - results[].id
-        - results[].name
-        - results[].definition.text
-        - results[].aspect
-        - results[].isObsolete
+      - numberOfHits
+      - results[].id
+      - results[].name
+      - results[].definition.text
+      - results[].aspect
+      - results[].isObsolete
+    entity: gene
   getTerm:
     description: Get a Gene Ontology term by GO ID
     tags:
-      - go-term
-      - ontology-info
+    - go-term
+    - ontology-info
     method: GET
     path: /ontology/go/terms/{goId}
     params:
@@ -50,33 +51,128 @@ tools:
     response:
       format: json
       fields:
-        - numberOfHits
-        - results[].id
-        - results[].name
-        - results[].definition.text
-        - results[].aspect
-        - results[].synonyms[].name
-        - results[].synonyms[].type
-        - results[].isObsolete
+      - numberOfHits
+      - results[].id
+      - results[].name
+      - results[].definition.text
+      - results[].aspect
+      - results[].synonyms[].name
+      - results[].synonyms[].type
+      - results[].isObsolete
+    entity: ontology-term
+  searchAnnotations:
+    description: Search GO annotations by gene, GO term, or taxon
+    tags:
+    - go-annotation
+    - functional-annotation
+    method: GET
+    path: /annotation/search
+    params:
+      geneProductId:
+        type: string
+        description: Gene product ID (e.g. UniProt accession P04637)
+      goId:
+        type: string
+        description: GO term ID
+      taxonId:
+        type: integer
+        description: NCBI taxonomy ID
+      limit:
+        type: integer
+        default: 10
+      aspect:
+        type: string
+        description: GO aspect (biological_process, molecular_function, cellular_component)
+    response:
+      format: json
+      fields:
+      - numberOfHits
+      - results[].geneProductId
+      - results[].symbol
+      - results[].goId
+      - results[].goName
+      - results[].goAspect
+      - results[].evidenceCode
+    entity: annotation
+  getTermChildren:
+    description: Get child terms of a GO term
+    tags:
+    - go-hierarchy
+    - go-children
+    method: GET
+    path: /ontology/go/terms/{goId}/children
+    params:
+      goId:
+        type: string
+        required: true
+        description: GO term ID (e.g. GO:0006915)
+    response:
+      format: json
+      fields:
+      - numberOfHits
+      - results[].id
+      - results[].name
+    entity: ontology-term
+  getTermAncestors:
+    description: Get ancestor terms of a GO term
+    tags:
+    - go-hierarchy
+    - go-ancestors
+    method: GET
+    path: /ontology/go/terms/{goId}/ancestors
+    params:
+      goId:
+        type: string
+        required: true
+        description: GO term ID
+    response:
+      format: json
+      fields:
+      - numberOfHits
+      - results[].id
+      - results[].name
+    entity: ontology-term
 tests:
   search:
-    - name: searches for apoptosis GO terms
-      params:
-        query: apoptosis
-      assert:
-        - path: numberOfHits
-          gt: 0
-        - path: results
-          minLength: 1
-        - path: results.0.name
+  - name: searches for apoptosis GO terms
+    params:
+      query: apoptosis
+    assert:
+    - path: numberOfHits
+      gt: 0
+    - path: results
+      minLength: 1
+    - path: results.0.name
   getTerm:
-    - name: gets GO term GO:0006915 (apoptotic process)
-      params:
-        goId: GO:0006915
-      assert:
-        - path: numberOfHits
-          gte: 1
-        - path: results.0.id
-          equals: GO:0006915
-        - path: results.0.name
-          equals: apoptotic process
+  - name: gets GO term GO:0006915 (apoptotic process)
+    params:
+      goId: GO:0006915
+    assert:
+    - path: numberOfHits
+      gte: 1
+    - path: results.0.id
+      equals: GO:0006915
+    - path: results.0.name
+      equals: apoptotic process
+  searchAnnotations:
+  - name: searches GO annotations for TP53
+    params:
+      geneProductId: P04637
+      limit: 5
+    assert:
+    - path: numberOfHits
+      gt: 0
+  getTermChildren:
+  - name: gets children of apoptotic process
+    params:
+      goId: GO:0006915
+    assert:
+    - path: numberOfHits
+      gt: 0
+  getTermAncestors:
+  - name: gets ancestors of apoptotic process
+    params:
+      goId: GO:0006915
+    assert:
+    - path: numberOfHits
+      gt: 0

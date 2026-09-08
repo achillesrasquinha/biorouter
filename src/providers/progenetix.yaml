@@ -2,18 +2,18 @@ name: progenetix
 displayName: Progenetix
 description: Progenetix — cancer genomics resource with copy number variation data across tumor types
 tags:
-  - cancer
-  - cnv
-  - copy-number
-  - beacon
-  - oncogenomics
+- cancer
+- cnv
+- copy-number
+- beacon
+- oncogenomics
 baseUrl: https://progenetix.org/beacon
 tools:
   searchBiosamples:
     description: Search cancer biosamples by disease classification (NCIT, ICD-O)
     tags:
-      - cancer-search
-      - biosample-search
+    - cancer-search
+    - biosample-search
     method: GET
     path: /biosamples/
     params:
@@ -28,14 +28,15 @@ tools:
     response:
       format: json
       fields:
-        - responseSummary.numTotalResults
-        - response.resultSets[].results[].id
-        - response.resultSets[].results[].biosampleStatus
+      - responseSummary.numTotalResults
+      - response.resultSets[].results[].id
+      - response.resultSets[].results[].biosampleStatus
+    entity: sample
   searchVariants:
     description: Search for genomic variants in cancer samples
     tags:
-      - variant-search
-      - cnv-search
+    - variant-search
+    - cnv-search
     method: GET
     path: /g_variants/
     params:
@@ -60,11 +61,12 @@ tools:
         description: Maximum results
     response:
       format: json
+    entity: variant
 tests:
   searchBiosamples:
-    - name: searches for glioblastoma samples
-      params:
-        filters: NCIT:C3058
-        limit: 2
-      assert:
-        - path: responseSummary
+  - name: searches for glioblastoma samples
+    params:
+      filters: NCIT:C3058
+      limit: 2
+    assert:
+    - path: responseSummary

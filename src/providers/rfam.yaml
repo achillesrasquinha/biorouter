@@ -2,18 +2,18 @@ name: rfam
 displayName: Rfam
 description: Database of non-coding RNA families and structured RNA elements
 tags:
-  - rna
-  - non-coding-rna
-  - rna-families
-  - riboswitch
-  - rfam
+- rna
+- non-coding-rna
+- rna-families
+- riboswitch
+- rfam
 baseUrl: https://rfam.org
 tools:
   search:
     description: Search RNA families by keyword
     tags:
-      - rna-search
-      - family-search
+    - rna-search
+    - family-search
     method: GET
     path: /families
     params:
@@ -28,17 +28,18 @@ tools:
     response:
       format: json
       fields:
-        - families[].acc
-        - families[].id
-        - families[].description
-        - families[].type
-        - families[].num_seed
-        - families[].num_full
+      - families[].acc
+      - families[].id
+      - families[].description
+      - families[].type
+      - families[].num_seed
+      - families[].num_full
+    entity: dataset
   getFamily:
     description: Get RNA family details by Rfam accession
     tags:
-      - rna-family
-      - family-info
+    - rna-family
+    - family-info
     method: GET
     path: /family/{accession}
     params:
@@ -53,28 +54,29 @@ tools:
     response:
       format: json
       fields:
-        - rfam.acc
-        - rfam.id
-        - rfam.description
-        - rfam.comment
-        - rfam.curation.type
-        - rfam.curation.num_seed
-        - rfam.curation.num_full
-        - rfam.curation.num_species
+      - rfam.acc
+      - rfam.id
+      - rfam.description
+      - rfam.comment
+      - rfam.curation.type
+      - rfam.curation.num_seed
+      - rfam.curation.num_full
+      - rfam.curation.num_species
+    entity: dataset
 tests:
   search:
-    - name: searches for riboswitch RNA families
-      params:
-        query: riboswitch
-      assert:
-        - path: families
-          minLength: 1
-        - path: families.0.acc
+  - name: searches for riboswitch RNA families
+    params:
+      query: riboswitch
+    assert:
+    - path: families
+      minLength: 1
+    - path: families.0.acc
   getFamily:
-    - name: gets SAM riboswitch family details
-      params:
-        accession: RF00162
-      assert:
-        - path: rfam.acc
-          equals: RF00162
-        - path: rfam.description
+  - name: gets SAM riboswitch family details
+    params:
+      accession: RF00162
+    assert:
+    - path: rfam.acc
+      equals: RF00162
+    - path: rfam.description

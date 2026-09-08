@@ -2,19 +2,19 @@ name: depmap
 displayName: DepMap
 description: Cancer Dependency Map — cell line genomic and dependency data
 tags:
-  - cancer
-  - cell-line
-  - dependency
-  - depmap
-  - ccle
-  - genomics
+- cancer
+- cell-line
+- dependency
+- depmap
+- ccle
+- genomics
 baseUrl: https://depmap.org/portal/api
 tools:
   searchGene:
     description: Search genes in DepMap
     tags:
-      - gene-search
-      - cancer-dependency
+    - gene-search
+    - cancer-dependency
     method: GET
     path: /v1/gene/search
     params:
@@ -25,16 +25,17 @@ tools:
     response:
       format: json
       fields:
-        - "[].geneId"
-        - "[].symbol"
-        - "[].name"
-        - "[].entrezId"
-        - "[].description"
+      - '[].geneId'
+      - '[].symbol'
+      - '[].name'
+      - '[].entrezId'
+      - '[].description'
+    entity: gene
   getGeneDependency:
     description: Get gene dependency scores across cell lines
     tags:
-      - dependency-score
-      - cell-line
+    - dependency-score
+    - cell-line
     method: GET
     path: /v1/gene/{geneId}/dependency
     params:
@@ -45,16 +46,17 @@ tools:
     response:
       format: json
       fields:
-        - "[].cellLineName"
-        - "[].cellLineId"
-        - "[].dependencyScore"
-        - "[].geneId"
-        - "[].dataset"
+      - '[].cellLineName'
+      - '[].cellLineId'
+      - '[].dependencyScore'
+      - '[].geneId'
+      - '[].dataset'
+    entity: gene
   getCellLine:
     description: Get cell line information by DepMap cell line ID
     tags:
-      - cell-line-info
-      - cancer-cell-line
+    - cell-line-info
+    - cancer-cell-line
     method: GET
     path: /v1/cell_line/{cellLineId}
     params:
@@ -65,22 +67,23 @@ tools:
     response:
       format: json
       fields:
-        - cellLineId
-        - cellLineName
-        - lineage
-        - primaryDisease
-        - subtype
+      - cellLineId
+      - cellLineName
+      - lineage
+      - primaryDisease
+      - subtype
+    entity: sample
 tests:
   searchGene:
-    - name: searches for BRAF gene
-      params:
-        query: BRAF
-      assert:
-        - {}
+  - name: searches for BRAF gene
+    params:
+      query: BRAF
+    assert:
+    - {}
   getCellLine:
-    - name: gets cell line ACH-000001
-      params:
-        cellLineId: ACH-000001
-      assert:
-        - {}
-      allowError: true
+  - name: gets cell line ACH-000001
+    params:
+      cellLineId: ACH-000001
+    assert:
+    - {}
+    allowError: true

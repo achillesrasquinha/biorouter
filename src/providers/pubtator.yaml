@@ -2,18 +2,18 @@ name: pubtator
 displayName: PubTator
 description: PubTator3 biomedical text mining — named entity recognition and annotation of PubMed articles
 tags:
-  - text-mining
-  - ner
-  - annotation
-  - pubtator
-  - biomedical-nlp
+- text-mining
+- ner
+- annotation
+- pubtator
+- biomedical-nlp
 baseUrl: https://www.ncbi.nlm.nih.gov/research/pubtator3-api
 tools:
-  annotate:
+  annotateArticle:
     description: Get NER annotations for a PubMed article by PMID (returns BioC JSON)
     tags:
-      - annotation
-      - ner-annotation
+    - annotation
+    - ner-annotation
     method: GET
     path: /publications/export/biocjson
     params:
@@ -25,19 +25,20 @@ tools:
     response:
       format: json
       fields:
-        - PubTator3[].pmid
-        - PubTator3[].journal
-        - PubTator3[].authors
-        - PubTator3[].date
-        - PubTator3[].passages[].text
-        - PubTator3[].passages[].annotations[].text
-        - PubTator3[].passages[].annotations[].infons.type
-        - PubTator3[].passages[].annotations[].infons.identifier
+      - PubTator3[].pmid
+      - PubTator3[].journal
+      - PubTator3[].authors
+      - PubTator3[].date
+      - PubTator3[].passages[].text
+      - PubTator3[].passages[].annotations[].text
+      - PubTator3[].passages[].annotations[].infons.type
+      - PubTator3[].passages[].annotations[].infons.identifier
+    entity: annotation
   search:
     description: Search PubTator for annotated articles by text query
     tags:
-      - article-search
-      - entity-search
+    - article-search
+    - entity-search
     method: GET
     path: /search/
     params:
@@ -53,25 +54,26 @@ tools:
     response:
       format: json
       fields:
-        - results[].pmid
-        - results[].title
-        - results[].journal
-        - results[].authors
-        - results[].date
-        - results[].doi
-        - results[].score
+      - results[].pmid
+      - results[].title
+      - results[].journal
+      - results[].authors
+      - results[].date
+      - results[].doi
+      - results[].score
+    entity: publication
 tests:
-  annotate:
-    - name: annotates PMID 35153516
-      params:
-        pmid: "35153516"
-      assert:
-        - path: PubTator3
-          minLength: 1
+  annotateArticle:
+  - name: annotates PMID 35153516
+    params:
+      pmid: '35153516'
+    assert:
+    - path: PubTator3
+      minLength: 1
   search:
-    - name: searches for BRCA1 cancer
-      params:
-        query: BRCA1 cancer
-      assert:
-        - path: results
-          minLength: 1
+  - name: searches for BRCA1 cancer
+    params:
+      query: BRCA1 cancer
+    assert:
+    - path: results
+      minLength: 1

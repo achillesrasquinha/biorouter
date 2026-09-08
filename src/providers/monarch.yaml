@@ -2,18 +2,18 @@ name: monarch
 displayName: Monarch Initiative
 description: Knowledge graph integrating biological and clinical data for disease discovery
 tags:
-  - disease
-  - phenotype
-  - gene
-  - knowledge-graph
-  - ontology
+- disease
+- phenotype
+- gene
+- knowledge-graph
+- ontology
 baseUrl: https://api.monarchinitiative.org/v3/api
 tools:
   search:
     description: Search the Monarch knowledge graph for entities
     tags:
-      - entity-search
-      - disease-search
+    - entity-search
+    - disease-search
     method: GET
     path: /search
     params:
@@ -29,17 +29,18 @@ tools:
     response:
       format: json
       fields:
-        - total
-        - items[].id
-        - items[].category
-        - items[].name
-        - items[].description
-        - items[].synonym
+      - total
+      - items[].id
+      - items[].category
+      - items[].name
+      - items[].description
+      - items[].synonym
+    entity: disease
   getEntity:
     description: Get detailed information for a Monarch entity by ID
     tags:
-      - entity-info
-      - disease-info
+    - entity-info
+    - disease-info
     method: GET
     path: /entity/{id}
     params:
@@ -50,26 +51,72 @@ tools:
     response:
       format: json
       fields:
-        - id
-        - category
-        - name
-        - description
-        - symbol
-        - synonym
-        - in_taxon_label
+      - id
+      - category
+      - name
+      - description
+      - symbol
+      - synonym
+      - in_taxon_label
+    entity: disease
+  getAssociations:
+    description: Get associations for an entity (gene-disease, disease-phenotype, etc.)
+    tags:
+    - associations
+    - gene-disease
+    - phenotype
+    method: GET
+    path: /association
+    params:
+      subject:
+        type: string
+        description: Subject entity ID (e.g. HGNC:1100 for BRCA1)
+      object:
+        type: string
+        description: Object entity ID (e.g. MONDO:0007254)
+      category:
+        type: string
+        description: Association category
+      limit:
+        type: integer
+        default: 10
+        description: Number of results
+      offset:
+        type: integer
+        default: 0
+        description: Result offset
+    response:
+      format: json
+      fields:
+      - total
+      - items[].subject
+      - items[].subject_label
+      - items[].predicate
+      - items[].object
+      - items[].object_label
+      - items[].category
+    entity: gene
 tests:
   search:
-    - name: searches for Marfan syndrome
-      params:
-        query: Marfan syndrome
-      assert:
-        - path: items
-          minLength: 1
+  - name: searches for Marfan syndrome
+    params:
+      query: Marfan syndrome
+    assert:
+    - path: items
+      minLength: 1
   getEntity:
-    - name: gets entity details for MONDO:0007947
-      params:
-        id: MONDO:0007947
-      assert:
-        - anyOf:
-            - id
-            - name
+  - name: gets entity details for MONDO:0007947
+    params:
+      id: MONDO:0007947
+    assert:
+    - anyOf:
+      - id
+      - name
+  getAssociations:
+  - name: gets gene-disease associations for BRCA1
+    params:
+      subject: HGNC:1100
+      limit: 5
+    assert:
+    - path: items
+      minLength: 1

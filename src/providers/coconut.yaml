@@ -2,18 +2,18 @@ name: coconut
 displayName: COCONUT
 description: COlleCtion of Open Natural prodUcTs — comprehensive natural products database
 tags:
-  - natural-products
-  - chemistry
-  - compounds
-  - drug-discovery
-  - coconut
+- natural-products
+- chemistry
+- compounds
+- drug-discovery
+- coconut
 baseUrl: https://coconut.naturalproducts.net/api
 tools:
   search:
     description: Search natural products by name or keyword
     tags:
-      - compound-search
-      - natural-product-search
+    - compound-search
+    - natural-product-search
     method: GET
     path: /search
     params:
@@ -28,20 +28,21 @@ tools:
     response:
       format: json
       fields:
-        - data.data[].identifier
-        - data.data[].name
-        - data.data[].canonical_smiles
-        - data.data[].iupac_name
-        - data.data[].annotation_level
-        - data.data[].organism_count
-        - data.data[].citation_count
-        - data.data[].collection_count
-        - data.total
+      - data.data[].identifier
+      - data.data[].name
+      - data.data[].canonical_smiles
+      - data.data[].iupac_name
+      - data.data[].annotation_level
+      - data.data[].organism_count
+      - data.data[].citation_count
+      - data.data[].collection_count
+      - data.total
+    entity: dataset
   getCompound:
     description: Get natural product compound details by COCONUT ID
     tags:
-      - compound-info
-      - natural-product-details
+    - compound-info
+    - natural-product-details
     method: GET
     path: /compound/{id}
     params:
@@ -51,11 +52,12 @@ tools:
         description: COCONUT compound ID (e.g. CNP0000001)
     response:
       format: json
+    entity: compound
   searchByOrganism:
     description: Search natural products by source organism
     tags:
-      - organism-search
-      - natural-product-source
+    - organism-search
+    - natural-product-source
     method: GET
     path: /search
     params:
@@ -66,32 +68,33 @@ tools:
     response:
       format: json
       fields:
-        - data.data[].identifier
-        - data.data[].name
-        - data.data[].canonical_smiles
-        - data.data[].iupac_name
-        - data.data[].organism_count
-        - data.data[].citation_count
-        - data.total
+      - data.data[].identifier
+      - data.data[].name
+      - data.data[].canonical_smiles
+      - data.data[].iupac_name
+      - data.data[].organism_count
+      - data.data[].citation_count
+      - data.total
+    entity: organism
 tests:
   search:
-    - name: searches for quercetin
-      params:
-        query: quercetin
-      assert:
-        - minLength: 1
-      allowError: true
+  - name: searches for quercetin
+    params:
+      query: quercetin
+    assert:
+    - minLength: 1
+    allowError: true
   getCompound:
-    - name: gets compound by COCONUT ID
-      params:
-        id: CNP0000001
-      assert:
-        - {}
-      allowError: true
+  - name: gets compound by COCONUT ID
+    params:
+      id: CNP0000001
+    assert:
+    - {}
+    allowError: true
   searchByOrganism:
-    - name: searches natural products from Streptomyces
-      params:
-        organism: Streptomyces
-      assert:
-        - minLength: 1
-      allowError: true
+  - name: searches natural products from Streptomyces
+    params:
+      organism: Streptomyces
+    assert:
+    - minLength: 1
+    allowError: true

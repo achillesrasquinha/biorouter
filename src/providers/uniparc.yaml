@@ -2,17 +2,17 @@ name: uniparc
 displayName: UniParc
 description: UniProt Archive — comprehensive non-redundant protein sequence archive
 tags:
-  - protein
-  - sequence-archive
-  - uniparc
-  - uniprot
+- protein
+- sequence-archive
+- uniparc
+- uniprot
 baseUrl: https://rest.uniprot.org/uniparc
 tools:
   search:
     description: Search UniParc entries by keyword or accession
     tags:
-      - sequence-search
-      - archive-search
+    - sequence-search
+    - archive-search
     method: GET
     path: /search
     params:
@@ -30,17 +30,18 @@ tools:
     response:
       format: json
       fields:
-        - results[].uniParcId
-        - results[].uniProtKBAccessions
-        - results[].sequence.length
-        - results[].sequence.molWeight
-        - results[].crossReferenceCount
-        - results[].commonTaxons[].commonTaxon
+      - results[].uniParcId
+      - results[].uniProtKBAccessions
+      - results[].sequence.length
+      - results[].sequence.molWeight
+      - results[].crossReferenceCount
+      - results[].commonTaxons[].commonTaxon
+    entity: protein
   getEntry:
     description: Get UniParc entry by UPI identifier
     tags:
-      - sequence-info
-      - archive-entry
+    - sequence-info
+    - archive-entry
     method: GET
     path: /{uparcId}
     params:
@@ -51,30 +52,31 @@ tools:
     response:
       format: json
       fields:
-        - uniParcId
-        - sequence.length
-        - sequence.molWeight
-        - oldestCrossRefCreated
-        - mostRecentCrossRefUpdated
-        - uniParcCrossReferences[].database
-        - uniParcCrossReferences[].id
-        - uniParcCrossReferences[].active
+      - uniParcId
+      - sequence.length
+      - sequence.molWeight
+      - oldestCrossRefCreated
+      - mostRecentCrossRefUpdated
+      - uniParcCrossReferences[].database
+      - uniParcCrossReferences[].id
+      - uniParcCrossReferences[].active
+    entity: protein
 tests:
   search:
-    - name: searches for EGFR protein sequences
-      params:
-        query: P00533
-      assert:
-        - path: results
-          minLength: 1
-        - path: results.0.uniParcId
+  - name: searches for EGFR protein sequences
+    params:
+      query: P00533
+    assert:
+    - path: results
+      minLength: 1
+    - path: results.0.uniParcId
   getEntry:
-    - name: gets UniParc entry by UPI identifier
-      params:
-        uparcId: UPI0000050F30
-      assert:
-        - path: uniParcId
-          equals: UPI0000050F30
-        - anyOf:
-            - sequence.value
-            - uniParcCrossReferences
+  - name: gets UniParc entry by UPI identifier
+    params:
+      uparcId: UPI0000050F30
+    assert:
+    - path: uniParcId
+      equals: UPI0000050F30
+    - anyOf:
+      - sequence.value
+      - uniParcCrossReferences

@@ -2,17 +2,19 @@ name: orcid
 displayName: ORCID
 description: ORCID — persistent researcher identifiers linking authors to their works and affiliations
 tags:
-  - researchers
-  - identifiers
-  - authors
-  - affiliations
+- researchers
+- identifiers
+- authors
+- affiliations
 baseUrl: https://pub.orcid.org/v3.0
+headers:
+  Accept: application/json
 tools:
   searchResearchers:
     description: Search for researchers by name, affiliation, or keyword
     tags:
-      - researcher-search
-      - author-search
+    - researcher-search
+    - author-search
     method: GET
     path: /search
     params:
@@ -20,19 +22,18 @@ tools:
         type: string
         required: true
         description: Search query (e.g. family-name:watson AND given-names:james)
-    headers:
-      Accept: application/json
     response:
       format: json
       fields:
-        - num-found
-        - result[].orcid-identifier.uri
-        - result[].orcid-identifier.path
-  getRecord:
+      - num-found
+      - result[].orcid-identifier.uri
+      - result[].orcid-identifier.path
+    entity: publication
+  getResearcher:
     description: Get researcher profile by ORCID ID
     tags:
-      - researcher-info
-      - author-info
+    - researcher-info
+    - author-info
     method: GET
     path: /{orcidId}/record
     params:
@@ -40,19 +41,18 @@ tools:
         type: string
         required: true
         description: ORCID ID (e.g. 0000-0002-6839-5403)
-    headers:
-      Accept: application/json
     response:
       format: json
       fields:
-        - person.name
-        - activities-summary.employments
-        - activities-summary.works
+      - person.name
+      - activities-summary.employments
+      - activities-summary.works
+    entity: publication
 tests:
   searchResearchers:
-    - name: searches for researchers
-      params:
-        q: family-name:watson AND given-names:james
-      assert:
-        - path: result
-          minLength: 1
+  - name: searches for researchers
+    params:
+      q: family-name:watson AND given-names:james
+    assert:
+    - path: result
+      minLength: 1

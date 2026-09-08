@@ -1,0 +1,101 @@
+name: cancerhotspots
+displayName: Cancer Hotspots
+description: Recurrent somatic mutation hotspots identified in large-scale cancer genomics data
+tags:
+- cancer
+- hotspot
+- mutations
+- somatic
+baseUrl: https://www.cancerhotspots.org/api
+tools:
+  getHotspotsByGene:
+    description: Get single-residue mutation hotspots for a specific gene
+    tags:
+    - hotspot-search
+    - single-residue
+    method: GET
+    path: /hotspots/single
+    params:
+      gene:
+        type: string
+        required: true
+        mapsTo: hugoSymbol
+        description: Hugo gene symbol (e.g. TP53, BRAF, PIK3CA)
+    response:
+      format: json
+      fields:
+      - '[].hugoSymbol'
+      - '[].residue'
+      - '[].type'
+      - '[].variantAminoAcid'
+      - '[].qValue'
+      - '[].qValuePancan'
+    entity: variant
+  get3dHotspotsByGene:
+    description: Get 3D cluster mutation hotspots for a specific gene
+    tags:
+    - hotspot-search
+    - 3d-cluster
+    method: GET
+    path: /hotspots/3d
+    params:
+      gene:
+        type: string
+        required: true
+        mapsTo: hugoSymbol
+        description: Hugo gene symbol (e.g. TP53, BRAF, PIK3CA)
+    response:
+      format: json
+      fields:
+      - '[].hugoSymbol'
+      - '[].residue'
+      - '[].type'
+      - '[].variantAminoAcid'
+      - '[].qValue'
+      - '[].qValuePancan'
+    entity: variant
+  getHotspotsByTranscript:
+    description: Get single-residue mutation hotspots for a specific transcript
+    tags:
+    - hotspot-search
+    - transcript
+    method: GET
+    path: /hotspots/single
+    params:
+      transcriptId:
+        type: string
+        required: true
+        description: Transcript ID (e.g. ENST00000269305)
+    response:
+      format: json
+      fields:
+      - '[].hugoSymbol'
+      - '[].residue'
+      - '[].type'
+      - '[].variantAminoAcid'
+      - '[].qValue'
+      - '[].qValuePancan'
+    entity: variant
+tests:
+  getHotspotsByGene:
+  - name: gets single-residue hotspots for TP53
+    params:
+      gene: TP53
+    assert:
+    - isArray: true
+    - minLength: 1
+    - path: 0.hugoSymbol
+    - path: 0.residue
+  get3dHotspotsByGene:
+  - name: gets 3D cluster hotspots for TP53
+    params:
+      gene: TP53
+    assert:
+    - isArray: true
+  getHotspotsByTranscript:
+  - name: gets hotspots for BRAF transcript
+    params:
+      transcriptId: ENST00000288602
+    assert:
+    - isArray: true
+    - path: 0.residue

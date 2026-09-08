@@ -2,18 +2,18 @@ name: iedb
 displayName: IEDB
 description: Immune Epitope Database — curated epitope data for immune research
 tags:
-  - epitope
-  - immunology
-  - antigen
-  - mhc
-  - iedb
+- epitope
+- immunology
+- antigen
+- mhc
+- iedb
 baseUrl: https://query-api.iedb.org
 tools:
   searchEpitopes:
     description: Search for epitopes by linear peptide sequence (uses PostgREST eq operator)
     tags:
-      - epitope-search
-      - peptide-search
+    - epitope-search
+    - peptide-search
     method: GET
     path: /epitope_search
     params:
@@ -29,14 +29,15 @@ tools:
     response:
       format: json
       fields:
-        - "[].structure_id"
-        - "[].structure_descriptions"
-        - "[].curated_source_antigens"
+      - '[].structure_id'
+      - '[].structure_descriptions'
+      - '[].curated_source_antigens'
+    entity: sequence
   getEpitope:
     description: Get a specific epitope by its structure ID
     tags:
-      - epitope-info
-      - epitope-detail
+    - epitope-info
+    - epitope-detail
     method: GET
     path: /epitope_search
     params:
@@ -48,57 +49,59 @@ tools:
     response:
       format: json
       fields:
-        - "[].structure_id"
-        - "[].structure_type"
-        - "[].linear_sequence"
-        - "[].structure_descriptions"
-        - "[].source_organism_names"
-        - "[].host_organism_names"
-        - "[].mhc_allele_names"
-        - "[].qualitative_measures"
+      - '[].structure_id'
+      - '[].structure_type'
+      - '[].linear_sequence'
+      - '[].structure_descriptions'
+      - '[].source_organism_names'
+      - '[].host_organism_names'
+      - '[].mhc_allele_names'
+      - '[].qualitative_measures'
+    entity: structure
   searchAssays:
     description: Search assays by epitope structure ID
     tags:
-      - assay-search
-      - epitope-assays
+    - assay-search
+    - epitope-assays
     method: GET
     path: /tcell_search
     params:
       e_id:
-        type: integer
+        type: string
         required: true
         mapsTo: structure_id
         description: Epitope structure ID (e.g. eq.35572). Prefix value with eq.
       select:
         type: string
-        default: assay_id,assay_type,qualitative_measure,response_frequency_positive
+        default: assay_iris,assay_type,qualitative_measure,response_frequency_positive
         description: Columns to return
     response:
       format: json
       fields:
-        - "[].assay_id"
-        - "[].assay_type"
-        - "[].qualitative_measure"
-        - "[].response_frequency_positive"
+      - '[].assay_iris'
+      - '[].assay_type'
+      - '[].qualitative_measure'
+      - '[].response_frequency_positive'
+    entity: assay
 tests:
   searchEpitopes:
-    - name: searches for SIINFEKL epitope
-      params:
-        sequence: eq.SIINFEKL
-      assert:
-        - isArray: true
-        - path: 0.structure_id
+  - name: searches for SIINFEKL epitope
+    params:
+      sequence: eq.SIINFEKL
+    assert:
+    - isArray: true
+    - path: 0.structure_id
   getEpitope:
-    - name: gets epitope 35572
-      params:
-        id: eq.35572
-      assert:
-        - isArray: true
-        - path: 0.structure_id
-          equals: 35572
+  - name: gets epitope 35572
+    params:
+      id: eq.35572
+    assert:
+    - isArray: true
+    - path: 0.structure_id
+      equals: 35572
   searchAssays:
-    - name: searches assays for epitope 35572
-      params:
-        e_id: eq.35572
-      assert:
-        - isArray: true
+  - name: searches assays for epitope 35572
+    params:
+      e_id: eq.35572
+    assert:
+    - isArray: true

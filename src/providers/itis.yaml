@@ -2,80 +2,104 @@ name: itis
 displayName: ITIS
 description: Integrated Taxonomic Information System — authoritative taxonomic information for plants, animals, fungi, and microbes
 tags:
-  - taxonomy
-  - species
-  - classification
-  - itis
-  - biodiversity
+- taxonomy
+- species
+- itis
+- united-states
 baseUrl: https://www.itis.gov/ITISWebService/jsonservice
 tools:
-  searchByScientificName:
-    description: Search taxa by scientific name
+  searchByName:
+    description: Search ITIS for taxa by scientific name
     tags:
-      - taxonomy-search
-      - scientific-name
+    - taxonomy-search
+    - scientific-name
     method: GET
     path: /searchByScientificName
     params:
-      srchKey:
+      name:
         type: string
         required: true
-        description: Scientific name to search for (e.g. Apis mellifera)
+        mapsTo: srchKey
+        description: Scientific name to search for (e.g. "Ursus americanus", "Quercus alba")
     response:
       format: json
       fields:
-        - scientificNames
-  searchByCommonName:
-    description: Search taxa by common name
+      - scientificNames[].combinedName
+      - scientificNames[].tsn
+      - scientificNames[].unitInd1
+      - scientificNames[].unitName1
+      - scientificNames[].unitInd2
+      - scientificNames[].unitName2
+    entity: organism
+  getByTsn:
+    description: Get a full taxonomic record from ITIS by Taxonomic Serial Number
     tags:
-      - taxonomy-search
-      - common-name
+    - taxon-detail
+    - tsn-lookup
     method: GET
-    path: /searchByCommonNameBeginsWith
+    path: /getFullRecordFromTSN
     params:
-      srchKey:
+      tsn:
         type: string
         required: true
-        description: Common name to search for (e.g. honey bee)
+        description: ITIS Taxonomic Serial Number (e.g. "180544" for Ursus americanus)
     response:
       format: json
       fields:
-        - commonNames
+      - scientificName.combinedName
+      - scientificName.unitInd1
+      - scientificName.unitName1
+      - taxRank.rankName
+      - commonNameList.commonNames[].commonName
+      - commonNameList.commonNames[].language
+      - kingdom.kingdomName
+    entity: organism
   getHierarchy:
-    description: Get taxonomic hierarchy for a TSN (Taxonomic Serial Number)
+    description: Get full taxonomic hierarchy from ITIS by Taxonomic Serial Number
     tags:
-      - taxonomy-hierarchy
-      - classification
+    - taxonomy-hierarchy
+    - classification
     method: GET
     path: /getFullHierarchyFromTSN
     params:
       tsn:
         type: string
         required: true
-        description: Taxonomic Serial Number (e.g. 154395)
+        description: ITIS Taxonomic Serial Number (e.g. "180544")
     response:
       format: json
       fields:
-        - hierarchyList
-tests:
-  searchByScientificName:
-    - name: searches for Apis mellifera
-      params:
-        srchKey: Apis mellifera
-      assert:
-        - path: scientificNames
-          minLength: 1
+      - hierarchyList[].tsn
+      - hierarchyList[].taxonName
+      - hierarchyList[].rankName
+      - hierarchyList[].parentTsn
+    entity: organism
   searchByCommonName:
-    - name: searches for honey bee
-      params:
-        srchKey: honey bee
-      assert:
-        - path: commonNames
-          minLength: 1
-  getHierarchy:
-    - name: gets hierarchy for honey bee TSN
-      params:
-        tsn: "154395"
-      assert:
-        - path: hierarchyList
-          minLength: 1
+    description: Search ITIS for taxa by common or vernacular name
+    tags:
+    - common-name-search
+    - vernacular
+    method: GET
+    path: /searchByCommonName
+    params:
+      name:
+        type: string
+        required: true
+        mapsTo: srchKey
+        description: Common name to search for (e.g. "black bear", "red oak")
+    response:
+      format: json
+      fields:
+      - commonNames[].commonName
+      - commonNames[].tsn
+      - commonNames[].language
+    entity: organism
+tests:
+  searchByName:
+  - name: searches for Ursus americanus
+    params:
+      name: Ursus americanus
+    assert:
+    - path: scientificNames
+      minLength: 1
+    - path: scientificNames.0.tsn

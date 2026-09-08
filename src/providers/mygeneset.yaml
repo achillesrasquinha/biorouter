@@ -2,17 +2,17 @@ name: mygeneset
 displayName: MyGeneset.info
 description: MyGeneset.info — gene set query service for curated and community gene sets
 tags:
-  - gene-set
-  - pathway
-  - gene-list
-  - biothings
+- gene-set
+- pathway
+- gene-list
+- biothings
 baseUrl: https://mygeneset.info/v1
 tools:
   queryGenesets:
     description: Search for gene sets by gene name, pathway, or keyword
     tags:
-      - gene-set-search
-      - pathway-search
+    - gene-set-search
+    - pathway-search
     method: GET
     path: /query
     params:
@@ -27,14 +27,15 @@ tools:
     response:
       format: json
       fields:
-        - total
-        - hits[].name
-        - hits[].description
-        - hits[].genes[].symbol
+      - total
+      - hits[].name
+      - hits[].description
+      - hits[].genes[].symbol
+    entity: gene
   getGeneset:
     description: Get details for a specific gene set by ID
     tags:
-      - gene-set-info
+    - gene-set-info
     method: GET
     path: /geneset/{genesetId}
     params:
@@ -45,17 +46,18 @@ tools:
     response:
       format: json
       fields:
-        - name
-        - description
-        - genes[].symbol
-        - genes[].name
+      - name
+      - description
+      - genes[].symbol
+      - genes[].name
+    entity: gene
 tests:
   queryGenesets:
-    - name: searches for BRCA1 gene sets
-      params:
-        q: BRCA1
-        size: 2
-      assert:
-        - path: total
-        - path: hits
-          minLength: 1
+  - name: searches for BRCA1 gene sets
+    params:
+      q: BRCA1
+      size: 2
+    assert:
+    - path: total
+    - path: hits
+      minLength: 1

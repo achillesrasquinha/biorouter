@@ -2,18 +2,18 @@ name: stitch
 displayName: STITCH
 description: STITCH chemical-protein interaction database — sister project of STRING
 tags:
-  - chemical-protein
-  - interactions
-  - stitch
-  - drug-target
-  - network
+- chemical-protein
+- interactions
+- stitch
+- drug-target
+- network
 baseUrl: http://stitch-db.org/api
 tools:
   resolveIdentifier:
     description: Resolve a chemical name or identifier to STITCH internal IDs
     tags:
-      - identifier-resolution
-      - chemical-lookup
+    - identifier-resolution
+    - chemical-lookup
     method: GET
     path: /json/resolve
     params:
@@ -29,16 +29,17 @@ tools:
     response:
       format: json
       fields:
-        - "[].stringId"
-        - "[].preferredName"
-        - "[].taxonName"
-        - "[].annotation"
-        - "[].ncbiTaxonId"
+      - '[].stringId'
+      - '[].preferredName'
+      - '[].taxonName'
+      - '[].annotation'
+      - '[].ncbiTaxonId'
+    entity: identifier
   getInteractions:
     description: Get chemical-protein interaction partners for a given chemical
     tags:
-      - interaction-search
-      - drug-target
+    - interaction-search
+    - drug-target
     method: GET
     path: /json/interactionsList
     params:
@@ -54,24 +55,25 @@ tools:
     response:
       format: json
       fields:
-        - "[].stringId_A"
-        - "[].stringId_B"
-        - "[].preferredName_A"
-        - "[].preferredName_B"
-        - "[].score"
-        - "[].ncbiTaxonId"
+      - '[].stringId_A'
+      - '[].stringId_B'
+      - '[].preferredName_A'
+      - '[].preferredName_B'
+      - '[].score'
+      - '[].ncbiTaxonId'
+    entity: interaction
 tests:
   resolveIdentifier:
-    - name: resolves aspirin identifier
-      params:
-        query: aspirin
-      assert:
-        - isArray: true
-        - path: 0.preferredName
+  - name: resolves aspirin identifier
+    params:
+      query: aspirin
+    assert:
+    - isArray: true
+    - path: 0.preferredName
   getInteractions:
-    - name: gets interactions for aspirin (CIDm000002244)
-      params:
-        chemical: CIDm000002244
-      assert:
-        - isArray: true
-      allowError: true
+  - name: gets interactions for aspirin (CIDm000002244)
+    params:
+      chemical: CIDm000002244
+    assert:
+    - isArray: true
+    allowError: true

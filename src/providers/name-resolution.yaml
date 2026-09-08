@@ -2,17 +2,17 @@ name: name-resolution
 displayName: RENCI Name Resolution
 description: RENCI Name Resolution — Translator service mapping text labels to biomedical CURIEs
 tags:
-  - name-resolution
-  - identifier-mapping
-  - translator
-  - curie
+- name-resolution
+- identifier-mapping
+- translator
+- curie
 baseUrl: https://name-resolution-sri.renci.org
 tools:
-  lookup:
+  resolveIdentifier:
     description: Resolve a text label to standardized biomedical identifiers (CURIEs)
     tags:
-      - name-lookup
-      - identifier-mapping
+    - name-lookup
+    - identifier-mapping
     method: GET
     path: /lookup
     params:
@@ -27,14 +27,15 @@ tools:
     response:
       format: json
       fields:
-        - '[].curie'
-        - '[].label'
-        - '[].synonyms'
+      - '[].curie'
+      - '[].label'
+      - '[].synonyms'
+    entity: identifier
 tests:
-  lookup:
-    - name: resolves BRCA1 to identifiers
-      params:
-        string: BRCA1
-        limit: 5
-      assert:
-        - minLength: 1
+  resolveIdentifier:
+  - name: resolves BRCA1 to identifiers
+    params:
+      string: BRCA1
+      limit: 5
+    assert:
+    - minLength: 1

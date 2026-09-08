@@ -2,25 +2,25 @@ name: biocyc
 displayName: BioCyc
 description: BioCyc / MetaCyc — metabolic pathway and genome database collection
 tags:
-  - metabolic-pathways
-  - metabolism
-  - enzymes
-  - compounds
-  - metacyc
+- metabolic-pathways
+- metabolism
+- enzymes
+- compounds
+- metacyc
 baseUrl: https://websvc.biocyc.org
 tools:
   getPathway:
     description: Get detailed pathway information from MetaCyc by pathway ID
     tags:
-      - pathway-info
-      - metabolic-pathway
+    - pathway-info
+    - metabolic-pathway
     method: GET
     path: /apixml
     params:
       id:
         type: string
         required: true
-        description: "MetaCyc pathway ID prefixed with META: (e.g. META:TCA)"
+        description: 'MetaCyc pathway ID prefixed with META: (e.g. META:TCA)'
       fn:
         type: string
         default: PATHWAY
@@ -31,39 +31,41 @@ tools:
         description: Level of detail (full or low)
     response:
       format: xml
+    entity: pathway
   searchCompound:
     description: Search for compounds in a metabolic pathway
     tags:
-      - compound-search
-      - metabolite-search
+    - compound-search
+    - metabolite-search
     method: GET
     path: /apixml
     params:
       id:
         type: string
         required: true
-        description: "MetaCyc pathway ID prefixed with META: (e.g. META:TCA)"
+        description: 'MetaCyc pathway ID prefixed with META: (e.g. META:TCA)'
       fn:
         type: string
         default: compounds-of-pathway
         description: API function name
     response:
       format: xml
+    entity: compound
 tests:
   getPathway:
-    - name: gets TCA cycle pathway
-      params:
-        id: "META:TCA"
-        fn: PATHWAY
-        detail: full
-      assert:
-        - isNonEmpty: true
-      allowError: true
+  - name: gets TCA cycle pathway
+    params:
+      id: META:TCA
+      fn: PATHWAY
+      detail: full
+    assert:
+    - isNonEmpty: true
+    allowError: true
   searchCompound:
-    - name: gets compounds of TCA cycle
-      params:
-        id: "META:TCA"
-        fn: compounds-of-pathway
-      assert:
-        - isNonEmpty: true
-      allowError: true
+  - name: gets compounds of TCA cycle
+    params:
+      id: META:TCA
+      fn: compounds-of-pathway
+    assert:
+    - isNonEmpty: true
+    allowError: true

@@ -2,17 +2,17 @@ name: zooma
 displayName: Zooma
 description: Zooma — EBI annotation tool mapping free text to ontology terms
 tags:
-  - annotation
-  - ontology-mapping
-  - text-mining
-  - ebi
+- annotation
+- ontology-mapping
+- text-mining
+- ebi
 baseUrl: https://www.ebi.ac.uk/spot/zooma/v2/api
 tools:
-  annotate:
+  annotateText:
     description: Map free text to ontology terms using Zooma
     tags:
-      - text-annotation
-      - ontology-mapping
+    - text-annotation
+    - ontology-mapping
     method: GET
     path: /services/annotate
     params:
@@ -27,13 +27,14 @@ tools:
     response:
       format: json
       fields:
-        - '[].annotatedProperty.propertyValue'
-        - '[].semanticTags'
+      - '[].annotatedProperty.propertyValue'
+      - '[].semanticTags'
+    entity: annotation
 tests:
-  annotate:
-    - name: annotates diabetes text
-      params:
-        propertyValue: diabetes
-        limit: 5
-      assert:
-        - minLength: 1
+  annotateText:
+  - name: annotates diabetes text
+    params:
+      propertyValue: diabetes
+      limit: 5
+    assert:
+    - minLength: 1

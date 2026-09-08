@@ -1,6 +1,6 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
-import { pluck } from "../src/lib/http/pluck.js";
+import { pluck } from "../src/pluck.js";
 
 describe("pluck", () => {
   it("extracts top-level fields", () => {

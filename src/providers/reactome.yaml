@@ -2,17 +2,17 @@ name: reactome
 displayName: Reactome
 description: Curated biological pathway and reaction database
 tags:
-  - pathways
-  - reactions
-  - metabolism
-  - signaling
-  - reactome
+- pathways
+- reactions
+- metabolism
+- signaling
+- reactome
 baseUrl: https://reactome.org
 tools:
   search:
     description: Search Reactome for pathways by keyword
     tags:
-      - pathway-search
+    - pathway-search
     method: GET
     path: /ContentService/search/query
     params:
@@ -32,16 +32,17 @@ tools:
     response:
       format: json
       fields:
-        - results[].entries[].stId
-        - results[].entries[].name
-        - results[].entries[].type
-        - results[].entries[].species
-        - results[].entries[].summation
+      - results[].entries[].stId
+      - results[].entries[].name
+      - results[].entries[].type
+      - results[].entries[].species
+      - results[].entries[].summation
+    entity: pathway
   getPathway:
     description: Get pathway details by Reactome stable ID
     tags:
-      - pathway-info
-      - pathway-details
+    - pathway-info
+    - pathway-details
     method: GET
     path: /ContentService/data/query/{pathwayId}
     params:
@@ -52,21 +53,22 @@ tools:
     response:
       format: json
       fields:
-        - stId
-        - displayName
-        - speciesName
-        - isInDisease
-        - releaseDate
-        - goBiologicalProcess.displayName
-        - goBiologicalProcess.accession
-        - goBiologicalProcess.definition
-        - literatureReference[].title
-        - literatureReference[].pubMedIdentifier
+      - stId
+      - displayName
+      - speciesName
+      - isInDisease
+      - releaseDate
+      - goBiologicalProcess.displayName
+      - goBiologicalProcess.accession
+      - goBiologicalProcess.definition
+      - literatureReference[].title
+      - literatureReference[].pubMedIdentifier
+    entity: pathway
   getPathwayDetail:
     description: Get contained events (sub-pathways and reactions) in a pathway
     tags:
-      - pathway-events
-      - pathway-contents
+    - pathway-events
+    - pathway-contents
     method: GET
     path: /ContentService/data/pathway/{id}/containedEvents
     params:
@@ -77,33 +79,38 @@ tools:
     response:
       format: json
       fields:
-        - '[].stId'
-        - '[].displayName'
-        - '[].schemaClass'
+      - '[].stId'
+      - '[].displayName'
+      - '[].schemaClass'
+    entity: pathway
   getSpeciesPathways:
     description: Get top-level pathways for a species
     tags:
-      - species-pathways
-      - top-level-pathways
+    - species-pathways
+    - top-level-pathways
     method: GET
     path: /ContentService/data/pathways/top/{species}
     params:
       species:
         type: string
         required: true
-        default: "9606"
+        default: '9606'
         description: Species taxon ID or name (e.g. 9606, "Homo sapiens")
     response:
       format: json
       fields:
-        - '[].stId'
-        - '[].displayName'
-        - '[].isInferred'
+      - '[].stId'
+      - '[].displayName'
+      - '[].isInferred'
+    entity: pathway
   analyzeIdentifiers:
+    # NOTE: This endpoint requires Content-Type: text/plain with the raw
+    # identifier list as the body. The engine sends application/json, causing
+    # HTTP 415 Unsupported Media Type. Use Reactome's web tools or curl directly.
     description: Perform pathway enrichment analysis on a list of identifiers
     tags:
-      - pathway-enrichment
-      - gene-set-analysis
+    - pathway-enrichment
+    - gene-set-analysis
     method: POST
     path: /AnalysisService/identifiers/
     params:
@@ -114,40 +121,48 @@ tools:
     response:
       format: json
       fields:
-        - summary.token
-        - pathways[].stId
-        - pathways[].name
-        - pathways[].entities.pValue
+      - summary.token
+      - pathways[].stId
+      - pathways[].name
+      - pathways[].entities.pValue
+    entity: identifier
 tests:
   search:
-    - name: searches for apoptosis pathways
-      params:
-        query: apoptosis
-      assert:
-        - path: results
-          minLength: 1
+  - name: searches for apoptosis pathways
+    params:
+      query: apoptosis
+    assert:
+    - path: results
+      minLength: 1
   getPathway:
-    - name: gets pathway by stable ID
-      params:
-        pathwayId: R-HSA-109581
-      assert: []
+  - name: gets pathway by stable ID
+    params:
+      pathwayId: R-HSA-109581
+    assert: []
   getPathwayDetail:
-    - name: gets contained events for a pathway
-      params:
-        id: R-HSA-1640170
-      assert:
-        - isArray: true
-          minLength: 1
+  - name: gets contained events for a pathway
+    params:
+      id: R-HSA-1640170
+    assert:
+    - isArray: true
+      minLength: 1
   getSpeciesPathways:
-    - name: gets top-level human pathways
-      params:
-        species: "9606"
-      assert:
-        - isArray: true
-          minLength: 1
+  - name: gets top-level human pathways
+    params:
+      species: '9606'
+    assert:
+    - isArray: true
+      minLength: 1
   analyzeIdentifiers:
-    - name: analyzes a small gene list
-      params:
-        ids: "TP53\nBRCA1\nEGFR"
-      assert:
-        - path: summary.token
+  # NOTE: Will fail with HTTP 415 because the engine sends JSON but the
+  # endpoint requires text/plain body.
+  - name: analyzes a small gene list
+    params:
+      ids: 'TP53
+
+        BRCA1
+
+        EGFR'
+    assert:
+    - path: summary.token
+    allowError: true

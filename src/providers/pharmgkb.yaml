@@ -2,18 +2,18 @@ name: pharmgkb
 displayName: PharmGKB (CPIC)
 description: CPIC pharmacogenomics knowledge base — drug-gene pairs, clinical guidelines, and pharmacogenomic recommendations
 tags:
-  - pharmacogenomics
-  - drug-gene
-  - pharmgkb
-  - clinical
-  - pgx
+- pharmacogenomics
+- drug-gene
+- pharmgkb
+- clinical
+- pgx
 baseUrl: https://api.cpicpgx.org/v1
 tools:
   searchDrugs:
     description: Search for drugs by name in the CPIC pharmacogenomics database
     tags:
-      - drug-search
-      - pgx-drug
+    - drug-search
+    - pgx-drug
     method: GET
     path: /drug
     params:
@@ -22,21 +22,22 @@ tools:
         required: true
         mapsTo: name
         description: Drug name (e.g. "warfarin")
-        prefix: "eq."
+        prefix: eq.
     response:
       format: json
       fields:
-        - '[].drugid'
-        - '[].name'
-        - '[].rxnormid'
-        - '[].drugbankid'
-        - '[].atcid'
-        - '[].guidelineid'
+      - '[].drugid'
+      - '[].name'
+      - '[].rxnormid'
+      - '[].drugbankid'
+      - '[].atcid'
+      - '[].guidelineid'
+    entity: compound
   getDrugGenePairs:
     description: Get drug-gene interaction pairs for a specific drug
     tags:
-      - drug-gene-pairs
-      - pgx-pairs
+    - drug-gene-pairs
+    - pgx-pairs
     method: GET
     path: /pair
     params:
@@ -45,73 +46,79 @@ tools:
         required: true
         mapsTo: drugid
         description: Drug ID (e.g. "RxNorm:11289" for warfarin)
-        prefix: "eq."
+        prefix: eq.
     response:
       format: json
       fields:
-        - '[].pairid'
-        - '[].genesymbol'
-        - '[].drugid'
-        - '[].guidelineid'
-        - '[].usedforrecommendation'
-        - '[].cpiclevel'
-        - '[].clinpgxlevel'
-        - '[].pgxtesting'
+      - '[].pairid'
+      - '[].genesymbol'
+      - '[].drugid'
+      - '[].guidelineid'
+      - '[].usedforrecommendation'
+      - '[].cpiclevel'
+      - '[].clinpgxlevel'
+      - '[].pgxtesting'
+    entity: gene
   getGene:
-    description: Get gene details by PharmGKB accession ID
+    description: Get gene details by symbol from CPIC database
     tags:
-      - gene-info
-      - pgx-gene
+    - gene-info
+    - pgx-gene
     method: GET
-    path: /data/gene/{accessionId}
-    params:
-      accessionId:
-        type: string
-        required: true
-        description: PharmGKB accession ID (e.g. PA24356)
-    response:
-      format: json
-      fields:
-        - data.id
-        - data.name
-        - data.symbol
-        - data.crossReferences[].resource
-        - data.crossReferences[].resourceId
-  searchGenes:
-    description: Search genes by symbol
-    tags:
-      - gene-search
-      - pgx-gene
-    method: GET
-    path: /data/gene
+    path: /gene
     params:
       symbol:
         type: string
         required: true
-        description: Gene symbol to search for (e.g. CYP2D6)
+        description: Gene symbol (e.g. CYP2D6)
+        prefix: eq.
     response:
       format: json
       fields:
-        - data[].id
-        - data[].name
-        - data[].symbol
-  getClinicalAnnotation:
-    description: Get clinical annotations filtered by gene, chemical, or location
+      - '[].symbol'
+      - '[].chr'
+      - '[].hgncid'
+      - '[].ncbiid'
+      - '[].ensemblid'
+      - '[].lookupmethod'
+    entity: gene
+  getAlleles:
+    description: Get allele definitions for a gene
     tags:
-      - clinical-annotation
-      - pgx-annotation
+    - allele-info
+    - pgx-allele
     method: GET
-    path: /data/clinicalAnnotation
+    path: /allele
     params:
-      gene:
+      genesymbol:
         type: string
-        description: Gene symbol to filter by
-      chemical:
+        required: true
+        description: Gene symbol (e.g. CYP2D6)
+        prefix: eq.
+      select:
         type: string
-        description: Chemical/drug name to filter by
-      location:
+        default: name,functionalstatus,clinicalfunctionalstatus,activityvalue
+        description: Columns to select
+    response:
+      format: json
+      fields:
+      - '[].name'
+      - '[].functionalstatus'
+      - '[].clinicalfunctionalstatus'
+      - '[].activityvalue'
+    entity: variant
+  getGuidelines:
+    description: Get CPIC clinical guidelines
+    tags:
+    - guideline-info
+    - pgx-guideline
+    method: GET
+    path: /guideline
+    params:
+      select:
         type: string
-        description: Variant location to filter by
+        default: id,name,url,genes,drugs
+        description: Columns to select
       limit:
         type: integer
         default: 10
@@ -119,99 +126,78 @@ tools:
     response:
       format: json
       fields:
-        - data[].id
-        - data[].location
-        - data[].gene
-        - data[].chemicals
-        - data[].phenotypes
-  getPathway:
-    description: Get pharmacogenomics pathway by accession ID
+      - '[].id'
+      - '[].name'
+      - '[].url'
+      - '[].genes'
+      - '[].drugs'
+    entity: annotation
+  getRecommendations:
+    description: Get dosing recommendations for a drug-gene pair
     tags:
-      - pathway-info
-      - pgx-pathway
+    - recommendation-info
+    - pgx-recommendation
     method: GET
-    path: /data/pathway/{accessionId}
+    path: /recommendation
     params:
-      accessionId:
+      drugid:
         type: string
         required: true
-        description: PharmGKB pathway accession ID
+        description: Drug ID (e.g. RxNorm:11289 for warfarin)
+        prefix: eq.
+      select:
+        type: string
+        default: drugid,implications,drugrecommendation,classification
+        description: Columns to select
     response:
       format: json
       fields:
-        - data.id
-        - data.name
-        - data.description
-  getVariant:
-    description: Get variant details by accession ID
-    tags:
-      - variant-info
-      - pgx-variant
-    method: GET
-    path: /data/variant/{accessionId}
-    params:
-      accessionId:
-        type: string
-        required: true
-        description: PharmGKB variant accession ID (e.g. PA166153760)
-    response:
-      format: json
-      fields:
-        - data.id
-        - data.name
-        - data.gene
-        - data.location
+      - '[].drugid'
+      - '[].implications'
+      - '[].drugrecommendation'
+      - '[].classification'
+    entity: annotation
 tests:
   searchDrugs:
-    - name: searches for warfarin
-      params:
-        name: eq.warfarin
-      assert:
-        - isArray: true
-        - path: 0.name
-          equals: warfarin
+  - name: searches for warfarin
+    params:
+      name: eq.warfarin
+    assert:
+    - isArray: true
+    - path: 0.name
+      equals: warfarin
   getDrugGenePairs:
-    - name: gets drug-gene pairs for warfarin (RxNorm:11289)
-      params:
-        drugid: eq.RxNorm:11289
-      assert:
-        - isArray: true
-        - path: 0.genesymbol
+  - name: gets drug-gene pairs for warfarin (RxNorm:11289)
+    params:
+      drugid: eq.RxNorm:11289
+    assert:
+    - isArray: true
+    - path: 0.genesymbol
   getGene:
-    - name: gets gene details for CYP2D6
-      params:
-        accessionId: PA24356
-      assert:
-        - path: data.id
-          equals: PA24356
-        - path: data.symbol
-  searchGenes:
-    - name: searches for CYP2D6 gene
-      params:
-        symbol: CYP2D6
-      assert:
-        - path: data
-          minLength: 1
-        - path: data.0.symbol
-  getClinicalAnnotation:
-    - name: gets clinical annotations for CYP2D6
-      params:
-        gene: CYP2D6
-        limit: 5
-      assert:
-        - path: data
-          minLength: 1
-  getPathway:
-    - name: gets a pharmacogenomics pathway
-      params:
-        accessionId: PA150653776
-      assert:
-        - path: data.id
-        - path: data.name
-  getVariant:
-    - name: gets variant details
-      params:
-        accessionId: PA166153760
-      assert:
-        - path: data.id
-          equals: PA166153760
+  - name: gets gene details for CYP2D6
+    params:
+      symbol: eq.CYP2D6
+    assert:
+    - isArray: true
+    - path: 0.symbol
+      equals: CYP2D6
+  getAlleles:
+  - name: gets allele definitions for CYP2D6
+    params:
+      genesymbol: eq.CYP2D6
+    assert:
+    - isArray: true
+    - path: 0.name
+  getGuidelines:
+  - name: lists CPIC guidelines
+    params:
+      limit: 5
+    assert:
+    - isArray: true
+    - path: 0.name
+  getRecommendations:
+  - name: gets recommendations for warfarin
+    params:
+      drugid: eq.RxNorm:11289
+    assert:
+    - isArray: true

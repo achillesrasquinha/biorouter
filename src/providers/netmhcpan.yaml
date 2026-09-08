@@ -2,20 +2,19 @@ name: netmhcpan
 displayName: NetMHCpan
 description: NetMHCpan 4.1 — MHC class I binding prediction for peptides across HLA alleles
 tags:
-  - mhc
-  - binding-prediction
-  - immunology
-  - hla
-  - peptide
-  - neoantigen
+- mhc
+- binding-prediction
+- immunology
+- hla
+- peptide
+- neoantigen
 baseUrl: https://services.healthtech.dtu.dk/api
-
 tools:
   predict:
     description: Submit a peptide sequence for MHC class I binding prediction
     tags:
-      - mhc-i-prediction
-      - binding-affinity
+    - mhc-i-prediction
+    - binding-affinity
     method: POST
     path: /NetMHCpan-4.1/submit
     params:
@@ -29,13 +28,13 @@ tools:
         description: HLA allele name (e.g. "HLA-A02:01")
     response:
       format: json
-
+    entity: structure
 tests:
   predict:
-    - name: predicts MHC-I binding for a peptide
-      params:
-        sequence: SLYNTVATL
-        allele: "HLA-A02:01"
-      assert:
-        - {}
-      allowError: true
+  - name: predicts MHC-I binding for a peptide
+    params:
+      sequence: SLYNTVATL
+      allele: HLA-A02:01
+    assert:
+    - {}
+    allowError: true

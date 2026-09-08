@@ -2,17 +2,17 @@ name: alphafold
 displayName: AlphaFold DB
 description: AI-predicted protein structures from DeepMind
 tags:
-  - protein-structure
-  - prediction
-  - alphafold
-  - 3d-structure
+- protein-structure
+- prediction
+- alphafold
+- 3d-structure
 baseUrl: https://alphafold.ebi.ac.uk/api
 tools:
   getPrediction:
     description: Get AlphaFold structure prediction by UniProt accession
     tags:
-      - structure-prediction
-      - protein-structure
+    - structure-prediction
+    - protein-structure
     method: GET
     path: /prediction/{accession}
     params:
@@ -23,20 +23,21 @@ tools:
     response:
       format: json
       fields:
-        - "[].uniprotAccession"
-        - "[].gene"
-        - "[].uniprotDescription"
-        - "[].organismScientificName"
-        - "[].globalMetricValue"
-        - "[].modelEntityId"
-        - "[].pdbUrl"
-        - "[].cifUrl"
+      - '[].uniprotAccession'
+      - '[].gene'
+      - '[].uniprotDescription'
+      - '[].organismScientificName'
+      - '[].globalMetricValue'
+      - '[].modelEntityId'
+      - '[].pdbUrl'
+      - '[].cifUrl'
+    entity: structure
   getConfidence:
     description: Get per-residue confidence (pLDDT) summary
     tags:
-      - structure-quality
-      - confidence
-      - plddt
+    - structure-quality
+    - confidence
+    - plddt
     method: GET
     path: /prediction/{accession}
     params:
@@ -47,22 +48,23 @@ tools:
     response:
       format: json
       fields:
-        - "[].uniprotAccession"
-        - "[].gene"
-        - "[].globalMetricValue"
-        - "[].fractionPlddtVeryHigh"
-        - "[].fractionPlddtConfident"
-        - "[].fractionPlddtLow"
-        - "[].fractionPlddtVeryLow"
+      - '[].uniprotAccession'
+      - '[].gene'
+      - '[].globalMetricValue'
+      - '[].fractionPlddtVeryHigh'
+      - '[].fractionPlddtConfident'
+      - '[].fractionPlddtLow'
+      - '[].fractionPlddtVeryLow'
+    entity: structure
 tests:
   getPrediction:
-    - name: gets prediction for EGFR (P00533)
-      params:
-        accession: P00533
-      assert:
-        - isArray: true
-        - path: 0.uniprotAccession
-          equals: P00533
-        - anyOf:
-            - 0.pdbUrl
-            - 0.cifUrl
+  - name: gets prediction for EGFR (P00533)
+    params:
+      accession: P00533
+    assert:
+    - isArray: true
+    - path: 0.uniprotAccession
+      equals: P00533
+    - anyOf:
+      - 0.pdbUrl
+      - 0.cifUrl

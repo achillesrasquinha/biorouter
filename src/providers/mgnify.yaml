@@ -2,18 +2,18 @@ name: mgnify
 displayName: MGnify
 description: MGnify — EBI metagenomics analysis and archiving platform
 tags:
-  - metagenomics
-  - microbiome
-  - mgnify
-  - 16s
-  - shotgun
+- metagenomics
+- microbiome
+- mgnify
+- 16s
+- shotgun
 baseUrl: https://www.ebi.ac.uk/metagenomics/api/v1
 tools:
   searchStudies:
     description: Search MGnify metagenomics studies by keyword
     tags:
-      - study-search
-      - metagenomics-study
+    - study-search
+    - metagenomics-study
     method: GET
     path: /studies
     params:
@@ -29,18 +29,19 @@ tools:
     response:
       format: json
       fields:
-        - data[].id
-        - data[].attributes.accession
-        - data[].attributes.bioproject
-        - data[].attributes.study-name
-        - data[].attributes.study-abstract
-        - data[].attributes.samples-count
-        - data[].attributes.centre-name
+      - data[].id
+      - data[].attributes.accession
+      - data[].attributes.bioproject
+      - data[].attributes.study-name
+      - data[].attributes.study-abstract
+      - data[].attributes.samples-count
+      - data[].attributes.centre-name
+    entity: dataset
   getStudy:
     description: Get details of a specific MGnify study by accession
     tags:
-      - study-detail
-      - metagenomics-study
+    - study-detail
+    - metagenomics-study
     method: GET
     path: /studies/{accession}
     params:
@@ -51,27 +52,28 @@ tools:
     response:
       format: json
       fields:
-        - data.id
-        - data.attributes.accession
-        - data.attributes.bioproject
-        - data.attributes.study-name
-        - data.attributes.study-abstract
-        - data.attributes.samples-count
-        - data.attributes.centre-name
+      - data.id
+      - data.attributes.accession
+      - data.attributes.bioproject
+      - data.attributes.study-name
+      - data.attributes.study-abstract
+      - data.attributes.samples-count
+      - data.attributes.centre-name
+    entity: dataset
 tests:
   searchStudies:
-    - name: searches studies for gut microbiome
-      params:
-        query: gut microbiome
-      assert:
-        - path: data
-          minLength: 1
-        - path: data.0.attributes.accession
+  - name: searches studies for gut microbiome
+    params:
+      query: gut microbiome
+    assert:
+    - path: data
+      minLength: 1
+    - path: data.0.attributes.accession
   getStudy:
-    - name: gets study MGYS00006822 details
-      params:
-        accession: MGYS00006822
-      assert:
-        - path: data.id
-          equals: MGYS00006822
-        - path: data.attributes
+  - name: gets study MGYS00006822 details
+    params:
+      accession: MGYS00006822
+    assert:
+    - path: data.id
+      equals: MGYS00006822
+    - path: data.attributes

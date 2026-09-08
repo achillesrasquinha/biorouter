@@ -2,18 +2,18 @@ name: openfda
 displayName: openFDA
 description: Open-access FDA data on drugs, devices, and foods including adverse events
 tags:
-  - drugs
-  - fda
-  - adverse-events
-  - drug-labels
-  - pharmacovigilance
+- drugs
+- fda
+- adverse-events
+- drug-labels
+- pharmacovigilance
 baseUrl: https://api.fda.gov
 tools:
   searchDrugs:
     description: Search FDA drug labeling data by drug name or active ingredient
     tags:
-      - drug-search
-      - drug-labels
+    - drug-search
+    - drug-labels
     method: GET
     path: /drug/label.json
     params:
@@ -30,16 +30,17 @@ tools:
     response:
       format: json
       fields:
-        - results[].openfda.brand_name
-        - results[].openfda.generic_name
-        - results[].openfda.route
-        - results[].openfda.substance_name
-        - results[].indications_and_usage
+      - results[].openfda.brand_name
+      - results[].openfda.generic_name
+      - results[].openfda.route
+      - results[].openfda.substance_name
+      - results[].indications_and_usage
+    entity: compound
   searchEvents:
     description: Search FDA adverse event reports for drugs
     tags:
-      - adverse-events
-      - drug-safety
+    - adverse-events
+    - drug-safety
     method: GET
     path: /drug/event.json
     params:
@@ -56,15 +57,16 @@ tools:
     response:
       format: json
       fields:
-        - results[].patient.drug[].medicinalproduct
-        - results[].patient.reaction[].reactionmeddrapt
-        - results[].serious
-        - results[].receivedate
+      - results[].patient.drug[].medicinalproduct
+      - results[].patient.reaction[].reactionmeddrapt
+      - results[].serious
+      - results[].receivedate
+    entity: compound
   searchRecalls:
     description: Search FDA drug recall and enforcement data
     tags:
-      - drug-recalls
-      - enforcement
+    - drug-recalls
+    - enforcement
     method: GET
     path: /drug/enforcement.json
     params:
@@ -81,32 +83,33 @@ tools:
     response:
       format: json
       fields:
-        - results[].product_description
-        - results[].reason_for_recall
-        - results[].classification
-        - results[].recall_initiation_date
+      - results[].product_description
+      - results[].reason_for_recall
+      - results[].classification
+      - results[].recall_initiation_date
+    entity: compound
 tests:
   searchDrugs:
-    - name: searches drug labels for aspirin
-      params:
-        query: aspirin
-        limit: 5
-      assert:
-        - path: results
-          minLength: 1
+  - name: searches drug labels for aspirin
+    params:
+      query: aspirin
+      limit: 5
+    assert:
+    - path: results
+      minLength: 1
   searchEvents:
-    - name: searches adverse events for aspirin
-      params:
-        query: aspirin
-        limit: 5
-      assert:
-        - path: results
-          minLength: 1
+  - name: searches adverse events for aspirin
+    params:
+      query: aspirin
+      limit: 5
+    assert:
+    - path: results
+      minLength: 1
   searchRecalls:
-    - name: searches drug recalls
-      params:
-        query: aspirin
-        limit: 5
-      assert:
-        - path: results
-          minLength: 1
+  - name: searches drug recalls
+    params:
+      query: aspirin
+      limit: 5
+    assert:
+    - path: results
+      minLength: 1

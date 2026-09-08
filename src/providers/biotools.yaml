@@ -2,18 +2,18 @@ name: biotools
 displayName: bio.tools
 description: ELIXIR bio.tools registry — bioinformatics tools and databases catalog
 tags:
-  - bioinformatics
-  - tools
-  - software
-  - registry
-  - elixir
+- bioinformatics
+- tools
+- software
+- registry
+- elixir
 baseUrl: https://bio.tools/api
 tools:
   searchTools:
     description: Search the bio.tools registry for bioinformatics tools
     tags:
-      - tool-search
-      - software-search
+    - tool-search
+    - software-search
     method: GET
     path: /tool/
     params:
@@ -39,17 +39,18 @@ tools:
     response:
       format: json
       fields:
-        - count
-        - list[].name
-        - list[].description
-        - list[].homepage
-        - list[].topic[].term
-        - list[].function[].operation[].term
+      - count
+      - list[].name
+      - list[].description
+      - list[].homepage
+      - list[].topic[].term
+      - list[].function[].operation[].term
+    entity: dataset
   getTool:
     description: Get detailed information about a specific tool by ID
     tags:
-      - tool-info
-      - software-info
+    - tool-info
+    - software-info
     method: GET
     path: /tool/{toolId}/
     params:
@@ -64,22 +65,23 @@ tools:
     response:
       format: json
       fields:
-        - name
-        - description
-        - homepage
-        - topic[].term
-        - function[].operation[].term
-        - function[].input[].data.term
-        - function[].output[].data.term
-        - credit[].name
+      - name
+      - description
+      - homepage
+      - topic[].term
+      - function[].operation[].term
+      - function[].input[].data.term
+      - function[].output[].data.term
+      - credit[].name
+    entity: dataset
 tests:
   searchTools:
-    - name: searches for alignment tools
-      params:
-        q: sequence alignment
-        size: 3
-        format: json
-      assert:
-        - path: count
-        - path: list
-          minLength: 1
+  - name: searches for alignment tools
+    params:
+      q: sequence alignment
+      size: 3
+      format: json
+    assert:
+    - path: count
+    - path: list
+      minLength: 1

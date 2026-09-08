@@ -2,20 +2,20 @@ name: hpo
 displayName: Human Phenotype Ontology
 description: Human Phenotype Ontology — standardized vocabulary of human phenotypic abnormalities
 tags:
-  - phenotype
-  - ontology
-  - hpo
-  - disease
-  - clinical
-baseUrl: https://ontology.jax.org/api/hp
+- phenotype
+- ontology
+- hpo
+- disease
+- clinical
+baseUrl: https://ontology.jax.org/api
 tools:
   searchTerms:
     description: Search the Human Phenotype Ontology by keyword
     tags:
-      - phenotype-search
-      - hpo-search
+    - phenotype-search
+    - hpo-search
     method: GET
-    path: /search
+    path: /hp/search
     params:
       query:
         type: string
@@ -29,18 +29,19 @@ tools:
     response:
       format: json
       fields:
-        - terms[].id
-        - terms[].name
-        - terms[].definition
-        - terms[].descendantCount
-        - terms[].synonyms
+      - terms[].id
+      - terms[].name
+      - terms[].definition
+      - terms[].descendantCount
+      - terms[].synonyms
+    entity: ontology-term
   getTerm:
     description: Get a specific HPO term by its identifier
     tags:
-      - phenotype-info
-      - hpo-term
+    - phenotype-info
+    - hpo-term
     method: GET
-    path: /terms/{id}
+    path: /hp/terms/{id}
     params:
       id:
         type: string
@@ -49,19 +50,20 @@ tools:
     response:
       format: json
       fields:
-        - id
-        - name
-        - definition
-        - comment
-        - descendantCount
-        - synonyms
+      - id
+      - name
+      - definition
+      - comment
+      - descendantCount
+      - synonyms
+    entity: ontology-term
   getTermGenes:
-    description: Get genes associated with an HPO term
+    description: Get genes associated with an HPO term via network annotations
     tags:
-      - phenotype-genes
-      - hpo-genes
+    - phenotype-genes
+    - hpo-genes
     method: GET
-    path: /terms/{termId}/genes
+    path: /network/annotation/{termId}
     params:
       termId:
         type: string
@@ -70,16 +72,18 @@ tools:
     response:
       format: json
       fields:
-        - genes[].geneSymbol
-        - genes[].geneId
-        - genes[].dbDiseases
+      - genes[].id
+      - genes[].name
+      - diseases[].id
+      - diseases[].name
+    entity: gene
   getDisease:
-    description: Get disease details by disease identifier
+    description: Get disease details and associated phenotypes by disease identifier
     tags:
-      - disease-info
-      - hpo-disease
+    - disease-info
+    - hpo-disease
     method: GET
-    path: /diseases/{diseaseId}
+    path: /network/annotation/{diseaseId}
     params:
       diseaseId:
         type: string
@@ -88,40 +92,45 @@ tools:
     response:
       format: json
       fields:
-        - disease.diseaseName
-        - disease.diseaseId
-        - disease.catTermsMap
+      - disease.id
+      - disease.name
+      - categories[].catLabel
+      - genes[].id
+      - genes[].name
+    entity: disease
 tests:
   searchTerms:
-    - name: searches for epilepsy phenotype terms
-      params:
-        query: epilepsy
-        max: 5
-      assert:
-        - path: terms
-          minLength: 1
-        - path: terms.0.id
-        - path: terms.0.name
+  - name: searches for epilepsy phenotype terms
+    params:
+      query: epilepsy
+      max: 5
+    assert:
+    - path: terms
+      minLength: 1
+    - path: terms.0.id
+    - path: terms.0.name
   getTerm:
-    - name: gets HPO term HP:0001250 (Seizure)
-      params:
-        id: HP:0001250
-      assert:
-        - path: id
-          equals: HP:0001250
-        - path: name
+  - name: gets HPO term HP:0001250 (Seizure)
+    params:
+      id: HP:0001250
+    assert:
+    - path: id
+      equals: HP:0001250
+    - path: name
   getTermGenes:
-    - name: gets genes associated with HP:0001250
-      params:
-        termId: HP:0001250
-      assert:
-        - path: genes
-          minLength: 1
-        - path: genes.0.geneSymbol
+  - name: gets genes associated with HP:0001250
+    params:
+      termId: HP:0001250
+    assert:
+    - path: genes
+      minLength: 1
+    - path: genes.0.id
+    - path: genes.0.name
   getDisease:
-    - name: gets disease details for OMIM:154700
-      params:
-        diseaseId: OMIM:154700
-      assert:
-        - path: disease.diseaseName
-        - path: disease.diseaseId
+  - name: gets disease details for OMIM:154700
+    params:
+      diseaseId: OMIM:154700
+    assert:
+    - path: disease
+    - path: genes
+      minLength: 1

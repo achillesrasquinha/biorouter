@@ -2,18 +2,18 @@ name: itol
 displayName: iTOL
 description: iTOL Interactive Tree of Life — phylogenetic tree upload, annotation, and export
 tags:
-  - phylogenetics
-  - tree-visualization
-  - newick
-  - itol
-  - evolution
+- phylogenetics
+- tree-visualization
+- newick
+- itol
+- evolution
 baseUrl: https://itol.embl.de
 tools:
   uploadTree:
     description: Upload a phylogenetic tree to iTOL for visualization (multipart form with tree data)
     tags:
-      - tree-upload
-      - phylogeny-upload
+    - tree-upload
+    - phylogeny-upload
     method: POST
     path: /upload
     params:
@@ -23,11 +23,12 @@ tools:
         description: Newick-format tree string to upload
     response:
       format: json
+    entity: gene
   exportTree:
     description: Export a tree from iTOL in a specified format (e.g. SVG, PDF, PNG)
     tags:
-      - tree-export
-      - tree-download
+    - tree-export
+    - tree-download
     method: GET
     path: /export/{treeId}
     params:
@@ -41,19 +42,20 @@ tools:
         description: Export format (svg, pdf, png, eps, newick)
     response:
       format: json
+    entity: organism
 tests:
   uploadTree:
-    - name: uploads a simple newick tree
-      params:
-        treeFile: "(A:0.1,B:0.2,(C:0.3,D:0.4):0.5);"
-      assert:
-        - {}
-      allowError: true
+  - name: uploads a simple newick tree
+    params:
+      treeFile: (A:0.1,B:0.2,(C:0.3,D:0.4):0.5);
+    assert:
+    - {}
+    allowError: true
   exportTree:
-    - name: exports a tree as SVG
-      params:
-        treeId: test123
-        format: svg
-      assert:
-        - {}
-      allowError: true
+  - name: exports a tree as SVG
+    params:
+      treeId: test123
+      format: svg
+    assert:
+    - {}
+    allowError: true

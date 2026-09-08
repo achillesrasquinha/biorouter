@@ -2,18 +2,18 @@ name: emdb
 displayName: EMDB
 description: Electron Microscopy Data Bank — 3D cryo-EM density maps and tomograms
 tags:
-  - electron-microscopy
-  - structure
-  - emdb
-  - cryoem
-  - 3d-reconstruction
+- electron-microscopy
+- structure
+- emdb
+- cryoem
+- 3d-reconstruction
 baseUrl: https://www.ebi.ac.uk/emdb/api
 tools:
   search:
     description: Search EMDB for electron microscopy entries by keyword
     tags:
-      - em-search
-      - structure-search
+    - em-search
+    - structure-search
     method: GET
     path: /search/*{query}
     params:
@@ -28,17 +28,18 @@ tools:
     response:
       format: json
       fields:
-        - "[].emdb_id"
-        - "[].admin.title"
-        - "[].admin.key_dates.deposition"
-        - "[].admin.key_dates.map_release"
-        - "[].admin.current_status.code.valueOf_"
-        - "[].admin.keywords"
+      - '[].emdb_id'
+      - '[].admin.title'
+      - '[].admin.key_dates.deposition'
+      - '[].admin.key_dates.map_release'
+      - '[].admin.current_status.code.valueOf_'
+      - '[].admin.keywords'
+    entity: dataset
   getEntry:
     description: Get a specific EMDB entry by ID
     tags:
-      - entry-info
-      - em-detail
+    - entry-info
+    - em-detail
     method: GET
     path: /entry/{id}
     params:
@@ -49,27 +50,28 @@ tools:
     response:
       format: json
       fields:
-        - "emdb_id"
-        - "admin.title"
-        - "admin.key_dates.deposition"
-        - "admin.key_dates.map_release"
-        - "admin.keywords"
-        - "admin.current_status.code.valueOf_"
-        - "sample"
-        - "map"
+      - emdb_id
+      - admin.title
+      - admin.key_dates.deposition
+      - admin.key_dates.map_release
+      - admin.keywords
+      - admin.current_status.code.valueOf_
+      - sample
+      - map
+    entity: dataset
 tests:
   search:
-    - name: searches for ribosome entries
-      params:
-        query: ribosome
-      assert:
-        - isArray: true
+  - name: searches for ribosome entries
+    params:
+      query: ribosome
+    assert:
+    - isArray: true
   getEntry:
-    - name: gets entry EMD-1234
-      params:
-        id: EMD-1234
-      assert:
-        - {}
-        - anyOf:
-            - admin
-            - _id
+  - name: gets entry EMD-1234
+    params:
+      id: EMD-1234
+    assert:
+    - {}
+    - anyOf:
+      - admin
+      - _id

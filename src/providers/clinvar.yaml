@@ -2,18 +2,18 @@ name: clinvar
 displayName: ClinVar
 description: Variant-disease relationship database linking genetic variants to clinical significance
 tags:
-  - variants
-  - clinical
-  - pathogenicity
-  - ncbi
-  - genetic-testing
+- variants
+- clinical
+- pathogenicity
+- ncbi
+- genetic-testing
 baseUrl: https://eutils.ncbi.nlm.nih.gov/entrez/eutils
 tools:
   search:
     description: Search ClinVar for clinically relevant genetic variants
     tags:
-      - variant-search
-      - clinical-search
+    - variant-search
+    - clinical-search
     method: GET
     path: /esearch.fcgi
     params:
@@ -35,15 +35,16 @@ tools:
     response:
       format: json
       fields:
-        - esearchresult.count
-        - esearchresult.retmax
-        - esearchresult.idlist
-        - esearchresult.querytranslation
+      - esearchresult.count
+      - esearchresult.retmax
+      - esearchresult.idlist
+      - esearchresult.querytranslation
+    entity: gene
   getSummary:
     description: Get ClinVar variant summary by ClinVar ID
     tags:
-      - variant-info
-      - clinical-significance
+    - variant-info
+    - clinical-significance
     method: GET
     path: /esummary.fcgi
     params:
@@ -59,27 +60,18 @@ tools:
         default: json
     response:
       format: json
-      fields:
-        - result.uids
-        - result.*.uid
-        - result.*.title
-        - result.*.obj_type
-        - result.*.accession
-        - result.*.germline_classification
-        - result.*.genes
-        - result.*.protein_change
-        - result.*.molecular_consequence_list
+    entity: variant
 tests:
   search:
-    - name: searches for BRCA1 pathogenic variants
-      params:
-        query: BRCA1 pathogenic
-      assert:
-        - path: esearchresult.idlist
-          minLength: 1
+  - name: searches for BRCA1 pathogenic variants
+    params:
+      query: BRCA1 pathogenic
+    assert:
+    - path: esearchresult.idlist
+      minLength: 1
   getSummary:
-    - name: gets ClinVar variant summary by ID
-      params:
-        id: "37722"
-      assert:
-        - path: result.37722
+  - name: gets ClinVar variant summary by ID
+    params:
+      id: '37722'
+    assert:
+    - path: result.37722

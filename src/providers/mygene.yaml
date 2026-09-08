@@ -2,18 +2,18 @@ name: mygene
 displayName: MyGene.info
 description: Gene annotation query service — aggregated gene info from multiple sources
 tags:
-  - gene
-  - annotation
-  - query
-  - mygene
-  - entrez
+- gene
+- annotation
+- query
+- mygene
+- entrez
 baseUrl: https://mygene.info/v3
 tools:
   search:
     description: Search genes by keyword or symbol
     tags:
-      - gene-search
-      - symbol-search
+    - gene-search
+    - symbol-search
     method: GET
     path: /query
     params:
@@ -33,18 +33,19 @@ tools:
     response:
       format: json
       fields:
-        - total
-        - hits[]._id
-        - hits[]._score
-        - hits[].entrezgene
-        - hits[].symbol
-        - hits[].name
-        - hits[].taxid
+      - total
+      - hits[]._id
+      - hits[]._score
+      - hits[].entrezgene
+      - hits[].symbol
+      - hits[].name
+      - hits[].taxid
+    entity: gene
   getGene:
     description: Get detailed gene annotation by Entrez gene ID
     tags:
-      - gene-info
-      - annotation
+    - gene-info
+    - annotation
     method: GET
     path: /gene/{geneId}
     params:
@@ -55,31 +56,32 @@ tools:
     response:
       format: json
       fields:
-        - _id
-        - symbol
-        - name
-        - summary
-        - type_of_gene
-        - map_location
-        - entrezgene
-        - taxid
+      - _id
+      - symbol
+      - name
+      - summary
+      - type_of_gene
+      - map_location
+      - entrezgene
+      - taxid
+    entity: gene
 tests:
   search:
-    - name: searches for kinase genes in human
-      params:
-        query: kinase
-        species: human
-      assert:
-        - path: hits
-          minLength: 1
-        - anyOf:
-            - hits.0.entrezgene
-            - hits.0._id
+  - name: searches for kinase genes in human
+    params:
+      query: kinase
+      species: human
+    assert:
+    - path: hits
+      minLength: 1
+    - anyOf:
+      - hits.0.entrezgene
+      - hits.0._id
   getGene:
-    - name: gets BRCA1 gene annotation by Entrez ID
-      params:
-        geneId: "672"
-      assert:
-        - path: symbol
-          equals: BRCA1
-        - path: name
+  - name: gets BRCA1 gene annotation by Entrez ID
+    params:
+      geneId: '672'
+    assert:
+    - path: symbol
+      equals: BRCA1
+    - path: name

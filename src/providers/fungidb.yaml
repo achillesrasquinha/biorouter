@@ -2,27 +2,28 @@ name: fungidb
 displayName: FungiDB
 description: FungiDB — VEuPathDB resource for fungal genomics (Aspergillus, Candida, Cryptococcus, etc.)
 tags:
-  - fungi
-  - pathogen
-  - veupathdb
-  - genomics
+- fungi
+- pathogen
+- veupathdb
+- genomics
 baseUrl: https://fungidb.org/fungidb/service
 tools:
   listRecordTypes:
     description: List available record types in FungiDB
     tags:
-      - record-types
-      - metadata
+    - record-types
+    - metadata
     method: GET
     path: /record-types
     params: {}
     response:
       format: json
+    entity: dataset
   search:
     description: Search FungiDB for fungal genes and genomic features
     tags:
-      - gene-search
-      - fungal-search
+    - gene-search
+    - fungal-search
     method: GET
     path: /search
     params:
@@ -40,9 +41,10 @@ tools:
         description: Number of results
     response:
       format: json
+    entity: gene
 tests:
   listRecordTypes:
-    - name: lists record types
-      params: {}
-      assert:
-        - minLength: 1
+  - name: lists record types
+    params: {}
+    assert:
+    - minLength: 1

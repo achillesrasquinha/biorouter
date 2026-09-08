@@ -2,18 +2,18 @@ name: interpro
 displayName: InterPro
 description: Protein families, domains, and functional sites classification
 tags:
-  - protein
-  - domain
-  - family
-  - motif
-  - interpro
+- protein
+- domain
+- family
+- motif
+- interpro
 baseUrl: https://www.ebi.ac.uk/interpro/api
 tools:
   search:
     description: Search InterPro for protein families and domains by keyword
     tags:
-      - protein-family-search
-      - domain-search
+    - protein-family-search
+    - domain-search
     method: GET
     path: /entry/interpro
     params:
@@ -30,16 +30,17 @@ tools:
     response:
       format: json
       fields:
-        - results[].metadata.accession
-        - results[].metadata.name
-        - results[].metadata.type
-        - results[].metadata.source_database
-        - results[].metadata.go_terms
+      - results[].metadata.accession
+      - results[].metadata.name
+      - results[].metadata.type
+      - results[].metadata.source_database
+      - results[].metadata.go_terms
+    entity: protein
   getEntry:
     description: Get an InterPro entry by accession
     tags:
-      - protein-family-info
-      - domain-info
+    - protein-family-info
+    - domain-info
     method: GET
     path: /entry/interpro/{accession}
     params:
@@ -50,18 +51,19 @@ tools:
     response:
       format: json
       fields:
-        - metadata.accession
-        - metadata.name
-        - metadata.type
-        - metadata.source_database
-        - metadata.go_terms
-        - metadata.member_databases
-        - metadata.counters
+      - metadata.accession
+      - metadata.name
+      - metadata.type
+      - metadata.source_database
+      - metadata.go_terms
+      - metadata.member_databases
+      - metadata.counters
+    entity: protein
   getProteinEntries:
     description: Get InterPro entries for a UniProt protein
     tags:
-      - protein-domains
-      - protein-classification
+    - protein-domains
+    - protein-classification
     method: GET
     path: /entry/interpro/protein/uniprot/{accession}
     params:
@@ -72,30 +74,31 @@ tools:
     response:
       format: json
       fields:
-        - results[].metadata.accession
-        - results[].metadata.name
-        - results[].metadata.type
+      - results[].metadata.accession
+      - results[].metadata.name
+      - results[].metadata.type
+    entity: protein
 tests:
   search:
-    - name: searches for kinase domains
-      params:
-        query: kinase
-      assert:
-        - path: results
-          minLength: 1
-        - path: results.0.metadata.accession
+  - name: searches for kinase domains
+    params:
+      query: kinase
+    assert:
+    - path: results
+      minLength: 1
+    - path: results.0.metadata.accession
   getEntry:
-    - name: gets entry by accession IPR000719
-      params:
-        accession: IPR000719
-      assert:
-        - path: metadata.accession
-          equals: IPR000719
-        - path: metadata.name
+  - name: gets entry by accession IPR000719
+    params:
+      accession: IPR000719
+    assert:
+    - path: metadata.accession
+      equals: IPR000719
+    - path: metadata.name
   getProteinEntries:
-    - name: gets InterPro entries for P04637
-      params:
-        accession: P04637
-      assert:
-        - path: results
-          minLength: 1
+  - name: gets InterPro entries for P04637
+    params:
+      accession: P04637
+    assert:
+    - path: results
+      minLength: 1

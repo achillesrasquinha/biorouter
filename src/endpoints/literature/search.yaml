@@ -1,0 +1,361 @@
+description: Search biomedical literature — publications, preprints, citations, and semantic annotations
+tags:
+- literature
+- search
+- publications
+- preprints
+- citations
+- biorouter
+input:
+  query:
+    type: string
+    required: true
+    description: Search query — drug name, disease, gene, technique, or any biomedical topic
+phases:
+- name: resolve
+  parallel: false
+  calls:
+  - source: pubmed
+    tool: search
+    params:
+      query: '{input.query}'
+      maxResults: 5
+    extract:
+      pubmed_ids: esearchresult.idlist
+- name: fetch
+  parallel: true
+  calls:
+  - source: europepmc
+    tool: search
+    params:
+      query: '{input.query}'
+      pageSize: 10
+    provides:
+    - publications
+  - source: pubmed
+    tool: search
+    params:
+      query: '{input.query}'
+      maxResults: 10
+    provides:
+    - publications
+  - source: pubmed
+    tool: getSummary
+    params:
+      ids: '{resolved.pubmed_ids}'
+    skip_if: '!resolved.pubmed_ids'
+    provides:
+    - articleSummaries
+  - source: semanticscholar
+    tool: searchPapers
+    params:
+      query: '{input.query}'
+      limit: 10
+      fields: title,abstract,year,citationCount,authors,doi,publicationDate
+    provides:
+    - publications
+  - source: openalex
+    tool: searchWorks
+    params:
+      search: '{input.query}'
+      per_page: 10
+    provides:
+    - publications
+  - source: pubtator
+    tool: search
+    params:
+      query: '{input.query}'
+      sort: score desc
+    provides:
+    - publications
+  - source: mesh
+    tool: search
+    params:
+      query: '{input.query}'
+      maxResults: 5
+    provides:
+    - vocabulary
+  - source: ncbo-annotator
+    tool: recommend
+    params:
+      input: '{input.query}'
+    provides:
+    - ontologies
+  - source: biorxiv
+    tool: getRecent
+    params:
+      startDate: '2026-01-01'
+      endDate: '2026-12-31'
+      cursor: 0
+    provides:
+    - preprints
+  - source: crossref
+    tool: searchWorks
+    params:
+      query: '{input.query}'
+      rows: 10
+      sort: relevance
+    provides:
+    - doiMetadata
+  - source: crossref
+    tool: searchByAuthor
+    params:
+      author: '{input.query}'
+      rows: 10
+    provides:
+    - publications
+  - source: crossref
+    tool: searchJournals
+    params:
+      query: '{input.query}'
+      rows: 10
+    provides:
+    - doiMetadata
+  - source: europepmc
+    tool: getArticle
+    params:
+      pmid: '{resolved.pubmed_ids}'
+    skip_if: '!resolved.pubmed_ids'
+    provides:
+    - articleDetails
+  - source: europepmc
+    tool: getCitations
+    params:
+      source: MED
+      id: '{resolved.pubmed_ids}'
+    skip_if: '!resolved.pubmed_ids'
+    provides:
+    - citations
+  - source: europepmc
+    tool: getReferences
+    params:
+      source: MED
+      id: '{resolved.pubmed_ids}'
+    skip_if: '!resolved.pubmed_ids'
+    provides:
+    - citations
+  - source: ncbo-annotator
+    tool: annotateText
+    params:
+      text: '{input.query}'
+    provides:
+    - ontologies
+  - source: openalex
+    tool: searchAuthors
+    params:
+      search: '{input.query}'
+      per_page: 5
+    provides:
+    - authorProfiles
+  - source: pubmed
+    tool: getArticle
+    params:
+      pmid: '{resolved.pubmed_ids}'
+    skip_if: '!resolved.pubmed_ids'
+    provides:
+    - articleDetails
+  - source: pubtator
+    tool: annotateArticle
+    params:
+      pmid: '{resolved.pubmed_ids}'
+    skip_if: '!resolved.pubmed_ids'
+    provides:
+    - articleDetails
+output:
+  publications:
+    europepmcResults:
+      sources:
+      - source: europepmc
+        call: search
+        path: $passthrough
+        rank: 1
+      reason: Europe PMC — comprehensive open-access biomedical literature with citation counts
+    pubmedResults:
+      sources:
+      - source: pubmed
+        call: search
+        path: $passthrough
+        rank: 1
+      reason: PubMed/NCBI — authoritative MEDLINE database with NIH indexing
+    semanticscholarResults:
+      sources:
+      - source: semanticscholar
+        call: searchPapers
+        path: $passthrough
+        rank: 1
+      reason: Semantic Scholar — AI-powered analysis with citation graphs and influence metrics
+    openalexResults:
+      sources:
+      - source: openalex
+        call: searchWorks
+        path: $passthrough
+        rank: 1
+      reason: OpenAlex — open scholarly metadata with author and institution linking
+    pubtatorResults:
+      sources:
+      - source: pubtator
+        call: search
+        path: $passthrough
+        rank: 1
+      reason: PubTator — annotated articles with named entity recognition (genes, diseases, chemicals)
+    crossrefAuthorWorks:
+      sources:
+      - source: crossref
+        call: searchByAuthor
+        path: message.items
+        rank: 2
+      reason: Crossref works by author — publications filtered by author name
+  articleSummaries:
+    pubmedArticleDetails:
+      sources:
+      - source: pubmed
+        call: getSummary
+        path: result
+        rank: 1
+      reason: PubMed article summaries — titles, authors, journals, publication dates for resolved PMIDs
+  articleDetails:
+    europepmcArticleDetail:
+      sources:
+      - source: europepmc
+        call: getArticle
+        path: resultList.result
+        rank: 1
+      reason: Europe PMC article detail — full metadata, abstract, and identifiers for a specific PMID
+    pubmedArticleDetail:
+      sources:
+      - source: pubmed
+        call: getArticle
+        path: $passthrough
+        rank: 1
+      reason: PubMed article detail — full XML record with title, abstract, authors, and MeSH terms for a PMID
+    pubtatorAnnotations:
+      sources:
+      - source: pubtator
+        call: annotateArticle
+        path: PubTator3
+        rank: 1
+      reason: PubTator NER annotations — genes, diseases, chemicals, and mutations identified in a specific article
+  citations:
+    europepmcCounts:
+      sources:
+      - source: europepmc
+        call: search
+        path: resultList.result
+        rank: 1
+      reason: Europe PMC citation counts per article
+    semanticscholarCounts:
+      sources:
+      - source: semanticscholar
+        call: searchPapers
+        path: data
+        rank: 1
+      reason: Semantic Scholar citation counts with influence metrics
+    openalexCounts:
+      sources:
+      - source: openalex
+        call: searchWorks
+        path: results
+        rank: 1
+      reason: OpenAlex citation counts with open access flags
+    europepmcCitingArticles:
+      sources:
+      - source: europepmc
+        call: getCitations
+        path: citationList.citation
+        rank: 2
+      reason: Europe PMC citing articles — articles that cite a given PMID
+    europepmcReferences:
+      sources:
+      - source: europepmc
+        call: getReferences
+        path: referenceList.reference
+        rank: 2
+      reason: Europe PMC references — bibliography entries cited by a given article
+  metadata:
+    totalResults:
+      sources:
+      - source: europepmc
+        call: search
+        path: hitCount
+        rank: 1
+      - source: pubmed
+        call: search
+        path: esearchresult.count
+        rank: 2
+      - source: semanticscholar
+        call: searchPapers
+        path: total
+        rank: 3
+      - source: openalex
+        call: searchWorks
+        path: meta.count
+        rank: 4
+      reason: Total number of matching publications across databases
+  vocabulary:
+    meshTerms:
+      sources:
+      - source: mesh
+        call: search
+        path: $passthrough
+        rank: 1
+      reason: MeSH controlled vocabulary terms for precise indexing
+  ontologies:
+    recommendedOntologies:
+      sources:
+      - source: ncbo-annotator
+        call: recommend
+        path: $passthrough
+        rank: 1
+      reason: NCBO recommended ontologies for semantic context
+    ncboTextAnnotations:
+      sources:
+      - source: ncbo-annotator
+        call: annotateText
+        path: $passthrough
+        rank: 2
+      reason: NCBO text annotations — biomedical ontology concepts matched to the query text
+  preprints:
+    biorxivPreprints:
+      sources:
+      - source: biorxiv
+        call: getRecent
+        path: collection
+        rank: 1
+      reason: Recent bioRxiv and medRxiv preprints — early access to unpublished research
+    preprintCount:
+      sources:
+      - source: biorxiv
+        call: getRecent
+        path: collection
+        rank: 1
+      reason: Number of preprints in date range
+  doiMetadata:
+    scholarlyWorks:
+      sources:
+      - source: crossref
+        call: searchWorks
+        path: message.items
+        rank: 1
+      reason: Crossref scholarly metadata — DOIs, titles, authors, journals, and citation counts for published works
+    totalResults:
+      sources:
+      - source: crossref
+        call: searchWorks
+        path: message.total-results
+        rank: 1
+      reason: Total number of matching works in the Crossref registry
+    crossrefJournals:
+      sources:
+      - source: crossref
+        call: searchJournals
+        path: message.items
+        rank: 2
+      reason: Crossref journals — ISSN, publisher, and title for journals matching the query
+  authorProfiles:
+    openalexAuthorSearch:
+      sources:
+      - source: openalex
+        call: searchAuthors
+        path: results
+        rank: 1
+      reason: OpenAlex author search — researchers matching the query with h-index and affiliation data

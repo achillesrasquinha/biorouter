@@ -2,18 +2,18 @@ name: opentreeoflife
 displayName: Open Tree of Life
 description: Open Tree of Life — comprehensive phylogenetic tree and taxonomy synthesis
 tags:
-  - phylogenetics
-  - taxonomy
-  - tree-of-life
-  - evolution
-  - opentree
+- phylogenetics
+- taxonomy
+- tree-of-life
+- evolution
+- opentree
 baseUrl: https://api.opentreeoflife.org/v3
 tools:
   searchTaxa:
     description: Match taxon names to Open Tree taxonomy using TNRS
     tags:
-      - taxon-search
-      - name-resolution
+    - taxon-search
+    - name-resolution
     method: POST
     path: /tnrs/match_names
     params:
@@ -24,21 +24,22 @@ tools:
     response:
       format: json
       fields:
-        - context
-        - governing_code
-        - matched_names
-        - results[].matches[].matched_name
-        - results[].matches[].score
-        - results[].matches[].is_approximate_match
-        - results[].matches[].taxon.name
-        - results[].matches[].taxon.ott_id
-        - results[].matches[].taxon.rank
+      - context
+      - governing_code
+      - matched_names
+      - results[].matches[].matched_name
+      - results[].matches[].score
+      - results[].matches[].is_approximate_match
+      - results[].matches[].taxon.name
+      - results[].matches[].taxon.ott_id
+      - results[].matches[].taxon.rank
+    entity: organism
   getSubtree:
     description: Get a phylogenetic subtree from the synthetic tree rooted at a given OTT taxon
     tags:
-      - phylogeny
-      - subtree
-      - newick
+    - phylogeny
+    - subtree
+    - newick
     method: POST
     path: /tree_of_life/subtree
     params:
@@ -49,13 +50,14 @@ tools:
     response:
       format: json
       fields:
-        - newick
-        - supporting_studies
+      - newick
+      - supporting_studies
+    entity: gene
   getTaxonInfo:
     description: Get taxonomy information for a taxon by OTT ID
     tags:
-      - taxonomy-info
-      - taxon-detail
+    - taxonomy-info
+    - taxon-detail
     method: POST
     path: /taxonomy/taxon_info
     params:
@@ -66,16 +68,17 @@ tools:
     response:
       format: json
       fields:
-        - name
-        - rank
-        - ott_id
-        - tax_sources
+      - name
+      - rank
+      - ott_id
+      - tax_sources
+    entity: organism
   findMrca:
     description: Find the most recent common ancestor of a set of taxa
     tags:
-      - mrca
-      - common-ancestor
-      - phylogeny
+    - mrca
+    - common-ancestor
+    - phylogeny
     method: POST
     path: /tree_of_life/mrca
     params:
@@ -86,37 +89,40 @@ tools:
     response:
       format: json
       fields:
-        - mrca.name
-        - mrca.ott_id
-        - mrca.rank
+      - mrca.node_id
+      - mrca.num_tips
+      - nearest_taxon.name
+      - nearest_taxon.ott_id
+      - nearest_taxon.rank
+    entity: organism
 tests:
   searchTaxa:
-    - name: matches taxon names for Homo sapiens
-      params:
-        names:
-          - Homo sapiens
-      assert:
-        - path: results
-          minLength: 1
+  - name: matches taxon names for Homo sapiens
+    params:
+      names:
+      - Homo sapiens
+    assert:
+    - path: results
+      minLength: 1
   getSubtree:
-    - name: gets subtree for Homo sapiens (OTT ID 770315)
-      params:
-        ott_id: 770315
-      assert:
-        - path: newick
+  - name: gets subtree for Homo sapiens (OTT ID 770315)
+    params:
+      ott_id: 770315
+    assert:
+    - path: newick
   getTaxonInfo:
-    - name: gets taxon info for Homo sapiens
-      params:
-        ott_id: 770315
-      assert:
-        - path: name
-        - path: ott_id
+  - name: gets taxon info for Homo sapiens
+    params:
+      ott_id: 770315
+    assert:
+    - path: name
+    - path: ott_id
   findMrca:
-    - name: finds MRCA for Homo sapiens and Pan troglodytes
-      params:
-        ott_ids:
-          - 770315
-          - 417950
-      assert:
-        - path: mrca.name
-        - path: mrca.ott_id
+  - name: finds MRCA for Homo sapiens and Pan troglodytes
+    params:
+      ott_ids:
+      - 770315
+      - 417950
+    assert:
+    - path: nearest_taxon.name
+    - path: nearest_taxon.ott_id

@@ -2,18 +2,18 @@ name: chembl
 displayName: ChEMBL
 description: Database of bioactive drug-like small molecules
 tags:
-  - compounds
-  - drugs
-  - bioactivity
-  - chemistry
-  - chembl
+- compounds
+- drugs
+- bioactivity
+- chemistry
+- chembl
 baseUrl: https://www.ebi.ac.uk/chembl/api/data
 tools:
   getMolecule:
     description: Get molecule details by ChEMBL ID
     tags:
-      - compound-info
-      - molecule
+    - compound-info
+    - molecule
     method: GET
     path: /molecule/{chemblId}.json
     params:
@@ -24,26 +24,27 @@ tools:
     response:
       format: json
       fields:
-        - molecule_chembl_id
-        - pref_name
-        - molecule_type
-        - max_phase
-        - first_approval
-        - molecule_properties.full_mwt
-        - molecule_properties.alogp
-        - molecule_properties.full_molformula
-        - molecule_properties.psa
-        - molecule_properties.qed_weighted
-        - molecule_properties.num_ro5_violations
-        - molecule_structures.canonical_smiles
-        - molecule_structures.standard_inchi
-        - atc_classifications
-        - natural_product
+      - molecule_chembl_id
+      - pref_name
+      - molecule_type
+      - max_phase
+      - first_approval
+      - molecule_properties.full_mwt
+      - molecule_properties.alogp
+      - molecule_properties.full_molformula
+      - molecule_properties.psa
+      - molecule_properties.qed_weighted
+      - molecule_properties.num_ro5_violations
+      - molecule_structures.canonical_smiles
+      - molecule_structures.standard_inchi
+      - atc_classifications
+      - natural_product
+    entity: compound
   search:
     description: Search molecules by name or keyword
     tags:
-      - compound-search
-      - molecule-search
+    - compound-search
+    - molecule-search
     method: GET
     path: /molecule/search.json
     params:
@@ -55,17 +56,18 @@ tools:
     response:
       format: json
       fields:
-        - molecules[].molecule_chembl_id
-        - molecules[].pref_name
-        - molecules[].molecule_type
-        - molecules[].max_phase
-        - molecules[].molecule_properties.full_mwt
-        - molecules[].molecule_properties.alogp
+      - molecules[].molecule_chembl_id
+      - molecules[].pref_name
+      - molecules[].molecule_type
+      - molecules[].max_phase
+      - molecules[].molecule_properties.full_mwt
+      - molecules[].molecule_properties.alogp
+    entity: compound
   getActivity:
     description: Get bioactivity data for a molecule
     tags:
-      - bioactivity
-      - assay-data
+    - bioactivity
+    - assay-data
     method: GET
     path: /activity.json
     params:
@@ -80,17 +82,18 @@ tools:
     response:
       format: json
       fields:
-        - activities[].molecule_chembl_id
-        - activities[].target_chembl_id
-        - activities[].standard_type
-        - activities[].standard_value
-        - activities[].standard_units
-        - activities[].pchembl_value
+      - activities[].molecule_chembl_id
+      - activities[].target_chembl_id
+      - activities[].standard_type
+      - activities[].standard_value
+      - activities[].standard_units
+      - activities[].pchembl_value
+    entity: compound
   getTarget:
     description: Get target details by ChEMBL ID
     tags:
-      - target-info
-      - drug-target
+    - target-info
+    - drug-target
     method: GET
     path: /target/{chemblId}.json
     params:
@@ -101,16 +104,17 @@ tools:
     response:
       format: json
       fields:
-        - target_chembl_id
-        - pref_name
-        - target_type
-        - organism
-        - target_components[].accession
+      - target_chembl_id
+      - pref_name
+      - target_type
+      - organism
+      - target_components[].accession
+    entity: protein
   searchTarget:
     description: Search targets by keyword
     tags:
-      - target-search
-      - drug-target
+    - target-search
+    - drug-target
     method: GET
     path: /target/search.json
     params:
@@ -122,15 +126,16 @@ tools:
     response:
       format: json
       fields:
-        - targets[].target_chembl_id
-        - targets[].pref_name
-        - targets[].target_type
-        - targets[].organism
+      - targets[].target_chembl_id
+      - targets[].pref_name
+      - targets[].target_type
+      - targets[].organism
+    entity: protein
   getAssay:
     description: Get assay details by ChEMBL ID
     tags:
-      - assay-info
-      - bioassay
+    - assay-info
+    - bioassay
     method: GET
     path: /assay/{chemblId}.json
     params:
@@ -141,17 +146,18 @@ tools:
     response:
       format: json
       fields:
-        - assay_chembl_id
-        - description
-        - assay_type
-        - assay_organism
-        - confidence_score
-        - target_chembl_id
+      - assay_chembl_id
+      - description
+      - assay_type
+      - assay_organism
+      - confidence_score
+      - target_chembl_id
+    entity: assay
   getMechanism:
     description: Get drug mechanism of action
     tags:
-      - mechanism-of-action
-      - drug-mechanism
+    - mechanism-of-action
+    - drug-mechanism
     method: GET
     path: /mechanism.json
     params:
@@ -166,16 +172,17 @@ tools:
     response:
       format: json
       fields:
-        - mechanisms[].molecule_chembl_id
-        - mechanisms[].target_chembl_id
-        - mechanisms[].mechanism_of_action
-        - mechanisms[].action_type
-        - mechanisms[].max_phase
+      - mechanisms[].molecule_chembl_id
+      - mechanisms[].target_chembl_id
+      - mechanisms[].mechanism_of_action
+      - mechanisms[].action_type
+      - mechanisms[].max_phase
+    entity: compound
   getDrugIndication:
     description: Get drug indications for a molecule
     tags:
-      - drug-indication
-      - therapeutic-use
+    - drug-indication
+    - therapeutic-use
     method: GET
     path: /drug_indication.json
     params:
@@ -190,77 +197,168 @@ tools:
     response:
       format: json
       fields:
-        - drug_indications[].molecule_chembl_id
-        - drug_indications[].mesh_heading
-        - drug_indications[].efo_term
-        - drug_indications[].max_phase_for_ind
+      - drug_indications[].molecule_chembl_id
+      - drug_indications[].mesh_heading
+      - drug_indications[].efo_term
+      - drug_indications[].max_phase_for_ind
+    entity: compound
+  getDrug:
+    description: Browse approved drugs in ChEMBL
+    tags:
+    - drug-browse
+    - approved-drugs
+    method: GET
+    path: /drug.json
+    params:
+      limit:
+        type: integer
+        default: 10
+      offset:
+        type: integer
+        default: 0
+    response:
+      format: json
+      fields:
+      - drugs[].molecule_chembl_id
+      - drugs[].pref_name
+      - drugs[].first_approval
+      - drugs[].indication_class
+    entity: compound
+  getDrugWarning:
+    description: Get drug safety warnings and withdrawals
+    tags:
+    - drug-safety
+    - drug-warning
+    method: GET
+    path: /drug_warning.json
+    params:
+      limit:
+        type: integer
+        default: 10
+    response:
+      format: json
+      fields:
+      - drug_warnings[].molecule_chembl_id
+      - drug_warnings[].warning_type
+      - drug_warnings[].warning_class
+      - drug_warnings[].warning_description
+    entity: compound
+  getSimilarity:
+    description: Find molecules similar to a given SMILES structure
+    tags:
+    - similarity-search
+    - chemical-similarity
+    method: GET
+    path: /similarity/{smiles}/{threshold}.json
+    params:
+      smiles:
+        type: string
+        required: true
+        description: SMILES string (e.g. CC(=O)Oc1ccccc1C(=O)O for aspirin)
+      threshold:
+        type: integer
+        default: 70
+        description: Similarity threshold percentage (40-100)
+      limit:
+        type: integer
+        default: 10
+    response:
+      format: json
+      fields:
+      - molecules[].molecule_chembl_id
+      - molecules[].pref_name
+      - molecules[].similarity
+    entity: compound
 tests:
   getMolecule:
-    - name: gets molecule by ChEMBL ID
-      params:
-        chemblId: CHEMBL25
-      assert:
-        - path: molecule_chembl_id
-          equals: CHEMBL25
-        - path: pref_name
+  - name: gets molecule by ChEMBL ID
+    params:
+      chemblId: CHEMBL25
+    assert:
+    - path: molecule_chembl_id
+      equals: CHEMBL25
+    - path: pref_name
   search:
-    - name: searches molecules by name
-      params:
-        query: ibuprofen
-      assert:
-        - path: molecules
-          minLength: 1
+  - name: searches molecules by name
+    params:
+      query: ibuprofen
+    assert:
+    - path: molecules
+      minLength: 1
   getActivity:
-    - name: gets bioactivity data for aspirin
-      params:
-        molecule_chembl_id: CHEMBL25
-        limit: 5
-      assert:
-        - path: activities
-          minLength: 1
-        - path: activities.0.molecule_chembl_id
-          equals: CHEMBL25
+  - name: gets bioactivity data for aspirin
+    params:
+      molecule_chembl_id: CHEMBL25
+      limit: 5
+    assert:
+    - path: activities
+      minLength: 1
+    - path: activities.0.molecule_chembl_id
+      equals: CHEMBL25
   getTarget:
-    - name: gets target details by ChEMBL ID
-      params:
-        chemblId: CHEMBL2093868
-      assert:
-        - path: target_chembl_id
-          equals: CHEMBL2093868
-        - path: pref_name
-        - path: target_type
+  - name: gets target details by ChEMBL ID
+    params:
+      chemblId: CHEMBL2093868
+    assert:
+    - path: target_chembl_id
+      equals: CHEMBL2093868
+    - path: pref_name
+    - path: target_type
   searchTarget:
-    - name: searches for cyclooxygenase targets
-      params:
-        query: cyclooxygenase
-      assert:
-        - path: targets
-          minLength: 1
-        - path: targets.0.target_chembl_id
+  - name: searches for cyclooxygenase targets
+    params:
+      query: cyclooxygenase
+    assert:
+    - path: targets
+      minLength: 1
+    - path: targets.0.target_chembl_id
   getAssay:
-    - name: gets assay details by ChEMBL ID
-      params:
-        chemblId: CHEMBL615110
-      assert:
-        - path: assay_chembl_id
-          equals: CHEMBL615110
-        - path: assay_type
+  - name: gets assay details by ChEMBL ID
+    params:
+      chemblId: CHEMBL615110
+    assert:
+    - path: assay_chembl_id
+      equals: CHEMBL615110
+    - path: assay_type
   getMechanism:
-    - name: gets mechanism of action for aspirin
-      params:
-        molecule_chembl_id: CHEMBL25
-        limit: 5
-      assert:
-        - path: mechanisms
-          minLength: 1
-        - path: mechanisms.0.mechanism_of_action
+  - name: gets mechanism of action for aspirin
+    params:
+      molecule_chembl_id: CHEMBL25
+      limit: 5
+    assert:
+    - path: mechanisms
+      minLength: 1
+    - path: mechanisms.0.mechanism_of_action
   getDrugIndication:
-    - name: gets drug indications for aspirin
-      params:
-        molecule_chembl_id: CHEMBL25
-        limit: 5
-      assert:
-        - path: drug_indications
-          minLength: 1
-        - path: drug_indications.0.molecule_chembl_id
-          equals: CHEMBL25
+  - name: gets drug indications for aspirin
+    params:
+      molecule_chembl_id: CHEMBL25
+      limit: 5
+    assert:
+    - path: drug_indications
+      minLength: 1
+    - path: drug_indications.0.molecule_chembl_id
+      equals: CHEMBL25
+  getDrug:
+  - name: browses approved drugs
+    params:
+      limit: 3
+    assert:
+    - path: drugs
+      minLength: 1
+  getDrugWarning:
+  - name: gets drug safety warnings
+    params:
+      limit: 3
+    assert:
+    - path: drug_warnings
+      minLength: 1
+  getSimilarity:
+  - name: finds molecules similar to aspirin
+    params:
+      smiles: CC(=O)Oc1ccccc1C(=O)O
+      threshold: 70
+      limit: 3
+    assert:
+    - path: molecules
+      minLength: 1

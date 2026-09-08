@@ -2,17 +2,19 @@ name: peptideatlas
 displayName: PeptideAtlas
 description: PeptideAtlas — proteomics data repository for peptide and protein identifications
 tags:
-  - proteomics
-  - peptides
-  - mass-spectrometry
-  - peptideatlas
+- proteomics
+- peptides
+- mass-spectrometry
+- peptideatlas
+# NOTE: PeptideAtlas has bot protection that serves an HTML challenge page
+# instead of JSON to automated requests. Tests may fail with non-JSON responses.
 baseUrl: https://db.systemsbiology.net/sbeams/cgi/PeptideAtlas
 tools:
   getProtein:
     description: Get protein details and observed peptides from PeptideAtlas
     tags:
-      - protein-info
-      - peptide-info
+    - protein-info
+    - peptide-info
     method: GET
     path: /GetProtein
     params:
@@ -32,11 +34,12 @@ tools:
         description: Action type
     response:
       format: json
+    entity: protein
   search:
     description: Search PeptideAtlas for proteins matching a query
     tags:
-      - protein-search
-      - proteomics-search
+    - protein-search
+    - proteomics-search
     method: GET
     path: /GetProteins
     params:
@@ -52,21 +55,22 @@ tools:
         description: Atlas build ID (default 570 for human)
     response:
       format: json
+    entity: protein
 tests:
   getProtein:
-    - name: gets protein details for EGFR
-      params:
-        protein_name: EGFR
-        atlas_build_id: 570
-        action: QUERY
-      assert:
-        - path: protein_name
-      allowError: true
+  - name: gets protein details for EGFR
+    params:
+      protein_name: EGFR
+      atlas_build_id: 570
+      action: QUERY
+    assert:
+    - {}
+    allowError: true
   search:
-    - name: searches for BRCA1 proteins
-      params:
-        protein_name_constraint: BRCA1
-        atlas_build_id: 570
-      assert:
-        - isArray: true
-      allowError: true
+  - name: searches for BRCA1 proteins
+    params:
+      protein_name_constraint: BRCA1
+      atlas_build_id: 570
+    assert:
+    - {}
+    allowError: true

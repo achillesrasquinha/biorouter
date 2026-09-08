@@ -2,18 +2,18 @@ name: guidetopharmacology
 displayName: Guide to Pharmacology
 description: IUPHAR/BPS Guide to Pharmacology database of drug targets and ligands
 tags:
-  - pharmacology
-  - drug-targets
-  - ligands
-  - receptors
-  - iuphar
+- pharmacology
+- drug-targets
+- ligands
+- receptors
+- iuphar
 baseUrl: https://www.guidetopharmacology.org/services
 tools:
   searchTargets:
     description: Search pharmacological targets by name
     tags:
-      - target-search
-      - receptor-search
+    - target-search
+    - receptor-search
     method: GET
     path: /targets
     params:
@@ -25,16 +25,17 @@ tools:
     response:
       format: json
       fields:
-        - "[].targetId"
-        - "[].name"
-        - "[].abbreviation"
-        - "[].type"
-        - "[].familyNames"
+      - '[].targetId'
+      - '[].name'
+      - '[].abbreviation'
+      - '[].type'
+      - '[].familyNames'
+    entity: protein
   searchLigands:
     description: Search pharmacological ligands by name
     tags:
-      - ligand-search
-      - drug-search
+    - ligand-search
+    - drug-search
     method: GET
     path: /ligands
     params:
@@ -46,17 +47,18 @@ tools:
     response:
       format: json
       fields:
-        - "[].ligandId"
-        - "[].name"
-        - "[].type"
-        - "[].inn"
-        - "[].approved"
-        - "[].approvalSource"
+      - '[].ligandId'
+      - '[].name'
+      - '[].type'
+      - '[].inn'
+      - '[].approved'
+      - '[].approvalSource'
+    entity: compound
   getLigand:
     description: Get ligand details by ligand ID
     tags:
-      - ligand-info
-      - drug-detail
+    - ligand-info
+    - drug-detail
     method: GET
     path: /ligands/{ligandId}
     params:
@@ -67,16 +69,17 @@ tools:
     response:
       format: json
       fields:
-        - ligandId
-        - name
-        - type
-        - approved
-        - inn
+      - ligandId
+      - name
+      - type
+      - approved
+      - inn
+    entity: compound
   getTarget:
     description: Get target details by target ID
     tags:
-      - target-info
-      - receptor-detail
+    - target-info
+    - receptor-detail
     method: GET
     path: /targets/{targetId}
     params:
@@ -87,43 +90,44 @@ tools:
     response:
       format: json
       fields:
-        - targetId
-        - name
-        - nomenclature
-        - type
-        - familyIds
+      - targetId
+      - name
+      - nomenclature
+      - type
+      - familyIds
+    entity: protein
 tests:
   searchTargets:
-    - name: searches targets for EGFR
-      params:
-        name: EGFR
-      assert:
-        - {}
-        - anyOf:
-            - isArray: true
-              minLength: 1
-            - path: targets
+  - name: searches targets for EGFR
+    params:
+      name: EGFR
+    assert:
+    - {}
+    - anyOf:
+      - isArray: true
+        minLength: 1
+      - path: targets
   searchLigands:
-    - name: searches ligands for erlotinib
-      params:
-        name: erlotinib
-      assert:
-        - {}
-        - anyOf:
-            - isArray: true
-              minLength: 1
-            - path: ligands
+  - name: searches ligands for erlotinib
+    params:
+      name: erlotinib
+    assert:
+    - {}
+    - anyOf:
+      - isArray: true
+        minLength: 1
+      - path: ligands
   getLigand:
-    - name: gets ligand details for ligand 5085
-      params:
-        ligandId: 5085
-      assert:
-        - path: ligandId
-        - path: name
+  - name: gets ligand details for ligand 5085
+    params:
+      ligandId: 5085
+    assert:
+    - path: ligandId
+    - path: name
   getTarget:
-    - name: gets target details for target 1
-      params:
-        targetId: 1
-      assert:
-        - path: targetId
-        - path: name
+  - name: gets target details for target 1
+    params:
+      targetId: 1
+    assert:
+    - path: targetId
+    - path: name

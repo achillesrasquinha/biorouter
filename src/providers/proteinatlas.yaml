@@ -2,19 +2,19 @@ name: proteinatlas
 displayName: Human Protein Atlas
 description: Human protein expression and localization data across tissues and cell types
 tags:
-  - protein
-  - expression
-  - tissue
-  - localization
-  - human-protein-atlas
+- protein
+- expression
+- tissue
+- localization
+- human-protein-atlas
 baseUrl: https://www.proteinatlas.org
 tools:
   getGene:
     description: Get protein expression and localization data for a gene by Ensembl ID
     tags:
-      - protein-expression
-      - tissue-expression
-      - gene-info
+    - protein-expression
+    - tissue-expression
+    - gene-info
     method: GET
     path: /{ensemblId}.json
     params:
@@ -25,25 +25,26 @@ tools:
     response:
       format: json
       fields:
-        - Gene
-        - Gene synonym
-        - Ensembl
-        - Gene description
-        - Uniprot
-        - Chromosome
-        - Protein class
-        - Biological process
-        - Molecular function
-        - Disease involvement
-        - Subcellular location
-        - RNA tissue specificity
+      - Gene
+      - Gene synonym
+      - Ensembl
+      - Gene description
+      - Uniprot
+      - Chromosome
+      - Protein class
+      - Biological process
+      - Molecular function
+      - Disease involvement
+      - Subcellular location
+      - RNA tissue specificity
+    entity: gene
 tests:
   getGene:
-    - name: gets TP53 gene data by Ensembl ID
-      params:
-        ensemblId: ENSG00000141510
-      assert:
-        - path: Gene
-          equals: TP53
-        - path: Ensembl
-          equals: ENSG00000141510
+  - name: gets TP53 gene data by Ensembl ID
+    params:
+      ensemblId: ENSG00000141510
+    assert:
+    - path: Gene
+      equals: TP53
+    - path: Ensembl
+      equals: ENSG00000141510

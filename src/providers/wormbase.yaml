@@ -2,18 +2,18 @@ name: wormbase
 displayName: WormBase
 description: WormBase C. elegans and nematode genomics via the Alliance of Genome Resources API
 tags:
-  - c-elegans
-  - model-organism
-  - wormbase
-  - nematode
-  - genetics
+- c-elegans
+- model-organism
+- wormbase
+- nematode
+- genetics
 baseUrl: https://www.alliancegenome.org/api
 tools:
   getGene:
     description: Get detailed gene information from WormBase by gene ID (e.g. WB:WBGene00006763 for unc-26)
     tags:
-      - gene-info
-      - gene-detail
+    - gene-info
+    - gene-detail
     method: GET
     path: /gene/{geneId}
     params:
@@ -24,17 +24,18 @@ tools:
     response:
       format: json
       fields:
-        - gene.primaryExternalId
-        - gene.symbol
-        - gene.taxon.name
-        - gene.dataProvider.abbreviation
-        - gene.relatedNotes[].freeText
-        - gene.relatedNotes[].noteType.name
+      - gene.primaryExternalId
+      - gene.symbol
+      - gene.taxon.name
+      - gene.dataProvider.abbreviation
+      - gene.relatedNotes[].freeText
+      - gene.relatedNotes[].noteType.name
+    entity: gene
   searchGene:
     description: Search WormBase genes by name or keyword via autocomplete
     tags:
-      - gene-search
-      - name-search
+    - gene-search
+    - name-search
     method: GET
     path: /search_autocomplete
     params:
@@ -50,15 +51,16 @@ tools:
     response:
       format: json
       fields:
-        - results[].symbol
-        - results[].curie
-        - results[].name
-        - results[].category
+      - results[].symbol
+      - results[].curie
+      - results[].name
+      - results[].category
+    entity: gene
   getProtein:
     description: Get protein information for a gene from the Alliance of Genome Resources
     tags:
-      - protein-info
-      - gene-protein
+    - protein-info
+    - gene-protein
     method: GET
     path: /gene/{geneId}/homologs
     params:
@@ -69,28 +71,29 @@ tools:
     response:
       format: json
       fields:
-        - results[].gene.symbol
-        - results[].homologGene.symbol
-        - results[].homologGene.species.name
+      - results[].gene.symbol
+      - results[].homologGene.symbol
+      - results[].homologGene.species.name
+    entity: protein
 tests:
   getGene:
-    - name: gets gene detail for unc-26 (WB:WBGene00006763)
-      params:
-        geneId: WB:WBGene00006763
-      assert:
-        - path: gene
-        - path: gene.primaryExternalId
+  - name: gets gene detail for unc-26 (WB:WBGene00006763)
+    params:
+      geneId: WB:WBGene00006763
+    assert:
+    - path: gene
+    - path: gene.primaryExternalId
   searchGene:
-    - name: searches for unc-26 via autocomplete
-      params:
-        query: unc-26
-      assert:
-        - path: results
-          minLength: 1
+  - name: searches for unc-26 via autocomplete
+    params:
+      query: unc-26
+    assert:
+    - path: results
+      minLength: 1
   getProtein:
-    - name: gets protein/homolog info for unc-26 (WB:WBGene00006763)
-      params:
-        geneId: WB:WBGene00006763
-      assert:
-        - {}
-      allowError: true
+  - name: gets protein/homolog info for unc-26 (WB:WBGene00006763)
+    params:
+      geneId: WB:WBGene00006763
+    assert:
+    - {}
+    allowError: true

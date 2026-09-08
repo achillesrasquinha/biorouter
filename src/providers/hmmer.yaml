@@ -2,19 +2,18 @@ name: hmmer
 displayName: HMMER
 description: HMMER protein sequence search using profile hidden Markov models
 tags:
-  - protein-search
-  - hmm
-  - sequence-search
-  - domain
-  - ebi
+- protein-search
+- hmm
+- sequence-search
+- domain
+- ebi
 baseUrl: https://www.ebi.ac.uk/Tools/hmmer
-
 tools:
   search:
     description: Submit a phmmer protein sequence search against a sequence database
     tags:
-      - phmmer-search
-      - protein-homology
+    - phmmer-search
+    - protein-homology
     method: POST
     path: /search/phmmer
     headers:
@@ -31,11 +30,12 @@ tools:
         description: Protein sequence in FASTA format or plain amino acid sequence
     response:
       format: json
-  getResults:
+    entity: protein
+  getSearchResults:
     description: Retrieve results of a previously submitted HMMER search job
     tags:
-      - hmmer-results
-      - search-results
+    - hmmer-results
+    - search-results
     method: GET
     path: /results/{jobId}
     headers:
@@ -47,20 +47,22 @@ tools:
         description: Job ID returned from the search submission
     response:
       format: json
-
+    entity: protein
 tests:
   search:
-    - name: searches for a short protein sequence
-      params:
-        seqdb: pdb
-        seq: ">test\nMKTAYIAKQRQISFVKSHFSRQLEERLGLIEVQAPILSRVGDGTQDNLSGAEKAVQVKVKALPD"
-      assert:
-        - minLength: 1
-      allowError: true
-  getResults:
-    - name: retrieves results for a placeholder job
-      params:
-        jobId: placeholder-job-id
-      assert:
-        - minLength: 1
-      allowError: true
+  - name: searches for a short protein sequence
+    params:
+      seqdb: pdb
+      seq: '>test
+
+        MKTAYIAKQRQISFVKSHFSRQLEERLGLIEVQAPILSRVGDGTQDNLSGAEKAVQVKVKALPD'
+    assert:
+    - minLength: 1
+    allowError: true
+  getSearchResults:
+  - name: retrieves results for a placeholder job
+    params:
+      jobId: placeholder-job-id
+    assert:
+    - minLength: 1
+    allowError: true

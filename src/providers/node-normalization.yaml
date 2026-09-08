@@ -2,17 +2,17 @@ name: node-normalization
 displayName: RENCI Node Normalization
 description: RENCI Node Normalization — Translator service normalizing CURIEs to canonical identifiers
 tags:
-  - normalization
-  - identifier-mapping
-  - translator
-  - curie
+- normalization
+- identifier-mapping
+- translator
+- curie
 baseUrl: https://nodenormalization-sri.renci.org
 tools:
   getNormalizedNodes:
     description: Normalize CURIEs to their canonical form with equivalent identifiers
     tags:
-      - curie-normalization
-      - identifier-mapping
+    - curie-normalization
+    - identifier-mapping
     method: GET
     path: /get_normalized_nodes
     params:
@@ -22,10 +22,11 @@ tools:
         description: CURIE to normalize (e.g. HGNC:1100, CHEBI:15377, MONDO:0005148)
     response:
       format: json
+    entity: identifier
 tests:
   getNormalizedNodes:
-    - name: normalizes HGNC:1100 (BRCA1)
-      params:
-        curie: HGNC:1100
-      assert:
-        - path: HGNC:1100
+  - name: normalizes HGNC:1100 (BRCA1)
+    params:
+      curie: HGNC:1100
+    assert:
+    - path: HGNC:1100

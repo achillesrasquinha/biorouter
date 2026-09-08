@@ -1,0 +1,106 @@
+name: bridgedb
+displayName: BridgeDb
+description: BridgeDb — identifier mapping service for biological databases and cross-references
+tags:
+- identifier-mapping
+- cross-reference
+- bridgedb
+baseUrl: https://webservice.bridgedb.org
+tools:
+  mapIdentifiers:
+    description: Map a biological identifier to equivalent identifiers in other databases
+    tags:
+    - identifier-mapping
+    - cross-reference
+    method: GET
+    path: /{organism}/xrefs/{systemCode}/{identifier}
+    params:
+      organism:
+        type: string
+        required: true
+        description: Species name (e.g. Homo sapiens, Mus musculus, Rattus norvegicus)
+      systemCode:
+        type: string
+        required: true
+        description: Source database system code (e.g. L for Entrez Gene, En for Ensembl, S for UniProt, H for HGNC)
+      identifier:
+        type: string
+        required: true
+        description: Identifier to map (e.g. 7157 for TP53 in Entrez Gene)
+    response:
+      format: tsv
+      columns:
+      - identifier
+      - dataSource
+    entity: identifier
+  searchByAttribute:
+    description: Search for identifiers by attribute name or symbol
+    tags:
+    - identifier-search
+    - attribute-search
+    method: GET
+    path: /{organism}/search/{query}
+    params:
+      organism:
+        type: string
+        required: true
+        description: Species name (e.g. Homo sapiens)
+      query:
+        type: string
+        required: true
+        description: Search query (e.g. gene symbol like TP53, or attribute keyword)
+      limit:
+        type: integer
+        default: 10
+        description: Maximum number of results to return
+    response:
+      format: tsv
+      columns:
+      - identifier
+      - dataSource
+    entity: identifier
+  getDataSources:
+    description: List all available data sources and their system codes
+    tags:
+    - data-sources
+    - metadata
+    method: GET
+    path: /datasources
+    params: {}
+    response:
+      format: tsv
+    entity: identifier
+  getSupportedOrganisms:
+    description: List all supported organisms available for identifier mapping
+    tags:
+    - organisms
+    - metadata
+    method: GET
+    path: /contents
+    params: {}
+    response:
+      format: lines
+    entity: identifier
+tests:
+  mapIdentifiers:
+  - name: maps TP53 Entrez Gene ID to other databases
+    params:
+      organism: Homo sapiens
+      systemCode: L
+      identifier: '7157'
+    assert:
+    - minLength: 1
+    - path: 0.identifier
+  searchByAttribute:
+  - name: searches for TP53 gene symbol
+    params:
+      organism: Homo sapiens
+      query: TP53
+      limit: 5
+    assert:
+    - minLength: 1
+  getSupportedOrganisms:
+  - name: lists supported organisms
+    params: {}
+    assert:
+    - minLength: 1

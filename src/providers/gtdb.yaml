@@ -2,18 +2,18 @@ name: gtdb
 displayName: GTDB
 description: Genome Taxonomy Database — standardized bacterial and archaeal taxonomy based on genome phylogeny
 tags:
-  - taxonomy
-  - genome
-  - bacteria
-  - archaea
-  - gtdb
+- taxonomy
+- genome
+- bacteria
+- archaea
+- gtdb
 baseUrl: https://gtdb-api.ecogenomic.org
 tools:
   search:
     description: Search GTDB for bacterial or archaeal genomes
     tags:
-      - genome-search
-      - taxonomy-search
+    - genome-search
+    - taxonomy-search
     method: GET
     path: /search/gtdb
     params:
@@ -32,18 +32,19 @@ tools:
     response:
       format: json
       fields:
-        - "rows[].gid"
-        - "rows[].accession"
-        - "rows[].ncbiOrgName"
-        - "rows[].ncbiTaxonomy"
-        - "rows[].gtdbTaxonomy"
-        - "rows[].isGtdbSpeciesRep"
-        - "rows[].isTypeSpecies"
+      - rows[].gid
+      - rows[].accession
+      - rows[].ncbiOrgName
+      - rows[].ncbiTaxonomy
+      - rows[].gtdbTaxonomy
+      - rows[].isGtdbSpeciesRep
+      - rows[].isTypeSpecies
+    entity: dataset
   getTaxon:
     description: Get taxonomic details by GTDB ID
     tags:
-      - taxon-details
-      - taxonomy
+    - taxon-details
+    - taxonomy
     method: GET
     path: /taxon/{taxon}
     params:
@@ -53,18 +54,20 @@ tools:
         description: GTDB taxon identifier
     response:
       format: json
+    entity: organism
 tests:
   search:
-    - name: searches for Escherichia coli genomes
-      params:
-        search: Escherichia coli
-      assert:
-        - path: rows
-          minLength: 1
-        - path: rows.0.accession
+  - name: searches for Escherichia coli genomes
+    params:
+      search: Escherichia coli
+    assert:
+    - path: rows
+      minLength: 1
+    - path: rows.0.accession
   getTaxon:
-    - name: gets taxon details for a GTDB species
-      params:
-        taxon: s__Escherichia coli
-      assert:
-        - path: taxon
+  - name: gets taxon details for a GTDB species
+    params:
+      taxon: s__Escherichia coli
+    assert:
+    - minLength: 1
+    - path: 0.taxon

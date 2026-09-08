@@ -2,17 +2,17 @@ name: ebi-search
 displayName: EBI Search
 description: EBI Search — unified search across 400+ EBI databases (UniProt, PDB, SRA, metagenomics, etc.)
 tags:
-  - search
-  - ebi
-  - cross-database
-  - unified-search
+- search
+- ebi
+- cross-database
+- unified-search
 baseUrl: https://www.ebi.ac.uk/ebisearch/ws/rest
 tools:
   search:
     description: Search across a specific EBI domain (e.g. uniprot, pdb, sra-experiment)
     tags:
-      - cross-database-search
-      - ebi-search
+    - cross-database-search
+    - ebi-search
     method: GET
     path: /{domain}
     params:
@@ -35,15 +35,16 @@ tools:
     response:
       format: json
       fields:
-        - hitCount
-        - entries[].acc
-        - entries[].id
-        - entries[].source
+      - hitCount
+      - entries[].acc
+      - entries[].id
+      - entries[].source
+    entity: assay
   listDomains:
     description: List all available EBI search domains
     tags:
-      - domain-list
-      - metadata
+    - domain-list
+    - metadata
     method: GET
     path: /
     params:
@@ -54,25 +55,26 @@ tools:
     response:
       format: json
       fields:
-        - domains[].id
-        - domains[].name
-        - domains[].description
+      - domains[].id
+      - domains[].name
+      - domains[].description
+    entity: protein
 tests:
   search:
-    - name: searches UniProt for BRCA1
-      params:
-        domain: uniprot
-        query: BRCA1
-        size: 2
-        format: json
-      assert:
-        - path: hitCount
-        - path: entries
-          minLength: 1
+  - name: searches UniProt for BRCA1
+    params:
+      domain: uniprot
+      query: BRCA1
+      size: 2
+      format: json
+    assert:
+    - path: hitCount
+    - path: entries
+      minLength: 1
   listDomains:
-    - name: lists available domains
-      params:
-        format: json
-      assert:
-        - path: domains
-          minLength: 1
+  - name: lists available domains
+    params:
+      format: json
+    assert:
+    - path: domains
+      minLength: 1

@@ -2,18 +2,18 @@ name: ctd
 displayName: Comparative Toxicogenomics Database
 description: CTD curated chemical-gene-disease interactions for toxicogenomics research
 tags:
-  - toxicogenomics
-  - chemical-gene
-  - chemical-disease
-  - gene-pathways
-  - ctd
+- toxicogenomics
+- chemical-gene
+- chemical-disease
+- gene-pathways
+- ctd
 baseUrl: https://ctdbase.org/tools/batchQuery.go
 tools:
   getChemicalInteractions:
     description: Get curated gene interactions for a chemical
     tags:
-      - chemical-gene
-      - gene-interactions
+    - chemical-gene
+    - gene-interactions
     method: GET
     path: /
     params:
@@ -35,11 +35,12 @@ tools:
         description: Output format
     response:
       format: json
+    entity: compound
   getDiseases:
     description: Get curated disease associations for a chemical
     tags:
-      - chemical-disease
-      - disease-associations
+    - chemical-disease
+    - disease-associations
     method: GET
     path: /
     params:
@@ -61,11 +62,12 @@ tools:
         description: Output format
     response:
       format: json
+    entity: disease
   getPathways:
     description: Get enriched pathways for a gene
     tags:
-      - gene-pathways
-      - pathway-enrichment
+    - gene-pathways
+    - pathway-enrichment
     method: GET
     path: /
     params:
@@ -87,25 +89,26 @@ tools:
         description: Output format
     response:
       format: json
+    entity: pathway
 tests:
   getChemicalInteractions:
-    - name: gets gene interactions for bisphenol A
-      params:
-        inputTerms: bisphenol A
-      assert:
-        - minLength: 1
-      allowError: true
+  - name: gets gene interactions for bisphenol A
+    params:
+      inputTerms: bisphenol A
+    assert:
+    - minLength: 1
+    allowError: true
   getDiseases:
-    - name: gets disease associations for bisphenol A
-      params:
-        inputTerms: bisphenol A
-      assert:
-        - minLength: 1
-      allowError: true
+  - name: gets disease associations for bisphenol A
+    params:
+      inputTerms: bisphenol A
+    assert:
+    - minLength: 1
+    allowError: true
   getPathways:
-    - name: gets enriched pathways for TP53
-      params:
-        inputTerms: TP53
-      assert:
-        - minLength: 1
-      allowError: true
+  - name: gets enriched pathways for TP53
+    params:
+      inputTerms: TP53
+    assert:
+    - minLength: 1
+    allowError: true

@@ -2,19 +2,19 @@ name: bindingdb
 displayName: BindingDB
 description: Public database of measured binding affinities between proteins and drug-like molecules
 tags:
-  - binding-affinity
-  - drugs
-  - targets
-  - ligands
-  - pharmacology
-  - bindingdb
+- binding-affinity
+- drugs
+- targets
+- ligands
+- pharmacology
+- bindingdb
 baseUrl: https://bindingdb.org/axis2/services/BDBService
 tools:
   searchByTarget:
     description: Search ligands by protein target name
     tags:
-      - target-search
-      - ligand-lookup
+    - target-search
+    - ligand-lookup
     method: GET
     path: /getLigandsByTarget
     params:
@@ -28,11 +28,12 @@ tools:
         description: Response format
     response:
       format: json
+    entity: protein
   searchBySmiles:
     description: Search similar ligands by SMILES structure with similarity cutoff
     tags:
-      - similarity-search
-      - structure-search
+    - similarity-search
+    - structure-search
     method: GET
     path: /getLigandsBySimilarity
     params:
@@ -50,19 +51,20 @@ tools:
         description: Response format
     response:
       format: json
+    entity: compound
 tests:
   searchByTarget:
-    - name: searches ligands for cyclooxygenase target
-      params:
-        target: cyclooxygenase
-      assert:
-        - minLength: 1
-      allowError: true
+  - name: searches ligands for cyclooxygenase target
+    params:
+      target: cyclooxygenase
+    assert:
+    - minLength: 1
+    allowError: true
   searchBySmiles:
-    - name: searches similar compounds by SMILES
-      params:
-        smiles: "CC(=O)OC1=CC=CC=C1C(=O)O"
-        cutoff: 0.85
-      assert:
-        - minLength: 1
-      allowError: true
+  - name: searches similar compounds by SMILES
+    params:
+      smiles: CC(=O)OC1=CC=CC=C1C(=O)O
+      cutoff: 0.85
+    assert:
+    - minLength: 1
+    allowError: true

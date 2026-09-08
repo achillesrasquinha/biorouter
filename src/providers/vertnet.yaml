@@ -1,13 +1,19 @@
 name: vertnet
 displayName: VertNet
 description: VertNet — vertebrate specimen records from natural history collections worldwide
-tags: [vertebrates, specimens, natural-history, collections, biodiversity]
+tags:
+- vertebrates
+- specimens
+- natural-history
+- collections
+- biodiversity
 baseUrl: http://api.vertnet-portal.appspot.com/api
-
 tools:
   search:
     description: Search VertNet for vertebrate specimen records
-    tags: [specimen-search, occurrence-search]
+    tags:
+    - specimen-search
+    - occurrence-search
     method: GET
     path: /search
     params:
@@ -21,10 +27,12 @@ tools:
         description: Maximum number of results to return
     response:
       format: json
-
-  getRecord:
+    entity: sample
+  getSpecimen:
     description: Get a specific VertNet specimen record by ID
-    tags: [specimen-detail, record-lookup]
+    tags:
+    - specimen-detail
+    - record-lookup
     method: GET
     path: /record/{id}
     params:
@@ -34,13 +42,13 @@ tools:
         description: VertNet record identifier
     response:
       format: json
-
+    entity: organism
 tests:
   search:
-    - name: searches for bear specimens
-      params:
-        q: Ursus arctos
-        limit: 5
-      assert:
-        - minLength: 1
-      allowError: true
+  - name: searches for bear specimens
+    params:
+      q: Ursus arctos
+      limit: 5
+    assert:
+    - minLength: 1
+    allowError: true

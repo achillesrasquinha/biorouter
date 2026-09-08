@@ -2,18 +2,18 @@ name: metabolights
 displayName: MetaboLights
 description: EMBL-EBI database for metabolomics experiments and derived information
 tags:
-  - metabolomics
-  - metabolites
-  - studies
-  - ebi
-  - mass-spectrometry
+- metabolomics
+- metabolites
+- studies
+- ebi
+- mass-spectrometry
 baseUrl: https://www.ebi.ac.uk/metabolights/ws
 tools:
   getStudy:
     description: Get details of a MetaboLights study by accession ID
     tags:
-      - study-info
-      - metabolomics-study
+    - study-info
+    - metabolomics-study
     method: GET
     path: /studies/{studyId}
     params:
@@ -24,39 +24,41 @@ tools:
     response:
       format: json
       fields:
-        - isaInvestigation.identifier
-        - isaInvestigation.title
-        - isaInvestigation.description
-        - isaInvestigation.submissionDate
-        - isaInvestigation.publicReleaseDate
-        - mtblsStudy.studyStatus
+      - isaInvestigation.identifier
+      - isaInvestigation.title
+      - isaInvestigation.description
+      - isaInvestigation.submissionDate
+      - isaInvestigation.publicReleaseDate
+      - mtblsStudy.studyStatus
+    entity: dataset
   listStudies:
     description: List public MetaboLights studies
     tags:
-      - study-search
-      - study-list
+    - study-search
+    - study-list
     method: GET
     path: /studies
     response:
       format: json
       fields:
-        - content
+      - content
+    entity: dataset
 tests:
   getStudy:
-    - name: gets study MTBLS1
-      params:
-        studyId: MTBLS1
-      assert:
-        - {}
-        - anyOf:
-            - mtblsStudy
-            - isaInvestigation
+  - name: gets study MTBLS1
+    params:
+      studyId: MTBLS1
+    assert:
+    - {}
+    - anyOf:
+      - mtblsStudy
+      - isaInvestigation
   listStudies:
-    - name: lists public studies
-      params: {}
-      assert:
-        - {}
-        - anyOf:
-            - isArray: true
-              minLength: 1
-            - path: content
+  - name: lists public studies
+    params: {}
+    assert:
+    - {}
+    - anyOf:
+      - isArray: true
+        minLength: 1
+      - path: content

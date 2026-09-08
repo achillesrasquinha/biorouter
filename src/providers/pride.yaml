@@ -2,17 +2,17 @@ name: pride
 displayName: PRIDE
 description: PRIDE proteomics archive — mass spectrometry proteomics data repository
 tags:
-  - proteomics
-  - mass-spectrometry
-  - pride
-  - peptides
+- proteomics
+- mass-spectrometry
+- pride
+- peptides
 baseUrl: https://www.ebi.ac.uk/pride/ws/archive/v2
 tools:
   searchProjects:
     description: Search PRIDE proteomics projects by keyword
     tags:
-      - project-search
-      - proteomics-search
+    - project-search
+    - proteomics-search
     method: GET
     path: /search/autocomplete
     params:
@@ -27,13 +27,12 @@ tools:
         description: Maximum number of results
     response:
       format: json
-      fields:
-        - '[]'
+    entity: dataset
   getProject:
     description: Get a specific PRIDE project by accession
     tags:
-      - project-info
-      - dataset-info
+    - project-info
+    - dataset-info
     method: GET
     path: /projects/{accession}
     params:
@@ -44,21 +43,22 @@ tools:
     response:
       format: json
       fields:
-        - accession
-        - title
-        - projectDescription
-        - submissionType
-        - submissionDate
-        - publicationDate
-        - keywords
-        - instruments[].name
-        - submitters[].name
-        - countries
+      - accession
+      - title
+      - projectDescription
+      - submissionType
+      - submissionDate
+      - publicationDate
+      - keywords
+      - instruments[].name
+      - submitters[].name
+      - countries
+    entity: dataset
   getProjectFiles:
     description: Get files associated with a PRIDE project
     tags:
-      - project-files
-      - dataset-files
+    - project-files
+    - dataset-files
     method: GET
     path: /projects/{accession}/files
     params:
@@ -73,29 +73,30 @@ tools:
     response:
       format: json
       fields:
-        - "[].fileName"
-        - "[].fileSizeBytes"
-        - "[].fileCategory.value"
-        - "[].projectAccessions"
+      - '[].fileName'
+      - '[].fileSizeBytes'
+      - '[].fileCategory.value'
+      - '[].projectAccessions'
+    entity: dataset
 tests:
   searchProjects:
-    - name: searches projects for cancer
-      params:
-        query: cancer
-      assert:
-        - isArray: true
+  - name: searches projects for cancer
+    params:
+      query: cancer
+    assert:
+    - isArray: true
   getProject:
-    - name: gets project PXD000001
-      params:
-        accession: PXD000001
-      assert:
-        - path: accession
-          equals: PXD000001
-        - path: title
+  - name: gets project PXD000001
+    params:
+      accession: PXD000001
+    assert:
+    - path: accession
+      equals: PXD000001
+    - path: title
   getProjectFiles:
-    - name: gets files for project PXD000001
-      params:
-        accession: PXD000001
-      assert:
-        - {}
-      allowError: true
+  - name: gets files for project PXD000001
+    params:
+      accession: PXD000001
+    assert:
+    - {}
+    allowError: true

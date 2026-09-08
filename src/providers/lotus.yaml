@@ -2,18 +2,18 @@ name: lotus
 displayName: LOTUS
 description: Natural products database — open knowledge on natural compounds and their biological sources
 tags:
-  - natural-products
-  - chemistry
-  - compounds
-  - lotus
-  - metabolites
+- natural-products
+- chemistry
+- compounds
+- lotus
+- metabolites
 baseUrl: https://lotus.naturalproducts.net/api
 tools:
   search:
     description: Search natural products by name or SMILES
     tags:
-      - natural-product-search
-      - compound-search
+    - natural-product-search
+    - compound-search
     method: GET
     path: /search/simple
     params:
@@ -24,37 +24,39 @@ tools:
     response:
       format: json
       fields:
-        - "naturalProducts[].lotus_id"
-        - "naturalProducts[].wikidata_id"
-        - "naturalProducts[].smiles"
-        - "naturalProducts[].contains_sugar"
-        - "naturalProducts[].heavy_atom_number"
+      - naturalProducts[].lotus_id
+      - naturalProducts[].wikidata_id
+      - naturalProducts[].smiles
+      - naturalProducts[].contains_sugar
+      - naturalProducts[].heavy_atom_number
+    entity: compound
   getCompound:
-    description: Get compound details by LOTUS ID
+    description: Get compound details by LOTUS internal ID (MongoDB ObjectId from search results)
     tags:
-      - compound-details
-      - natural-product
+    - compound-details
+    - natural-product
     method: GET
-    path: /compound/{lotusId}
+    path: /compound/{compoundId}
     params:
-      lotusId:
+      compoundId:
         type: string
         required: true
-        description: LOTUS compound identifier
+        description: LOTUS internal compound ID (MongoDB ObjectId, e.g. 604b8da112e4996162764b83)
     response:
       format: json
+    entity: compound
 tests:
   search:
-    - name: searches for caffeine
-      params:
-        query: caffeine
-      assert:
-        - path: naturalProducts
-          minLength: 1
-        - path: naturalProducts.0.lotus_id
+  - name: searches for caffeine
+    params:
+      query: caffeine
+    assert:
+    - path: naturalProducts
+      minLength: 1
+    - path: naturalProducts.0.lotus_id
   getCompound:
-    - name: gets compound details by LOTUS ID
-      params:
-        lotusId: Q27113900
-      assert:
-        - path: lotus_id
+  - name: gets compound details by internal ID
+    params:
+      compoundId: 604b8da112e4996162764b83
+    assert:
+    - path: lotus_id

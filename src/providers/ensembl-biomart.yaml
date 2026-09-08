@@ -2,19 +2,18 @@ name: ensembl-biomart
 displayName: Ensembl BioMart
 description: Ensembl BioMart bulk annotation and data retrieval service
 tags:
-  - gene
-  - annotation
-  - bulk-query
-  - ensembl
-  - biomart
+- gene
+- annotation
+- bulk-query
+- ensembl
+- biomart
 baseUrl: https://www.ensembl.org/biomart/martservice
-
 tools:
-  query:
+  queryBioMart:
     description: Run a BioMart XML query for bulk annotation retrieval (genes, transcripts, variants, etc.)
     tags:
-      - bulk-annotation
-      - xml-query
+    - bulk-annotation
+    - xml-query
     method: GET
     path: /
     params:
@@ -24,11 +23,12 @@ tools:
         description: BioMart XML query string defining dataset, filters, and attributes
     response:
       format: tsv
+    entity: gene
   getRegistry:
     description: List available BioMart databases and datasets
     tags:
-      - registry
-      - datasets
+    - registry
+    - datasets
     method: GET
     path: /
     params:
@@ -39,19 +39,21 @@ tools:
         description: Request type — use "registry" to list available marts and datasets
     response:
       format: xml
-
+    entity: dataset
 tests:
   getRegistry:
-    - name: lists available BioMart databases
-      params:
-        type: registry
-      assert:
-        - minLength: 1
-      allowError: true
-  query:
-    - name: queries for human gene annotations
-      params:
-        query: '<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE Query><Query virtualSchemaName="default" formatter="TSV" header="1" uniqueRows="1" count="" datasetConfigVersion="0.6"><Dataset name="hsapiens_gene_ensembl" interface="default"><Filter name="hgnc_symbol" value="TP53"/><Attribute name="ensembl_gene_id"/><Attribute name="hgnc_symbol"/><Attribute name="chromosome_name"/></Dataset></Query>'
-      assert:
-        - minLength: 1
-      allowError: true
+  - name: lists available BioMart databases
+    params:
+      type: registry
+    assert:
+    - {}
+    allowError: true
+  queryBioMart:
+  - name: queries for human gene annotations
+    params:
+      query: <?xml version="1.0" encoding="UTF-8"?><!DOCTYPE Query><Query virtualSchemaName="default" formatter="TSV" header="1"
+        uniqueRows="1" count="" datasetConfigVersion="0.6"><Dataset name="hsapiens_gene_ensembl" interface="default"><Filter
+        name="hgnc_symbol" value="TP53"/><Attribute name="ensembl_gene_id"/><Attribute name="hgnc_symbol"/><Attribute name="chromosome_name"/></Dataset></Query>
+    assert:
+    - {}
+    allowError: true

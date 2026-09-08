@@ -2,20 +2,20 @@ name: onezoom
 displayName: OneZoom
 description: OneZoom tree of life explorer — interactive visualization and species search across the tree of life
 tags:
-  - tree-of-life
-  - phylogenetics
-  - evolution
-  - taxonomy
-  - onezoom
-baseUrl: https://www.onezoom.org/api/v1
+- tree-of-life
+- phylogenetics
+- evolution
+- taxonomy
+- onezoom
+baseUrl: https://www.onezoom.org/API
 tools:
   searchSpecies:
     description: Search OneZoom for species by name or keyword
     tags:
-      - species-search
-      - taxonomy-search
+    - species-search
+    - taxonomy-search
     method: GET
-    path: /search
+    path: /search_node.json
     params:
       query:
         type: string
@@ -24,64 +24,67 @@ tools:
     response:
       format: json
       fields:
-        - nodes.headers
-        - nodes.leaf_hits
-        - nodes.node_hits
-        - nodes.lang
+      - nodes.headers
+      - nodes.leaf_hits
+      - nodes.node_hits
+      - nodes.lang
+    entity: organism
   getNode:
     description: Get details for a specific node in the OneZoom tree of life
     tags:
-      - node-detail
-      - tree-node
+    - node-detail
+    - tree-node
     method: GET
-    path: /node/{id}
+    path: /node_details.json
     params:
-      id:
+      key:
         type: integer
         required: true
         description: OneZoom node identifier
     response:
       format: json
       fields:
-        - colnames_nodes
-        - colnames_leaves
-        - nodes
-        - leaves
-        - vernacular_by_ott
-        - vernacular_by_name
+      - colnames_nodes
+      - colnames_leaves
+      - nodes
+      - leaves
+      - vernacular_by_ott
+      - vernacular_by_name
+    entity: organism
   getSubtree:
     description: Retrieve the subtree rooted at a given node in the tree of life
     tags:
-      - subtree
-      - phylogeny
+    - subtree
+    - phylogeny
     method: GET
-    path: /subtree/{id}
+    path: /subtree_node_details.json
     params:
-      id:
+      key:
         type: integer
         required: true
         description: OneZoom node identifier for the root of the subtree
     response:
       format: json
+    entity: organism
 tests:
   searchSpecies:
-    - name: searches for Homo sapiens
-      params:
-        query: Homo sapiens
-      assert:
-        - {}
-      allowError: true
+  - name: searches for Homo sapiens
+    params:
+      query: Homo sapiens
+    assert:
+    - {}
+    allowError: true
   getNode:
-    - name: gets node details
-      params:
-        id: 770315
-      assert:
-        - {}
-      allowError: true
+  - name: gets node details
+    params:
+      key: 770315
+    assert:
+    - {}
+    allowError: true
   getSubtree:
-    - name: gets subtree for a node
-      params:
-        id: 770315
-      assert:
-        - {}
-      allowError: true
+  - name: gets subtree for a node
+    params:
+      key: 770315
+    assert:
+    - {}
+    allowError: true

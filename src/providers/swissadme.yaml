@@ -2,18 +2,18 @@ name: swissadme
 displayName: SwissADME
 description: SwissADME drug-likeness and pharmacokinetics prediction tool
 tags:
-  - adme
-  - drug-likeness
-  - pharmacokinetics
-  - lipinski
-  - swissadme
+- adme
+- drug-likeness
+- pharmacokinetics
+- lipinski
+- swissadme
 baseUrl: http://www.swissadme.ch
 tools:
   predict:
     description: Predict ADME properties and drug-likeness for a SMILES compound
     tags:
-      - adme-prediction
-      - drug-likeness-prediction
+    - adme-prediction
+    - drug-likeness-prediction
     method: POST
     path: /api/predict
     params:
@@ -23,11 +23,12 @@ tools:
         description: SMILES string of the molecule (e.g. "CC(=O)OC1=CC=CC=C1C(=O)O" for aspirin)
     response:
       format: json
+    entity: structure
 tests:
   predict:
-    - name: predicts ADME properties for aspirin
-      params:
-        smiles: "CC(=O)OC1=CC=CC=C1C(=O)O"
-      assert:
-        - {}
-      allowError: true
+  - name: predicts ADME properties for aspirin
+    params:
+      smiles: CC(=O)OC1=CC=CC=C1C(=O)O
+    assert:
+    - {}
+    allowError: true

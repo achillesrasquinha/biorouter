@@ -1,6 +1,6 @@
 {
   "name": "life-science-mcp",
-  "version": "0.1.0",
+  "version": "0.3.0",
   "description": "MCP server providing tools for life science APIs and databases",
   "type": "module",
   "bin": {
@@ -8,7 +8,7 @@
   },
   "scripts": {
     "start": "node src/index.js",
-    "test": "node --test test/auth.test.js test/params.test.js test/pluck.test.js test/parsers.test.js test/registry.test.js test/providers.unit.test.js",
+    "test": "node --test test/auth.test.js test/params.test.js test/pluck.test.js test/parsers.test.js test/registry.test.js test/engine.test.js test/index-features.test.js test/providers.unit.test.js",
     "test:integration": "node --test test/providers.integration.test.js"
   },
   "files": [

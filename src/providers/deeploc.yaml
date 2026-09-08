@@ -2,18 +2,18 @@ name: deeploc
 displayName: DeepLoc 2.0
 description: DeepLoc 2.0 — protein subcellular localization prediction (DTU BioLib)
 tags:
-  - localization
-  - prediction
-  - protein
-  - subcellular
-  - deeploc
+- localization
+- prediction
+- protein
+- subcellular
+- deeploc
 baseUrl: https://api.biolib.com/app/DTU/DeepLoc-2.0
 tools:
   predict:
     description: Submit a protein sequence for subcellular localization prediction
     tags:
-      - localization-prediction
-      - sequence-analysis
+    - localization-prediction
+    - sequence-analysis
     method: POST
     path: /run
     params:
@@ -23,11 +23,16 @@ tools:
         description: Protein sequence in FASTA format (e.g. ">prot1\nMKTLLILTLVVAVALA...")
     response:
       format: json
+    entity: structure
 tests:
   predict:
-    - name: submits a sequence for localization prediction
-      params:
-        sequence: ">test\nMKTLLILTLVVAVALACGSS"
-      assert:
-        - path: id
-      allowError: true
+  # NOTE: BioLib API has changed its URL structure; the /run endpoint
+  # redirects and no longer returns a JSON job ID directly.
+  - name: submits a sequence for localization prediction
+    params:
+      sequence: '>test
+
+        MKTLLILTLVVAVALACGSS'
+    assert:
+    - {}
+    allowError: true

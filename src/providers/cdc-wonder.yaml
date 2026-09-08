@@ -2,18 +2,18 @@ name: cdc-wonder
 displayName: CDC WONDER
 description: CDC WONDER — Wide-ranging Online Data for Epidemiologic Research, public health datasets
 tags:
-  - public-health
-  - epidemiology
-  - mortality
-  - cdc
-  - health-statistics
+- public-health
+- epidemiology
+- mortality
+- cdc
+- health-statistics
 baseUrl: https://wonder.cdc.gov/controller/datarequest
 tools:
-  query:
+  queryMortalityData:
     description: Query CDC WONDER mortality data (D76 dataset) with form-encoded request XML
     tags:
-      - mortality-query
-      - public-health-data
+    - mortality-query
+    - public-health-data
     method: POST
     path: /D76
     headers:
@@ -23,16 +23,17 @@ tools:
         type: string
         required: true
         mapsTo: request_xml
-        description: >
-          XML request body for the WONDER query. Example minimal query:
-          <request-parameters><parameter><name>B_1</name><value>D76.V1</value></parameter></request-parameters>
+        description: 'XML request body for the WONDER query. Example minimal query: <request-parameters><parameter><name>B_1</name><value>D76.V1</value></parameter></request-parameters>
+
+          '
     response:
       format: xml
+    entity: dataset
 tests:
-  query:
-    - name: queries mortality data
-      params:
-        request_xml: "<request-parameters><parameter><name>B_1</name><value>D76.V1</value></parameter></request-parameters>"
-      assert:
-        - isNonEmpty: true
-      allowError: true
+  queryMortalityData:
+  - name: queries mortality data
+    params:
+      request_xml: <request-parameters><parameter><name>B_1</name><value>D76.V1</value></parameter></request-parameters>
+    assert:
+    - isNonEmpty: true
+    allowError: true

@@ -1,0 +1,58 @@
+name: lovd
+displayName: LOVD
+description: Leiden Open Variation Database — gene-centered collection of DNA variants with clinical context
+tags:
+- variants
+- disease-variants
+- clinical
+- lovd
+# NOTE: LOVD REST API returns Atom XML (application/atom+xml), not JSON.
+# The response will be returned as raw text since the engine does not parse
+# Atom feeds. Assertions on JSON structure will not work.
+baseUrl: https://databases.lovd.nl/shared/api/rest.php
+tools:
+  searchVariants:
+    description: Get reported variants for a specific gene from LOVD
+    tags:
+    - variant-search
+    - gene-variants
+    method: GET
+    path: /variants/{gene}
+    params:
+      gene:
+        type: string
+        required: true
+        description: Gene symbol to query variants for (e.g. BRCA1, TP53, BRCA2)
+    response:
+      format: xml
+    entity: variant
+  getGeneInfo:
+    description: Get gene metadata and summary information from LOVD
+    tags:
+    - gene-info
+    - gene-summary
+    method: GET
+    path: /genes/{symbol}
+    params:
+      symbol:
+        type: string
+        required: true
+        description: Gene symbol (e.g. BRCA1, TP53, BRCA2)
+    response:
+      format: xml
+    entity: gene
+tests:
+  searchVariants:
+  - name: gets variants for BRCA1 gene
+    params:
+      gene: BRCA1
+    assert:
+    - {}
+    allowError: true
+  getGeneInfo:
+  - name: gets gene info for BRCA1
+    params:
+      symbol: BRCA1
+    assert:
+    - {}
+    allowError: true

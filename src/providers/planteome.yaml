@@ -2,18 +2,18 @@ name: planteome
 displayName: Planteome
 description: Planteome — plant trait ontologies and gene annotations for plant biology
 tags:
-  - plant-biology
-  - ontology
-  - traits
-  - annotation
-  - planteome
+- plant-biology
+- ontology
+- traits
+- annotation
+- planteome
 baseUrl: https://planteome.org/api
 tools:
   searchTraits:
     description: Search Planteome for plant traits by keyword and category
     tags:
-      - trait-search
-      - ontology-search
+    - trait-search
+    - ontology-search
     method: GET
     path: /search
     params:
@@ -27,11 +27,12 @@ tools:
         description: Category to search within (trait, gene, germplasm)
     response:
       format: json
+    entity: phenotype
   getAnnotation:
     description: Get a specific annotation record by its identifier
     tags:
-      - annotation-detail
-      - ontology-detail
+    - annotation-detail
+    - ontology-detail
     method: GET
     path: /annotation/{id}
     params:
@@ -41,19 +42,20 @@ tools:
         description: Planteome annotation identifier
     response:
       format: json
+    entity: annotation
 tests:
   searchTraits:
-    - name: searches for drought tolerance traits
-      params:
-        q: drought tolerance
-        category: trait
-      assert:
-        - {}
-      allowError: true
+  - name: searches for drought tolerance traits
+    params:
+      q: drought tolerance
+      category: trait
+    assert:
+    - {}
+    allowError: true
   getAnnotation:
-    - name: gets annotation by ID
-      params:
-        id: "PO:0009025"
-      assert:
-        - {}
-      allowError: true
+  - name: gets annotation by ID
+    params:
+      id: PO:0009025
+    assert:
+    - {}
+    allowError: true

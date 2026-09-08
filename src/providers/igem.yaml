@@ -2,18 +2,18 @@ name: igem
 displayName: iGEM Registry
 description: iGEM Registry of Standard Biological Parts — synthetic biology parts catalog
 tags:
-  - synthetic-biology
-  - biobricks
-  - genetic-parts
-  - igem
-  - registry
+- synthetic-biology
+- biobricks
+- genetic-parts
+- igem
+- registry
 baseUrl: https://igem.org/api/v1
 tools:
   searchParts:
     description: Search the iGEM parts registry by keyword
     tags:
-      - parts-search
-      - biobrick-search
+    - parts-search
+    - biobrick-search
     method: GET
     path: /parts
     params:
@@ -23,11 +23,12 @@ tools:
         description: Search query for biological parts (e.g. "GFP promoter")
     response:
       format: json
+    entity: sequence
   getPart:
     description: Get detailed information for a specific iGEM part
     tags:
-      - part-detail
-      - part-info
+    - part-detail
+    - part-info
     method: GET
     path: /parts/{id}
     params:
@@ -37,11 +38,12 @@ tools:
         description: iGEM part identifier (e.g. "BBa_E0040")
     response:
       format: json
+    entity: sequence
   getSequence:
     description: Get the DNA sequence for a specific iGEM part
     tags:
-      - sequence
-      - dna-sequence
+    - sequence
+    - dna-sequence
     method: GET
     path: /parts/{id}/sequence
     params:
@@ -51,25 +53,26 @@ tools:
         description: iGEM part identifier (e.g. "BBa_E0040")
     response:
       format: json
+    entity: sequence
 tests:
   searchParts:
-    - name: searches for GFP parts
-      params:
-        search: GFP
-      assert:
-        - {}
-      allowError: true
+  - name: searches for GFP parts
+    params:
+      search: GFP
+    assert:
+    - {}
+    allowError: true
   getPart:
-    - name: gets part BBa_E0040
-      params:
-        id: BBa_E0040
-      assert:
-        - {}
-      allowError: true
+  - name: gets part BBa_E0040
+    params:
+      id: BBa_E0040
+    assert:
+    - {}
+    allowError: true
   getSequence:
-    - name: gets sequence for BBa_E0040
-      params:
-        id: BBa_E0040
-      assert:
-        - {}
-      allowError: true
+  - name: gets sequence for BBa_E0040
+    params:
+      id: BBa_E0040
+    assert:
+    - {}
+    allowError: true

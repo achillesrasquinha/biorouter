@@ -2,18 +2,18 @@ name: enrichr
 displayName: Enrichr
 description: Enrichr — gene set enrichment analysis against curated gene-set libraries
 tags:
-  - enrichment
-  - gene-set
-  - pathways
-  - enrichr
-  - functional-analysis
+- enrichment
+- gene-set
+- pathways
+- enrichr
+- functional-analysis
 baseUrl: https://maayanlab.cloud/Enrichr
 tools:
   viewList:
     description: View a previously submitted gene list by userListId
     tags:
-      - gene-list
-      - gene-set-view
+    - gene-list
+    - gene-set-view
     method: GET
     path: /view
     params:
@@ -24,13 +24,14 @@ tools:
     response:
       format: json
       fields:
-        - genes
-        - description
+      - genes
+      - description
+    entity: gene
   enrich:
     description: Get enrichment results for a gene list against a specified library
     tags:
-      - enrichment-results
-      - pathway-enrichment
+    - enrichment-results
+    - pathway-enrichment
     method: GET
     path: /enrich
     params:
@@ -45,18 +46,19 @@ tools:
     response:
       format: json
       fields:
-        - KEGG_2021_Human[]
-        - GO_Biological_Process_2023[]
-        - GO_Molecular_Function_2023[]
-        - GO_Cellular_Component_2023[]
-        - Reactome_2022[]
-        - WikiPathway_2023_Human[]
-        - MSigDB_Hallmark_2020[]
+      - KEGG_2021_Human[]
+      - GO_Biological_Process_2023[]
+      - GO_Molecular_Function_2023[]
+      - GO_Cellular_Component_2023[]
+      - Reactome_2022[]
+      - WikiPathway_2023_Human[]
+      - MSigDB_Hallmark_2020[]
+    entity: pathway
   export:
     description: Export enrichment results as a table for a gene list and library
     tags:
-      - enrichment-export
-      - enrichment-table
+    - enrichment-export
+    - enrichment-table
     method: GET
     path: /export
     params:
@@ -74,52 +76,98 @@ tools:
         description: Output filename prefix
     response:
       format: tsv
-      columns: [rank, name, score]
+      columns:
+      - rank
+      - name
+      - score
       fields:
-        - "[].rank"
-        - "[].name"
-        - "[].score"
+      - '[].rank'
+      - '[].name'
+      - '[].score'
+    entity: gene
   getLibraries:
     description: List available gene set libraries with statistics
     tags:
-      - library-list
-      - gene-set-libraries
+    - library-list
+    - gene-set-libraries
     method: GET
     path: /datasetStatistics
     params: {}
     response:
       format: json
       fields:
-        - statistics[].libraryName
-        - statistics[].numTerms
-        - statistics[].geneCoverage
+      - statistics[].libraryName
+      - statistics[].numTerms
+      - statistics[].geneCoverage
+    entity: gene
+  addList:
+    # NOTE: This endpoint requires multipart/form-data but the engine sends JSON POST.
+    # Calls through this tool will return HTTP 400. Use Enrichr's web interface or
+    # a direct curl call with -F flags to submit gene lists.
+    description: Submit a gene list for enrichment analysis (returns userListId for enrich/export)
+    tags:
+    - gene-list-submit
+    - enrichment-input
+    method: POST
+    path: /addList
+    params:
+      list:
+        type: string
+        required: true
+        description: Newline-separated gene list (e.g. PHF14\nRBBP6\nCTSV)
+        mapsTo: list
+      description:
+        type: string
+        default: gene list
+        description: Description of the gene list
+    response:
+      format: json
+      fields:
+      - userListId
+      - shortId
+    entity: gene
 tests:
-  viewList:
-    - name: views a previously submitted gene list
-      params: {}
-      assert:
-        - path: genes
-        - path: genes
-          minLength: 1
-  enrich:
-    - name: gets KEGG enrichment results for a gene list
-      params:
-        backgroundType: KEGG_2021_Human
-      assert:
-        - path: KEGG_2021_Human
-        - path: KEGG_2021_Human
-          minLength: 1
-  export:
-    - name: exports enrichment results as TSV
-      params:
-        backgroundType: KEGG_2021_Human
-      assert:
-        - path: "[].rank"
-        - path: "[].name"
-        - path: "[].score"
   getLibraries:
-    - name: lists available gene set libraries
-      params: {}
-      assert:
-        - path: statistics
-          minLength: 1
+  - name: lists available gene set libraries
+    params: {}
+    assert:
+    - path: statistics
+      minLength: 1
+  addList:
+  # NOTE: Will fail with HTTP 400 because the engine sends JSON but
+  # the endpoint requires multipart/form-data.
+  - name: submits a gene list for enrichment
+    params:
+      list: 'PHF14
+
+        RBBP6
+
+        CTSV
+
+        SETD1A
+
+        CBL
+
+        NCOA4'
+      description: test gene list
+    assert:
+    - path: userListId
+    allowError: true
+  viewList:
+  # NOTE: Requires a valid userListId from addList which cannot be obtained
+  # through the engine (see addList note above).
+  - name: views a previously submitted gene list
+    params:
+      userListId: 1
+    assert:
+    - path: genes
+    allowError: true
+  enrich:
+  # NOTE: Requires a valid userListId from addList.
+  - name: gets KEGG enrichment results for a gene list
+    params:
+      userListId: 1
+      backgroundType: KEGG_2021_Human
+    assert:
+    - path: KEGG_2021_Human
+    allowError: true

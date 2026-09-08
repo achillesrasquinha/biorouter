@@ -1,112 +1,133 @@
-name: catalogueoflife
+name: catalogue-of-life
 displayName: Catalogue of Life
-description: Catalogue of Life — global checklist of all known species with authoritative taxonomy
+description: Catalogue of Life — comprehensive taxonomy of all known species worldwide
 tags:
-  - taxonomy
-  - species-catalog
-  - nomenclature
-  - catalogueoflife
-  - classification
+- taxonomy
+- species
+- biodiversity
+- catalogue-of-life
 baseUrl: https://api.catalogueoflife.org
 tools:
-  searchTaxa:
-    description: Search Catalogue of Life for taxa by name
+  searchSpecies:
+    description: Search Catalogue of Life for species by name with exact or prefix matching
     tags:
-      - taxon-search
-      - species-search
+    - species-search
+    - taxonomy-search
     method: GET
-    path: /dataset/3/nameusage/search
+    path: /dataset/9923/nameusage/search
     params:
       query:
         type: string
         required: true
         mapsTo: q
-        description: Taxon name to search (e.g. "Felis catus")
+        description: Species or taxon name to search (e.g. "Homo sapiens", "Quercus")
       limit:
         type: integer
-        default: 5
-        description: Maximum number of results
+        default: 10
+        description: Maximum number of results to return
+      type:
+        type: string
+        default: EXACT
+        description: Match type — EXACT or PREFIX
     response:
       format: json
       fields:
-        - total
-        - result[].id
-        - result[].usage.name.scientificName
-        - result[].usage.name.authorship
-        - result[].usage.name.rank
-        - result[].usage.status
-        - result[].usage.label
-        - result[].classification[].name
-        - result[].classification[].rank
-  getTaxon:
-    description: Get detailed taxon information from Catalogue of Life by ID
+      - total
+      - result[].id
+      - result[].usage.name.scientificName
+      - result[].usage.name.authorship
+      - result[].usage.name.rank
+      - result[].usage.status
+      - result[].usage.label
+      - result[].classification[].name
+      - result[].classification[].rank
+    entity: organism
+  getSpecies:
+    description: Get detailed species or name usage record by Catalogue of Life ID
     tags:
-      - taxon-info
-      - classification-detail
+    - species-info
+    - taxon-detail
     method: GET
-    path: /dataset/3/taxon/{id}
+    path: /dataset/9923/nameusage/{id}
     params:
       id:
         type: string
         required: true
-        description: Catalogue of Life taxon ID
+        description: Catalogue of Life name usage ID
     response:
       format: json
       fields:
-        - id
-        - name.scientificName
-        - name.authorship
-        - name.rank
-        - status
-        - parentId
-        - extinct
-        - label
-  getNameUsage:
-    description: Search name usages in the Catalogue of Life
+      - id
+      - name.scientificName
+      - name.authorship
+      - name.rank
+      - status
+      - parentId
+      - label
+      - accepted.name.scientificName
+    entity: organism
+  searchByHigherTaxon:
+    description: Search Catalogue of Life by higher taxon name and rank
     tags:
-      - name-usage-search
-      - nomenclature-search
+    - taxon-search
+    - higher-taxonomy
     method: GET
-    path: /dataset/3LR/nameusage/search
+    path: /dataset/9923/nameusage/search
     params:
       query:
         type: string
         required: true
         mapsTo: q
-        description: Name to search (e.g. "Panthera leo")
+        description: Higher taxon name to search (e.g. "Mammalia", "Rosaceae")
       rank:
         type: string
-        description: Filter by taxonomic rank (e.g. species, genus)
+        required: true
+        description: Taxonomic rank to filter by (e.g. class, order, family, genus)
       limit:
         type: integer
         default: 10
-        description: Maximum number of results
+        description: Maximum number of results to return
     response:
       format: json
       fields:
-        - result[].usage.id
-        - result[].usage.name.scientificName
-        - result[].usage.status
+      - total
+      - result[].id
+      - result[].usage.name.scientificName
+      - result[].usage.name.rank
+      - result[].usage.status
+      - result[].classification[].name
+      - result[].classification[].rank
+    entity: organism
+  getClassification:
+    description: Get full taxonomic classification for a name usage by ID
+    tags:
+    - classification
+    - taxonomy-hierarchy
+    method: GET
+    path: /dataset/9923/nameusage/{id}/classification
+    params:
+      id:
+        type: string
+        required: true
+        description: Catalogue of Life name usage ID
+    response:
+      format: json
+      fields:
+      - '[].id'
+      - '[].name.scientificName'
+      - '[].name.rank'
+      - '[].status'
+      - '[].label'
+    entity: organism
 tests:
-  searchTaxa:
-    - name: searches taxa for Felis catus
-      params:
-        query: Felis catus
-      assert:
-        - path: result
-          minLength: 1
-        - path: total
-          gt: 0
-    - name: gets taxon by ID
-      params:
-        query: Felis catus
-      assert:
-        - path: id
-        - path: name
-  getNameUsage:
-    - name: searches name usages for Panthera leo
-      params:
-        query: Panthera leo
-      assert:
-        - path: result
-          minLength: 1
+  searchSpecies:
+  - name: searches for Homo sapiens
+    params:
+      query: Homo sapiens
+      limit: 5
+    assert:
+    - path: total
+      gt: 0
+    - path: result
+      minLength: 1
+    - path: result.0.usage.name.scientificName

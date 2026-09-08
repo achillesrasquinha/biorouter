@@ -2,18 +2,18 @@ name: pkcsm
 displayName: pkCSM
 description: pkCSM pharmacokinetics and toxicity prediction using graph-based signatures
 tags:
-  - admet
-  - pharmacokinetics
-  - toxicity
-  - drug-properties
-  - pkcsm
+- admet
+- pharmacokinetics
+- toxicity
+- drug-properties
+- pkcsm
 baseUrl: https://biosig.lab.uq.edu.au/pkcsm
 tools:
   predict:
     description: Predict ADMET properties for a compound by SMILES
     tags:
-      - admet-prediction
-      - toxicity-prediction
+    - admet-prediction
+    - toxicity-prediction
     method: POST
     path: /prediction
     params:
@@ -23,11 +23,12 @@ tools:
         description: SMILES string of the molecule (e.g. "CC(=O)OC1=CC=CC=C1C(=O)O" for aspirin)
     response:
       format: json
+    entity: structure
 tests:
   predict:
-    - name: predicts ADMET properties for aspirin
-      params:
-        smiles: "CC(=O)OC1=CC=CC=C1C(=O)O"
-      assert:
-        - {}
-      allowError: true
+  - name: predicts ADMET properties for aspirin
+    params:
+      smiles: CC(=O)OC1=CC=CC=C1C(=O)O
+    assert:
+    - {}
+    allowError: true

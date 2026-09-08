@@ -2,17 +2,17 @@ name: biostudies
 displayName: BioStudies
 description: BioStudies — EBI archive for biological study data linking publications to datasets
 tags:
-  - studies
-  - publications
-  - datasets
-  - ebi
+- studies
+- publications
+- datasets
+- ebi
 baseUrl: https://www.ebi.ac.uk/biostudies/api/v1
 tools:
   search:
     description: Search BioStudies for biological studies and datasets
     tags:
-      - study-search
-      - dataset-search
+    - study-search
+    - dataset-search
     method: GET
     path: /search
     params:
@@ -31,16 +31,17 @@ tools:
     response:
       format: json
       fields:
-        - totalHits
-        - hits[].accession
-        - hits[].title
-        - hits[].author
-        - hits[].type
+      - totalHits
+      - hits[].accession
+      - hits[].title
+      - hits[].author
+      - hits[].type
+    entity: dataset
   getStudy:
     description: Get details for a specific BioStudies entry
     tags:
-      - study-info
-      - dataset-info
+    - study-info
+    - dataset-info
     method: GET
     path: /studies/{accession}
     params:
@@ -51,23 +52,24 @@ tools:
     response:
       format: json
       fields:
-        - accno
-        - attributes[].name
-        - attributes[].value
-        - section.type
+      - accno
+      - attributes[].name
+      - attributes[].value
+      - section.type
+    entity: dataset
 tests:
   search:
-    - name: searches for cancer studies
-      params:
-        query: cancer
-        pageSize: 2
-      assert:
-        - path: totalHits
-        - path: hits
-          minLength: 1
+  - name: searches for cancer studies
+    params:
+      query: cancer
+      pageSize: 2
+    assert:
+    - path: totalHits
+    - path: hits
+      minLength: 1
   getStudy:
-    - name: gets a specific study
-      params:
-        accession: S-EPMC10139049
-      assert:
-        - path: accno
+  - name: gets a specific study
+    params:
+      accession: S-EPMC10139049
+    assert:
+    - path: accno

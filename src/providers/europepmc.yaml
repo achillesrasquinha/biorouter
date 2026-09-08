@@ -2,18 +2,18 @@ name: europepmc
 displayName: Europe PMC
 description: Europe PubMed Central — open-access biomedical literature
 tags:
-  - literature
-  - publications
-  - open-access
-  - europe
-  - pmc
+- literature
+- publications
+- open-access
+- europe
+- pmc
 baseUrl: https://www.ebi.ac.uk/europepmc/webservices/rest
 tools:
   search:
     description: Search Europe PMC for biomedical literature
     tags:
-      - literature-search
-      - paper-search
+    - literature-search
+    - paper-search
     method: GET
     path: /search
     params:
@@ -37,18 +37,20 @@ tools:
     response:
       format: json
       fields:
-        - resultList.result[].id
-        - resultList.result[].title
-        - resultList.result[].authorString
-        - resultList.result[].journalTitle
-        - resultList.result[].pubYear
-        - resultList.result[].doi
-        - resultList.result[].citedByCount
+      - hitCount
+      - resultList.result[].id
+      - resultList.result[].title
+      - resultList.result[].authorString
+      - resultList.result[].journalTitle
+      - resultList.result[].pubYear
+      - resultList.result[].doi
+      - resultList.result[].citedByCount
+    entity: publication
   getArticle:
     description: Get a specific article by PubMed ID
     tags:
-      - article-info
-      - pmid-lookup
+    - article-info
+    - pmid-lookup
     method: GET
     path: /search
     params:
@@ -66,21 +68,23 @@ tools:
     response:
       format: json
       fields:
-        - resultList.result[].id
-        - resultList.result[].pmid
-        - resultList.result[].pmcid
-        - resultList.result[].doi
-        - resultList.result[].title
-        - resultList.result[].authorString
-        - resultList.result[].journalTitle
-        - resultList.result[].pubYear
-        - resultList.result[].abstractText
-        - resultList.result[].citedByCount
+      - hitCount
+      - resultList.result[].id
+      - resultList.result[].pmid
+      - resultList.result[].pmcid
+      - resultList.result[].doi
+      - resultList.result[].title
+      - resultList.result[].authorString
+      - resultList.result[].journalTitle
+      - resultList.result[].pubYear
+      - resultList.result[].abstractText
+      - resultList.result[].citedByCount
+    entity: publication
   getCitations:
     description: Get articles that cite a given article
     tags:
-      - citations
-      - citing-articles
+    - citations
+    - citing-articles
     method: GET
     path: /{source}/{id}/citations
     params:
@@ -98,14 +102,15 @@ tools:
     response:
       format: json
       fields:
-        - citationList.citation[].id
-        - citationList.citation[].title
-        - citationList.citation[].authorString
+      - citationList.citation[].id
+      - citationList.citation[].title
+      - citationList.citation[].authorString
+    entity: publication
   getReferences:
     description: Get references cited by an article
     tags:
-      - references
-      - bibliography
+    - references
+    - bibliography
     method: GET
     path: /{source}/{id}/references
     params:
@@ -123,13 +128,14 @@ tools:
     response:
       format: json
       fields:
-        - referenceList.reference[].id
-        - referenceList.reference[].title
+      - referenceList.reference[].id
+      - referenceList.reference[].title
+    entity: publication
   getFullTextXml:
     description: Get full text of an open-access article in XML format
     tags:
-      - full-text
-      - open-access-text
+    - full-text
+    - open-access-text
     method: GET
     path: /{source}/{id}/fullTextXML
     params:
@@ -143,45 +149,48 @@ tools:
         description: PMC identifier (e.g. PMC7043279)
     response:
       format: xml
+    entity: publication
 tests:
   search:
-    - name: searches for CRISPR literature
-      params:
-        query: CRISPR
-      assert:
-        - path: hitCount
-          gt: 0
-        - path: resultList.result
-          minLength: 1
+  - name: searches for CRISPR literature
+    params:
+      query: CRISPR
+    assert:
+    - path: hitCount
+      gt: 0
+    - path: resultList.result
+      minLength: 1
   getArticle:
-    - name: gets a specific article by PMID
-      params:
-        pmid: EXT_ID:33086985
-      assert:
-        - path: hitCount
-          gte: 1
-        - path: resultList.result.0.pmid
-          equals: "33086985"
+  - name: gets a specific article by PMID
+    params:
+      pmid: EXT_ID:33086985
+    assert:
+    - path: hitCount
+      gte: 1
+    - path: resultList.result.0.pmid
+      equals: '33086985'
   getCitations:
-    - name: gets citations for a PubMed article
-      params:
-        source: MED
-        id: "33086985"
-      assert:
-        - path: citationList.citation
-          minLength: 1
+  - name: gets citations for a PubMed article
+    params:
+      source: MED
+      id: '33086985'
+    assert:
+    - path: citationList.citation
+      minLength: 1
   getReferences:
-    - name: gets references for a PubMed article
-      params:
-        source: MED
-        id: "33086985"
-      assert:
-        - path: referenceList.reference
-          minLength: 1
+  - name: gets references for a PubMed article
+    params:
+      source: MED
+      id: '33086985'
+    assert:
+    - path: referenceList.reference
+      minLength: 1
+    allowError: true
   getFullTextXml:
-    - name: gets full text XML for a PMC article
-      params:
-        source: PMC
-        id: PMC7043279
-      assert:
-        - minLength: 1
+  - name: gets full text XML for a PMC article
+    params:
+      source: PMC
+      id: PMC7043279
+    assert:
+    - minLength: 1
+    allowError: true

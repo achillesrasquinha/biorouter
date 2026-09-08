@@ -2,17 +2,17 @@ name: biosample
 displayName: NCBI BioSample
 description: Database of biological sample metadata used in experimental assays
 tags:
-  - biosample
-  - sample-metadata
-  - ncbi
-  - experimental-data
+- biosample
+- sample-metadata
+- ncbi
+- experimental-data
 baseUrl: https://eutils.ncbi.nlm.nih.gov/entrez/eutils
 tools:
   search:
     description: Search NCBI BioSample for biological sample records
     tags:
-      - sample-search
-      - biosample-search
+    - sample-search
+    - biosample-search
     method: GET
     path: /esearch.fcgi
     params:
@@ -34,15 +34,16 @@ tools:
     response:
       format: json
       fields:
-        - esearchresult.count
-        - esearchresult.retmax
-        - esearchresult.idlist
-        - esearchresult.querytranslation
+      - esearchresult.count
+      - esearchresult.retmax
+      - esearchresult.idlist
+      - esearchresult.querytranslation
+    entity: sample
   getSummary:
     description: Get BioSample summary by BioSample ID
     tags:
-      - sample-info
-      - biosample-info
+    - sample-info
+    - biosample-info
     method: GET
     path: /esummary.fcgi
     params:
@@ -58,25 +59,18 @@ tools:
         default: json
     response:
       format: json
-      fields:
-        - result.uids
-        - result.*.uid
-        - result.*.title
-        - result.*.accession
-        - result.*.organism
-        - result.*.organization
-        - result.*.identifiers
+    entity: sample
 tests:
   search:
-    - name: searches for human liver biosamples
-      params:
-        query: human liver
-      assert:
-        - path: esearchresult.idlist
-          minLength: 1
+  - name: searches for human liver biosamples
+    params:
+      query: human liver
+    assert:
+    - path: esearchresult.idlist
+      minLength: 1
   getSummary:
-    - name: gets BioSample summary by ID
-      params:
-        id: "3737421"
-      assert:
-        - path: result.3737421
+  - name: gets BioSample summary by ID
+    params:
+      id: '3737421'
+    assert:
+    - path: result.3737421

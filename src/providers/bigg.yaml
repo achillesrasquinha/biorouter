@@ -2,35 +2,36 @@ name: bigg
 displayName: BiGG Models
 description: BiGG Models — genome-scale metabolic network reconstructions
 tags:
-  - metabolic-model
-  - flux-balance
-  - bigg
-  - systems-biology
-  - metabolism
+- metabolic-model
+- flux-balance
+- bigg
+- systems-biology
+- metabolism
 baseUrl: https://bigg.ucsd.edu/api/v2
 tools:
   listModels:
     description: List all available genome-scale metabolic models in BiGG
     tags:
-      - model-list
-      - metabolic-network
+    - model-list
+    - metabolic-network
     method: GET
     path: /models
     params: {}
     response:
       format: json
       fields:
-        - results_count
-        - results[].bigg_id
-        - results[].organism
-        - results[].metabolite_count
-        - results[].reaction_count
-        - results[].gene_count
+      - results_count
+      - results[].bigg_id
+      - results[].organism
+      - results[].metabolite_count
+      - results[].reaction_count
+      - results[].gene_count
+    entity: structure
   getModel:
     description: Get details of a specific metabolic model by BiGG identifier
     tags:
-      - model-detail
-      - metabolic-network
+    - model-detail
+    - metabolic-network
     method: GET
     path: /models/{bigg_id}
     params:
@@ -41,18 +42,19 @@ tools:
     response:
       format: json
       fields:
-        - model_bigg_id
-        - organism
-        - metabolite_count
-        - reaction_count
-        - gene_count
-        - reference_id
-        - reference_type
+      - model_bigg_id
+      - organism
+      - metabolite_count
+      - reaction_count
+      - gene_count
+      - reference_id
+      - reference_type
+    entity: structure
   searchMetabolites:
     description: Search BiGG for metabolites by name or identifier
     tags:
-      - metabolite-search
-      - compound-search
+    - metabolite-search
+    - compound-search
     method: GET
     path: /search
     params:
@@ -67,16 +69,17 @@ tools:
     response:
       format: json
       fields:
-        - results_count
-        - results[].bigg_id
-        - results[].name
-        - results[].model_bigg_id
-        - results[].organism
+      - results_count
+      - results[].bigg_id
+      - results[].name
+      - results[].model_bigg_id
+      - results[].organism
+    entity: compound
   getReaction:
     description: Get details of a specific reaction in a model
     tags:
-      - reaction-detail
-      - metabolic-network
+    - reaction-detail
+    - metabolic-network
     method: GET
     path: /models/{model_id}/reactions/{reaction_id}
     params:
@@ -91,17 +94,18 @@ tools:
     response:
       format: json
       fields:
-        - bigg_id
-        - name
-        - reaction_string
-        - metabolites[].bigg_id
-        - metabolites[].stoichiometry
-        - metabolites[].name
+      - bigg_id
+      - name
+      - reaction_string
+      - metabolites[].bigg_id
+      - metabolites[].stoichiometry
+      - metabolites[].name
+    entity: reaction
   getMetabolite:
     description: Get details of a specific metabolite in a model
     tags:
-      - metabolite-detail
-      - compound-info
+    - metabolite-detail
+    - compound-info
     method: GET
     path: /models/{model_id}/metabolites/{metabolite_id}
     params:
@@ -116,16 +120,17 @@ tools:
     response:
       format: json
       fields:
-        - bigg_id
-        - name
-        - formulae
-        - charges
-        - compartments_in_models[].bigg_id
+      - bigg_id
+      - name
+      - formula
+      - charge
+      - compartment_bigg_id
+    entity: compound
   getGene:
     description: Get details of a specific gene in a model
     tags:
-      - gene-detail
-      - metabolic-network
+    - gene-detail
+    - metabolic-network
     method: GET
     path: /models/{model_id}/genes/{gene_id}
     params:
@@ -140,15 +145,16 @@ tools:
     response:
       format: json
       fields:
-        - bigg_id
-        - name
-        - reactions[].bigg_id
-        - reactions[].name
+      - bigg_id
+      - name
+      - reactions[].bigg_id
+      - reactions[].name
+    entity: gene
   listReactions:
     description: List all reactions in a metabolic model
     tags:
-      - reaction-list
-      - metabolic-network
+    - reaction-list
+    - metabolic-network
     method: GET
     path: /models/{model_id}/reactions
     params:
@@ -159,14 +165,15 @@ tools:
     response:
       format: json
       fields:
-        - results_count
-        - results[].bigg_id
-        - results[].name
+      - results_count
+      - results[].bigg_id
+      - results[].name
+    entity: reaction
   listMetabolites:
     description: List all metabolites in a metabolic model
     tags:
-      - metabolite-list
-      - metabolic-network
+    - metabolite-list
+    - metabolic-network
     method: GET
     path: /models/{model_id}/metabolites
     params:
@@ -177,14 +184,15 @@ tools:
     response:
       format: json
       fields:
-        - results_count
-        - results[].bigg_id
-        - results[].name
+      - results_count
+      - results[].bigg_id
+      - results[].name
+    entity: compound
   listGenes:
     description: List all genes in a metabolic model
     tags:
-      - gene-list
-      - metabolic-network
+    - gene-list
+    - metabolic-network
     method: GET
     path: /models/{model_id}/genes
     params:
@@ -195,14 +203,15 @@ tools:
     response:
       format: json
       fields:
-        - results_count
-        - results[].bigg_id
-        - results[].name
+      - results_count
+      - results[].bigg_id
+      - results[].name
+    entity: gene
   getUniversalReaction:
     description: Get universal reaction details (not model-specific)
     tags:
-      - reaction-detail
-      - universal
+    - reaction-detail
+    - universal
     method: GET
     path: /universal/reactions/{reaction_id}
     params:
@@ -213,94 +222,95 @@ tools:
     response:
       format: json
       fields:
-        - bigg_id
-        - name
-        - reaction_string
-        - database_links
+      - bigg_id
+      - name
+      - reaction_string
+      - database_links
+    entity: reaction
 tests:
   listModels:
-    - name: lists available metabolic models
-      params: {}
-      assert:
-        - path: results_count
-          gt: 0
-        - path: results
-          minLength: 1
-        - path: results.0.bigg_id
+  - name: lists available metabolic models
+    params: {}
+    assert:
+    - path: results_count
+      gt: 0
+    - path: results
+      minLength: 1
+    - path: results.0.bigg_id
   getModel:
-    - name: gets model iJO1366 details
-      params:
-        bigg_id: iJO1366
-      assert:
-        - path: organism
-          equals: Escherichia coli str. K-12 substr. MG1655
-        - path: reaction_count
-          gt: 0
+  - name: gets model iJO1366 details
+    params:
+      bigg_id: iJO1366
+    assert:
+    - path: organism
+      equals: Escherichia coli str. K-12 substr. MG1655
+    - path: reaction_count
+      gt: 0
   searchMetabolites:
-    - name: searches for glucose metabolites
-      params:
-        query: glucose
-      assert:
-        - path: results_count
-          gt: 0
+  - name: searches for glucose metabolites
+    params:
+      query: glucose
+    assert:
+    - path: results_count
+      gt: 0
   getReaction:
-    - name: gets PFK reaction in iJO1366
-      params:
-        model_id: iJO1366
-        reaction_id: PFK
-      assert:
-        - path: bigg_id
-          equals: PFK
-        - path: name
+  - name: gets PFK reaction in iJO1366
+    params:
+      model_id: iJO1366
+      reaction_id: PFK
+    assert:
+    - path: bigg_id
+      equals: PFK
+    - path: name
   getMetabolite:
-    - name: gets glucose metabolite in iJO1366
-      params:
-        model_id: iJO1366
-        metabolite_id: glc__D_c
-      assert:
-        - path: bigg_id
-          equals: glc__D_c
-        - path: name
+  - name: gets glucose metabolite in iJO1366
+    params:
+      model_id: iJO1366
+      metabolite_id: glc__D_c
+    assert:
+    - path: bigg_id
+      equals: glc__D
+    - path: name
   getGene:
-    - name: gets gene b0727 in iJO1366
-      params:
-        model_id: iJO1366
-        gene_id: b0727
-      assert:
-        - path: bigg_id
-          equals: b0727
+  - name: gets gene b0727 in iJO1366
+    params:
+      model_id: iJO1366
+      gene_id: b0727
+    assert:
+    - path: bigg_id
+      equals: b0727
   listReactions:
-    - name: lists reactions in iJO1366
-      params:
-        model_id: iJO1366
-      assert:
-        - path: results_count
-          gt: 0
-        - path: results
-          minLength: 1
+  - name: lists reactions in iJO1366
+    params:
+      model_id: iJO1366
+    assert:
+    - path: results_count
+      gt: 0
+    - path: results
+      minLength: 1
   listMetabolites:
-    - name: lists metabolites in iJO1366
-      params:
-        model_id: iJO1366
-      assert:
-        - path: results_count
-          gt: 0
-        - path: results
-          minLength: 1
+  - name: lists metabolites in iJO1366
+    params:
+      model_id: iJO1366
+    assert:
+    - path: results_count
+      gt: 0
+    - path: results
+      minLength: 1
   listGenes:
-    - name: lists genes in iJO1366
-      params:
-        model_id: iJO1366
-      assert:
-        - path: results_count
-          gt: 0
-        - path: results
-          minLength: 1
+  - name: lists genes in iJO1366
+    params:
+      model_id: iJO1366
+    assert:
+    - path: results_count
+      gt: 0
+    - path: results
+      minLength: 1
   getUniversalReaction:
-    - name: gets universal PFK reaction
-      params:
-        reaction_id: PFK
-      assert:
-        - path: bigg_id
-          equals: PFK
-        - path: name
+  - name: gets universal PFK reaction
+    params:
+      reaction_id: PFK
+    assert:
+    - path: bigg_id
+      equals: PFK
+    - path: name

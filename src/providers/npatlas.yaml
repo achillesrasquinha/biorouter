@@ -2,18 +2,18 @@ name: npatlas
 displayName: Natural Products Atlas
 description: Database of microbially-derived natural products for drug discovery
 tags:
-  - natural-products
-  - microbial
-  - drug-discovery
-  - chemistry
-  - metabolites
+- natural-products
+- microbial
+- drug-discovery
+- chemistry
+- metabolites
 baseUrl: https://www.npatlas.org/api/v1
 tools:
   search:
     description: Search for natural product compounds by name or keyword
     tags:
-      - compound-search
-      - natural-product-search
+    - compound-search
+    - natural-product-search
     method: POST
     path: /compounds/basicSearch
     params:
@@ -24,17 +24,18 @@ tools:
     response:
       format: json
       fields:
-        - "[].npaid"
-        - "[].original_name"
-        - "[].mol_formula"
-        - "[].mol_weight"
-        - "[].exact_mass"
-        - "[].original_type"
-        - "[].original_organism"
+      - '[].npaid'
+      - '[].original_name'
+      - '[].mol_formula'
+      - '[].mol_weight'
+      - '[].exact_mass'
+      - '[].original_type'
+      - '[].original_organism'
+    entity: compound
   getCompound:
     description: Get natural product compound details by NP Atlas ID
     tags:
-      - compound-info
+    - compound-info
     method: GET
     path: /compound/{npatlasId}
     params:
@@ -45,30 +46,31 @@ tools:
     response:
       format: json
       fields:
-        - npaid
-        - original_name
-        - mol_formula
-        - mol_weight
-        - exact_mass
-        - smiles
-        - origin_organism
-        - origin_reference
+      - npaid
+      - original_name
+      - mol_formula
+      - mol_weight
+      - exact_mass
+      - smiles
+      - origin_organism
+      - origin_reference
+    entity: compound
 tests:
   search:
-    - name: searches for tetracycline
-      params:
-        query: tetracycline
-      assert:
-        - isArray: true
-        - anyOf:
-            - 0.original_name
-            - 0.npaid
+  - name: searches for tetracycline
+    params:
+      query: tetracycline
+    assert:
+    - isArray: true
+    - anyOf:
+      - 0.original_name
+      - 0.npaid
   getCompound:
-    - name: gets compound by NP Atlas ID
-      params:
-        npatlasId: NPA000001
-      assert:
-        - {}
-        - anyOf:
-            - original_name
-            - npaid
+  - name: gets compound by NP Atlas ID
+    params:
+      npatlasId: NPA000001
+    assert:
+    - {}
+    - anyOf:
+      - original_name
+      - npaid

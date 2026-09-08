@@ -2,37 +2,38 @@ name: elm
 displayName: Eukaryotic Linear Motifs
 description: ELM — resource for predicting and annotating short linear motifs in eukaryotic proteins
 tags:
-  - motif
-  - protein
-  - linear-motif
-  - elm
-  - functional-site
+- motif
+- protein
+- linear-motif
+- elm
+- functional-site
 baseUrl: http://elm.eu.org
 tools:
   listClasses:
     description: List all ELM motif classes
     tags:
-      - motif-classes
-      - catalogue
+    - motif-classes
+    - catalogue
     method: GET
     path: /elms/elms_index.tsv
     params: {}
     response:
       format: tsv
       columns:
-        - Accession
-        - ELMIdentifier
-        - FunctionalSiteName
-        - Description
-        - Regex
-        - Probability
-        - Instances
-        - Instances_in_PDB
+      - Accession
+      - ELMIdentifier
+      - FunctionalSiteName
+      - Description
+      - Regex
+      - Probability
+      - Instances
+      - Instances_in_PDB
+    entity: ontology-term
   getInstances:
     description: Get motif instances for a UniProt protein
     tags:
-      - motif-instances
-      - protein-annotation
+    - motif-instances
+    - protein-annotation
     method: GET
     path: /instances.gff
     params:
@@ -43,26 +44,27 @@ tools:
     response:
       format: tsv
       columns:
-        - seqid
-        - source
-        - type
-        - start
-        - end
-        - score
-        - strand
-        - phase
-        - attributes
+      - seqid
+      - source
+      - type
+      - start
+      - end
+      - score
+      - strand
+      - phase
+      - attributes
+    entity: protein
 tests:
   listClasses:
-    - name: lists all ELM motif classes
-      params: {}
-      assert:
-        - isArray: true
-          minLength: 1
+  - name: lists all ELM motif classes
+    params: {}
+    assert:
+    - isArray: true
+      minLength: 1
   getInstances:
-    - name: gets motif instances for p53 (P04637)
-      params:
-        q: P04637
-      assert:
-        - isArray: true
-          minLength: 1
+  - name: gets motif instances for p53 (P04637)
+    params:
+      q: P04637
+    assert:
+    - isArray: true
+      minLength: 1

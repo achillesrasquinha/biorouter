@@ -2,18 +2,18 @@ name: iptmnet
 displayName: iPTMnet
 description: iPTMnet — post-translational modification (PTM) knowledge base for proteins
 tags:
-  - ptm
-  - post-translational-modification
-  - phosphorylation
-  - proteomics
-  - iptmnet
+- ptm
+- post-translational-modification
+- phosphorylation
+- proteomics
+- iptmnet
 baseUrl: https://research.bioinformatics.udel.edu/iptmnet/api
 tools:
   search:
     description: Search iPTMnet for proteins with post-translational modifications
     tags:
-      - ptm-search
-      - protein-search
+    - ptm-search
+    - protein-search
     method: GET
     path: /search
     params:
@@ -24,15 +24,16 @@ tools:
         description: Search term — protein name, gene symbol, or UniProt ID (e.g. "EGFR", "P00533")
       role:
         type: string
-        default: ""
+        default: ''
         description: Role filter (e.g. Enzyme, Substrate, EnzymeOrSubstrate)
     response:
       format: json
+    entity: protein
   getEntry:
     description: Get PTM details for a specific protein entry
     tags:
-      - ptm-info
-      - protein-info
+    - ptm-info
+    - protein-info
     method: GET
     path: /{id}
     params:
@@ -42,11 +43,12 @@ tools:
         description: UniProt accession (e.g. P00533 for EGFR)
     response:
       format: json
+    entity: protein
   getSubstrates:
     description: Get known substrates for an enzyme
     tags:
-      - substrate-info
-      - enzyme-substrates
+    - substrate-info
+    - enzyme-substrates
     method: GET
     path: /substrate/{id}
     params:
@@ -56,25 +58,26 @@ tools:
         description: UniProt accession of the enzyme (e.g. P00533)
     response:
       format: json
+    entity: protein
 tests:
   search:
-    - name: searches for EGFR post-translational modifications
-      params:
-        search_term: EGFR
-      assert:
-        - isArray: true
-      allowError: true
+  - name: searches for EGFR post-translational modifications
+    params:
+      search_term: EGFR
+    assert:
+    - isArray: true
+    allowError: true
   getEntry:
-    - name: gets PTM entry for P00533
-      params:
-        id: P00533
-      assert:
-        - path: uniprot_ac
-      allowError: true
+  - name: gets PTM entry for P00533
+    params:
+      id: P00533
+    assert:
+    - path: uniprot_ac
+    allowError: true
   getSubstrates:
-    - name: gets substrates for P00533
-      params:
-        id: P00533
-      assert:
-        - isArray: true
-      allowError: true
+  - name: gets substrates for P00533
+    params:
+      id: P00533
+    assert:
+    - isArray: true
+    allowError: true

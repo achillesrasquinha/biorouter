@@ -2,18 +2,18 @@ name: inaturalist
 displayName: iNaturalist
 description: iNaturalist — citizen-science biodiversity observations and taxa worldwide
 tags:
-  - biodiversity
-  - citizen-science
-  - observations
-  - inaturalist
-  - ecology
+- biodiversity
+- citizen-science
+- observations
+- inaturalist
+- ecology
 baseUrl: https://api.inaturalist.org/v1
 tools:
   searchObservations:
     description: Search iNaturalist for biodiversity observations by keyword
     tags:
-      - observation-search
-      - sighting-search
+    - observation-search
+    - sighting-search
     method: GET
     path: /observations
     params:
@@ -29,19 +29,20 @@ tools:
     response:
       format: json
       fields:
-        - results[].id
-        - results[].species_guess
-        - results[].observed_on
-        - results[].quality_grade
-        - results[].place_guess
-        - results[].taxon.name
-        - results[].taxon.rank
-        - results[].taxon.preferred_common_name
+      - results[].id
+      - results[].species_guess
+      - results[].observed_on
+      - results[].quality_grade
+      - results[].place_guess
+      - results[].taxon.name
+      - results[].taxon.rank
+      - results[].taxon.preferred_common_name
+    entity: dataset
   getTaxon:
     description: Get detailed taxon information by iNaturalist taxon ID
     tags:
-      - taxon-info
-      - species-detail
+    - taxon-info
+    - species-detail
     method: GET
     path: /taxa/{id}
     params:
@@ -52,19 +53,20 @@ tools:
     response:
       format: json
       fields:
-        - results[].id
-        - results[].name
-        - results[].rank
-        - results[].preferred_common_name
-        - results[].observations_count
-        - results[].iconic_taxon_name
-        - results[].conservation_status.status
-        - results[].wikipedia_url
+      - results[].id
+      - results[].name
+      - results[].rank
+      - results[].preferred_common_name
+      - results[].observations_count
+      - results[].iconic_taxon_name
+      - results[].conservation_status.status
+      - results[].wikipedia_url
+    entity: organism
   searchTaxa:
     description: Search iNaturalist taxa by name or keyword
     tags:
-      - taxon-search
-      - species-search
+    - taxon-search
+    - species-search
     method: GET
     path: /taxa
     params:
@@ -80,19 +82,20 @@ tools:
     response:
       format: json
       fields:
-        - results[].id
-        - results[].name
-        - results[].rank
-        - results[].preferred_common_name
-        - results[].observations_count
-        - results[].iconic_taxon_name
-        - results[].conservation_status.status
-        - results[].wikipedia_url
+      - results[].id
+      - results[].name
+      - results[].rank
+      - results[].preferred_common_name
+      - results[].observations_count
+      - results[].iconic_taxon_name
+      - results[].conservation_status.status
+      - results[].wikipedia_url
+    entity: organism
   getObservation:
     description: Get a specific observation by ID
     tags:
-      - observation-detail
-      - sighting-info
+    - observation-detail
+    - sighting-info
     method: GET
     path: /observations/{id}
     params:
@@ -103,17 +106,18 @@ tools:
     response:
       format: json
       fields:
-        - results[].id
-        - results[].species_guess
-        - results[].taxon.name
-        - results[].place_guess
-        - results[].observed_on
-        - results[].quality_grade
+      - results[].id
+      - results[].species_guess
+      - results[].taxon.name
+      - results[].place_guess
+      - results[].observed_on
+      - results[].quality_grade
+    entity: dataset
   searchPlaces:
     description: Search places by name using autocomplete
     tags:
-      - place-search
-      - location-search
+    - place-search
+    - location-search
     method: GET
     path: /places/autocomplete
     params:
@@ -128,45 +132,46 @@ tools:
     response:
       format: json
       fields:
-        - results[].id
-        - results[].display_name
-        - results[].bounding_box_geojson
+      - results[].id
+      - results[].display_name
+      - results[].bounding_box_geojson
+    entity: dataset
 tests:
   searchObservations:
-    - name: searches observations for Monarch butterfly
-      params:
-        query: Monarch butterfly
-      assert:
-        - path: results
-          minLength: 1
+  - name: searches observations for Monarch butterfly
+    params:
+      query: Monarch butterfly
+    assert:
+    - path: results
+      minLength: 1
   searchTaxa:
-    - name: searches taxa for Danaus plexippus
-      params:
-        query: Danaus plexippus
-      assert:
-        - path: results
-          minLength: 1
-        - path: results.0.name
+  - name: searches taxa for Danaus plexippus
+    params:
+      query: Danaus plexippus
+    assert:
+    - path: results
+      minLength: 1
+    - path: results.0.name
   getTaxon:
-    - name: gets taxon by ID (Monarch butterfly = 48662)
-      params:
-        id: 48662
-      assert:
-        - path: results
-          minLength: 1
-        - path: results.0.name
-          equals: Danaus plexippus
+  - name: gets taxon by ID (Monarch butterfly = 48662)
+    params:
+      id: 48662
+    assert:
+    - path: results
+      minLength: 1
+    - path: results.0.name
+      equals: Danaus plexippus
   getObservation:
-    - name: gets a specific observation by ID
-      params:
-        id: 1
-      assert:
-        - path: results
-      allowError: true
+  - name: gets a specific observation by ID
+    params:
+      id: 1
+    assert:
+    - path: results
+    allowError: true
   searchPlaces:
-    - name: searches for Yellowstone places
-      params:
-        q: Yellowstone
-      assert:
-        - path: results
-          minLength: 1
+  - name: searches for Yellowstone places
+    params:
+      q: Yellowstone
+    assert:
+    - path: results
+      minLength: 1

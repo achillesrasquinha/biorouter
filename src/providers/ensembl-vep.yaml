@@ -2,12 +2,12 @@ name: ensembl-vep
 displayName: Ensembl VEP
 description: Variant Effect Predictor — predict functional effects of genetic variants
 tags:
-  - variant
-  - annotation
-  - vep
-  - ensembl
-  - effect-prediction
-  - snp
+- variant
+- annotation
+- vep
+- ensembl
+- effect-prediction
+- snp
 baseUrl: https://rest.ensembl.org
 headers:
   Content-Type: application/json
@@ -15,11 +15,11 @@ tools:
   predictByHgvs:
     description: Predict variant effects by HGVS notation
     tags:
-      - variant-effect
-      - hgvs
-      - prediction
+    - variant-effect
+    - hgvs
+    - prediction
     method: GET
-    path: /vep/human/hgvs/{hgvs}content-type=application/json
+    path: /vep/human/hgvs/{hgvs}?content-type=application/json
     params:
       hgvs:
         type: string
@@ -28,22 +28,23 @@ tools:
     response:
       format: json
       fields:
-        - "[].id"
-        - "[].allele_string"
-        - "[].most_severe_consequence"
-        - "[].start"
-        - "[].strand"
-        - "[].transcript_consequences[].gene_symbol"
-        - "[].transcript_consequences[].consequence_terms"
-        - "[].transcript_consequences[].impact"
+      - '[].id'
+      - '[].allele_string'
+      - '[].most_severe_consequence'
+      - '[].start'
+      - '[].strand'
+      - '[].transcript_consequences[].gene_symbol'
+      - '[].transcript_consequences[].consequence_terms'
+      - '[].transcript_consequences[].impact'
+    entity: variant
   predictByRegion:
     description: Predict variant effects by genomic region
     tags:
-      - variant-effect
-      - region
-      - prediction
+    - variant-effect
+    - region
+    - prediction
     method: GET
-    path: /vep/human/region/{region}/{allele}content-type=application/json
+    path: /vep/human/region/{region}/{allele}?content-type=application/json
     params:
       region:
         type: string
@@ -56,19 +57,20 @@ tools:
     response:
       format: json
       fields:
-        - "[].id"
-        - "[].allele_string"
-        - "[].most_severe_consequence"
-        - "[].start"
-        - "[].strand"
-        - "[].transcript_consequences[].gene_symbol"
-        - "[].transcript_consequences[].consequence_terms"
-        - "[].transcript_consequences[].impact"
+      - '[].id'
+      - '[].allele_string'
+      - '[].most_severe_consequence'
+      - '[].start'
+      - '[].strand'
+      - '[].transcript_consequences[].gene_symbol'
+      - '[].transcript_consequences[].consequence_terms'
+      - '[].transcript_consequences[].impact'
+    entity: structure
 tests:
   predictByHgvs:
-    - name: predicts variant effects by HGVS notation
-      params:
-        hgvs: ENST00000366667:c.803C>T
-      assert:
-        - isArray: true
-        - path: 0.transcript_consequences
+  - name: predicts variant effects by HGVS notation
+    params:
+      hgvs: ENST00000366667:c.803C>T
+    assert:
+    - isArray: true
+    - path: 0.transcript_consequences

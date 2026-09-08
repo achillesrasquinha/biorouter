@@ -1,0 +1,218 @@
+description: Find structurally similar compounds — fingerprint, substructure, and binding-based similarity
+tags:
+- compound
+- similarity
+- structure
+- fingerprint
+- biorouter
+input:
+  query:
+    type: string
+    required: true
+    description: Drug name, SMILES, InChIKey, PubChem CID, or ChEMBL ID
+phases:
+- name: resolve
+  parallel: false
+  calls:
+  - source: mychem
+    tool: search
+    params:
+      query: '{input.query}'
+    pick_best:
+      array: hits
+      match_field: chembl.pref_name
+      against: input.query
+      as: best_hit
+    extract:
+      inchikey: best_hit._id
+      name: best_hit.chembl.pref_name
+      chembl_id: best_hit.chembl.molecule_chembl_id
+      pubchem_cid: best_hit.pubchem.cid
+  - source: chembl
+    tool: getMolecule
+    params:
+      chemblId: '{resolved.chembl_id}'
+    skip_if: '!resolved.chembl_id'
+    extract:
+      canonical_smiles: molecule_structures.canonical_smiles
+- name: fetch
+  parallel: true
+  calls:
+  - source: pubchem
+    tool: similaritySearch
+    params:
+      smiles: '{resolved.canonical_smiles}'
+      threshold: 90
+    skip_if: '!resolved.canonical_smiles'
+    provides:
+    - similarCompounds
+  - source: pubchem
+    tool: getSubstructureSearch
+    params:
+      smiles: '{resolved.canonical_smiles}'
+    skip_if: '!resolved.canonical_smiles'
+    provides:
+    - similarCompounds
+  - source: classyfire
+    tool: classify
+    params:
+      inchikey: '{resolved.inchikey}'
+    skip_if: '!resolved.inchikey'
+    provides:
+    - taxonomy
+  - source: pubchem
+    tool: getCompound
+    params:
+      cid: '{resolved.pubchem_cid}'
+    skip_if: '!resolved.pubchem_cid'
+    provides:
+    - queryProperties
+  - source: chembl
+    tool: getMolecule
+    params:
+      chemblId: '{resolved.chembl_id}'
+    skip_if: '!resolved.chembl_id'
+    provides:
+    - queryProperties
+  - source: guidetopharmacology
+    tool: searchLigands
+    params:
+      name: '{input.query}'
+    provides:
+    - receptorPharmacology
+  - source: europepmc
+    tool: search
+    params:
+      query: '{input.query} structural analog similar'
+      pageSize: 3
+    provides:
+    - literature
+  - source: bindingdb
+    tool: searchBySmiles
+    params:
+      smiles: '{resolved.canonical_smiles}'
+      cutoff: 0.85
+    skip_if: '!resolved.canonical_smiles'
+    provides:
+    - similarCompounds
+  - source: zinc
+    tool: search
+    params:
+      query: '{input.query}'
+    provides:
+    - similarCompounds
+output:
+  identity:
+    name:
+      from: resolved.name
+    canonicalSmiles:
+      from: resolved.canonical_smiles
+    ids:
+      from: resolved
+      fields:
+      - inchikey
+      - chembl_id
+      - pubchem_cid
+  queryProperties:
+    molecularWeight:
+      sources:
+      - source: pubchem
+        call: getCompound
+        path: PropertyTable.Properties[0].MolecularWeight
+        rank: 1
+      - source: chembl
+        call: getMolecule
+        path: molecule_properties.full_mwt
+        rank: 2
+    xlogp:
+      sources:
+      - source: pubchem
+        call: getCompound
+        path: PropertyTable.Properties[0].XLogP
+        rank: 1
+      - source: chembl
+        call: getMolecule
+        path: molecule_properties.alogp
+        rank: 2
+    tpsa:
+      sources:
+      - source: chembl
+        call: getMolecule
+        path: molecule_properties.psa
+        rank: 1
+    qed:
+      sources:
+      - source: chembl
+        call: getMolecule
+        path: molecule_properties.qed_weighted
+        rank: 1
+  taxonomy:
+    kingdom:
+      sources:
+      - source: classyfire
+        call: classify
+        path: kingdom.name
+        rank: 1
+    superclass:
+      sources:
+      - source: classyfire
+        call: classify
+        path: superclass.name
+        rank: 1
+    class:
+      sources:
+      - source: classyfire
+        call: classify
+        path: class.name
+        rank: 1
+    directParent:
+      sources:
+      - source: classyfire
+        call: classify
+        path: direct_parent.name
+        rank: 1
+  receptorPharmacology:
+    ligandMatches:
+      sources:
+      - source: guidetopharmacology
+        call: searchLigands
+        path: $passthrough
+        rank: 1
+      reason: IUPHAR/BPS ligand data — approved status, INN, drug type for query compound
+  literature:
+    structuralPublications:
+      sources:
+      - source: europepmc
+        call: search
+        path: resultList.result
+        rank: 1
+      reason: Literature on structural analogs and similarity analysis
+  similarCompounds:
+    byFingerprint:
+      sources:
+      - source: pubchem
+        call: similaritySearch
+        path: $passthrough
+        rank: 1
+      reason: PubChem 2D fingerprint similarity at 90% Tanimoto threshold
+    bySubstructure:
+      sources:
+      - source: pubchem
+        call: getSubstructureSearch
+        path: IdentifierList.CID
+        rank: 1
+      reason: PubChem substructure search — all compounds containing the query scaffold
+    byBinding:
+      sources:
+      - source: bindingdb
+        call: searchBySmiles
+        path: $passthrough
+        rank: 1
+      reason: BindingDB — structurally similar compounds with binding affinity data
+    byZinc:
+      sources:
+      - source: zinc
+        call: search
+        path: $passthrough
+        rank: 1
+      reason: ZINC — commercially available compounds for virtual screening

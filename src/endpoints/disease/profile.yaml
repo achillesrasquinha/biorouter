@@ -1,0 +1,588 @@
+description: Profile a disease — phenotypes, genetics, ontology, therapeutics, and clinical classification
+tags:
+- disease
+- profile
+- phenotype
+- genetics
+- ontology
+- biorouter
+input:
+  query:
+    type: string
+    required: true
+    description: Disease name, MONDO ID, OMIM ID, or DOID
+phases:
+- name: resolve
+  parallel: false
+  calls:
+  - source: mydisease
+    tool: search
+    params:
+      query: '{input.query}'
+      size: 10
+    pick_best:
+      array: hits
+      match_field: mondo.label
+      against: input.query
+      as: best_hit
+    extract:
+      mondo_id: best_hit._id
+      name: best_hit.mondo.label
+      definition: best_hit.mondo.definition
+      xrefs: best_hit.mondo.xrefs
+      synonyms: best_hit.mondo.synonym
+  - source: opentargets
+    tool: searchDisease
+    params:
+      queryString: '{input.query}'
+      size: 5
+    pick_best:
+      array: search.hits
+      match_field: name
+      against: input.query
+      as: best_ot
+    extract:
+      efo_id: best_ot.id
+      ot_name: best_ot.name
+      ot_description: best_ot.description
+- name: fetch
+  parallel: true
+  calls:
+  - source: mydisease
+    tool: getDisease
+    params:
+      diseaseId: '{resolved.mondo_id}'
+    skip_if: '!resolved.mondo_id'
+    provides:
+    - ontology
+    - chemicalAssociations
+  - source: orphanet
+    tool: searchDisease
+    params:
+      query: '{input.query}'
+    provides:
+    - rareDisease
+  - source: monarch
+    tool: search
+    params:
+      query: '{input.query}'
+      limit: 5
+    provides:
+    - knowledgeGraph
+  - source: monarch
+    tool: getEntity
+    params:
+      id: '{resolved.mondo_id}'
+    skip_if: '!resolved.mondo_id'
+    provides:
+    - knowledgeGraph
+  - source: opentargets
+    tool: getDiseaseTargets
+    params:
+      efoId: '{resolved.efo_id}'
+      size: 15
+    skip_if: '!resolved.efo_id'
+    provides:
+    - geneTargets
+  - source: opentargets
+    tool: getDiseasePhenotypes
+    params:
+      efoId: '{resolved.efo_id}'
+    skip_if: '!resolved.efo_id'
+    provides:
+    - phenotypes
+  - source: clinicaltrials
+    tool: search
+    params:
+      query: '{input.query}'
+      pageSize: 10
+    provides:
+    - trials
+  - source: opentargets
+    tool: getDiseaseDrugs
+    params:
+      efoId: '{resolved.efo_id}'
+    skip_if: '!resolved.efo_id'
+    provides:
+    - drugsSummary
+  - source: clinvar
+    tool: search
+    params:
+      query: '{input.query}'
+      maxResults: 10
+    provides:
+    - geneticVariants
+  - source: gwas-catalog
+    tool: search
+    params:
+      query: '{input.query}'
+      size: 5
+    provides:
+    - gwas
+  - source: gwas-catalog
+    tool: getAssociationsByEfoTrait
+    params:
+      efoId: '{resolved.efo_id}'
+      size: 10
+    skip_if: '!resolved.efo_id'
+    provides:
+    - gwas
+  - source: gwas-catalog
+    tool: searchByEfoTrait
+    params:
+      efoTrait: '{input.query}'
+      size: 5
+    provides:
+    - gwas
+  - source: europepmc
+    tool: search
+    params:
+      query: '{input.query}'
+      pageSize: 5
+    provides:
+    - literature
+  - source: snomed
+    tool: searchConcepts
+    params:
+      term: '{input.query}'
+      count: 5
+    provides:
+    - terminology
+  - source: civic
+    tool: searchAssertions
+    params:
+      diseaseName: '{input.query}'
+      first: 10
+    provides:
+    - clinicalAssertions
+  - source: oncotree
+    tool: searchTumorType
+    params:
+      query: '{input.query}'
+    provides:
+    - cancerClassification
+  - source: hpo
+    tool: searchTerms
+    params:
+      query: '{input.query}'
+      max: 10
+    provides:
+    - phenotypes
+  - source: disgenet
+    tool: searchDisease
+    params:
+      query: '{input.query}'
+    provides:
+    - diseaseGeneNetwork
+  - source: omim
+    tool: search
+    params:
+      query: '{input.query}'
+      limit: 5
+    provides:
+    - mendelianInheritance
+  - source: icd
+    tool: search
+    params:
+      query: '{input.query}'
+    provides:
+    - terminology
+  - source: umls
+    tool: searchConcepts
+    params:
+      query: '{input.query}'
+      pageSize: 5
+    provides:
+    - terminology
+  - source: gard
+    tool: searchDiseases
+    params:
+      query: '{input.query}'
+    provides:
+    - rareDisease
+  - source: malacards
+    tool: searchDiseases
+    params:
+      query: '{input.query}'
+    provides:
+    - diseaseGeneNetwork
+  - source: ols
+    tool: searchTerms
+    params:
+      query: '{input.query}'
+      rows: 5
+    provides:
+    - ontology
+  - source: pharos
+    tool: searchTargets
+    params:
+      term: '{input.query}'
+      top: 5
+    provides:
+    - geneTargets
+  - source: mesh
+    tool: search
+    params:
+      query: '{input.query}'
+      maxResults: 5
+    provides:
+    - terminology
+  - source: reactome
+    tool: search
+    params:
+      query: '{input.query}'
+    provides:
+    - pathways
+  - source: pgs-catalog
+    tool: searchTraits
+    params:
+      term: '{input.query}'
+      limit: 10
+    provides:
+    - geneticRisk
+  - source: oncokb
+    tool: getCancerGeneList
+    params: {}
+    provides:
+    - cancerGeneAnnotation
+  - source: cancerhotspots
+    tool: getHotspotsByGene
+    params:
+      gene: '{input.query}'
+    provides:
+    - cancerHotspots
+  - source: mavedb
+    tool: searchExperiments
+    params:
+      query: '{input.query}'
+    provides:
+    - functionalAssays
+  - source: mavedb
+    tool: searchScoreSets
+    params:
+      query: '{input.query}'
+    provides:
+    - functionalAssays
+  - source: lovd
+    tool: searchVariants
+    params:
+      gene: '{input.query}'
+    provides:
+    - geneVariantDatabases
+output:
+  identity:
+    name:
+      from: resolved.name
+    definition:
+      from: resolved.definition
+      fallback: resolved.ot_description
+    synonyms:
+      from: resolved.synonyms
+    ids:
+      from: resolved
+      fields:
+      - mondo_id
+      - efo_id
+    crossReferences:
+      from: resolved.xrefs
+  ontology:
+    diseaseOntology:
+      sources:
+      - source: mydisease
+        call: getDisease
+        path: disease_ontology
+        rank: 1
+    mondo:
+      sources:
+      - source: mydisease
+        call: getDisease
+        path: mondo
+        rank: 1
+    umls:
+      sources:
+      - source: mydisease
+        call: getDisease
+        path: umls
+        rank: 1
+    olsTerms:
+      sources:
+      - source: ols
+        call: searchTerms
+        path: response.docs
+        rank: 2
+      reason: Cross-ontology disease terms from the Ontology Lookup Service
+  terminology:
+    snomedConcepts:
+      sources:
+      - source: snomed
+        call: searchConcepts
+        path: expansion.contains
+        rank: 1
+      reason: SNOMED CT clinical coding — standardized disease terminology for clinical systems
+    icdClassification:
+      sources:
+      - source: icd
+        call: search
+        path: $passthrough
+        rank: 2
+      reason: ICD-11 classification codes for this disease
+    umlsConcepts:
+      sources:
+      - source: umls
+        call: searchConcepts
+        path: result.results
+        rank: 3
+      reason: UMLS Metathesaurus concepts — unified medical terminology
+    meshHeadings:
+      sources:
+      - source: mesh
+        call: search
+        path: esearchresult
+        rank: 4
+      reason: MeSH medical subject headings for literature indexing
+  rareDisease:
+    orphanetMatches:
+      sources:
+      - source: orphanet
+        call: searchDisease
+        path: $passthrough
+        rank: 1
+      reason: Orphanet rare disease matches — only populated for rare/genetic diseases
+    gardInfo:
+      sources:
+      - source: gard
+        call: searchDiseases
+        path: $passthrough
+        rank: 2
+      reason: GARD rare disease information — only populated for rare/genetic diseases
+  knowledgeGraph:
+    monarchSearch:
+      sources:
+      - source: monarch
+        call: search
+        path: items
+        rank: 1
+      reason: Monarch Initiative knowledge graph entities — integrated disease-gene-phenotype relationships
+    monarchDetails:
+      sources:
+      - source: monarch
+        call: getEntity
+        path: $passthrough
+        rank: 1
+      reason: Monarch Initiative entity details — disease description, synonyms, and cross-references
+  geneTargets:
+    associatedTargets:
+      sources:
+      - source: opentargets
+        call: getDiseaseTargets
+        path: disease.associatedTargets
+        rank: 1
+      reason: Open Targets gene-disease associations ranked by overall evidence score
+    druggableTargets:
+      sources:
+      - source: pharos
+        call: searchTargets
+        path: targets.targets
+        rank: 2
+      reason: Pharos druggable genome targets — illuminating therapeutic opportunities
+  phenotypes:
+    otPhenotypes:
+      sources:
+      - source: opentargets
+        call: getDiseasePhenotypes
+        path: disease.phenotypes
+        rank: 1
+      reason: HPO phenotype terms associated with this disease via Open Targets
+    hpoPhenotypes:
+      sources:
+      - source: hpo
+        call: searchTerms
+        path: terms
+        rank: 2
+      reason: HPO phenotype terms matching this disease — standardized clinical features and abnormalities
+  drugsSummary:
+    drugCount:
+      sources:
+      - source: opentargets
+        call: getDiseaseDrugs
+        path: disease.drugAndClinicalCandidates.count
+        rank: 1
+    topDrugs:
+      sources:
+      - source: opentargets
+        call: getDiseaseDrugs
+        path: disease.drugAndClinicalCandidates.rows
+        rank: 1
+      reason: Drugs with clinical evidence for this disease from Open Targets
+  geneticVariants:
+    clinvarVariantCount:
+      sources:
+      - source: clinvar
+        call: search
+        path: esearchresult.count
+        rank: 1
+      reason: ClinVar total count of clinically relevant genetic variants for this disease
+    clinvarVariantIds:
+      sources:
+      - source: clinvar
+        call: search
+        path: esearchresult.idlist
+        rank: 1
+  gwas:
+    gwasStudies:
+      sources:
+      - source: gwas-catalog
+        call: search
+        path: _embedded.studies
+        rank: 1
+      reason: NHGRI-EBI GWAS Catalog studies linking genetic variants to this disease trait
+    efoTraitAssociations:
+      sources:
+      - source: gwas-catalog
+        call: getAssociationsByEfoTrait
+        path: _embedded.associations
+        rank: 2
+      reason: GWAS Catalog associations by EFO trait — genetic associations linked via EFO ontology
+    efoTraitStudies:
+      sources:
+      - source: gwas-catalog
+        call: searchByEfoTrait
+        path: _embedded.studies
+        rank: 3
+      reason: GWAS Catalog studies mapped to this disease via EFO trait name
+  chemicalAssociations:
+    ctdChemicals:
+      sources:
+      - source: mydisease
+        call: getDisease
+        path: ctd.chemical_related_to_disease
+        rank: 1
+      reason: CTD chemical-disease associations — chemicals linked to this disease in literature
+    ctdPathways:
+      sources:
+      - source: mydisease
+        call: getDisease
+        path: ctd.pathway_related_to_disease
+        rank: 1
+      reason: CTD pathway-disease associations — pathways implicated in this disease
+  clinicalAssertions:
+    civicAssertions:
+      sources:
+      - source: civic
+        call: searchAssertions
+        path: assertions
+        rank: 1
+      reason: CIViC clinical assertions — curated variant-level clinical evidence for cancer diseases
+  cancerClassification:
+    oncotreeTypes:
+      sources:
+      - source: oncotree
+        call: searchTumorType
+        path: $passthrough
+        rank: 1
+      reason: MSK OncoTree cancer type classification — only populated for cancer/tumor diseases
+  literature:
+    recentPublications:
+      sources:
+      - source: europepmc
+        call: search
+        path: resultList.result
+        rank: 1
+      reason: Recent biomedical literature from Europe PMC
+    publicationCount:
+      sources:
+      - source: europepmc
+        call: search
+        path: hitCount
+        rank: 1
+  trials:
+    activeTrials:
+      sources:
+      - source: clinicaltrials
+        call: search
+        path: $passthrough
+        rank: 1
+  diseaseGeneNetwork:
+    disgenetMatches:
+      sources:
+      - source: disgenet
+        call: searchDisease
+        path: payload
+        rank: 1
+      reason: DisGeNET disease entries with gene association metadata
+    malacardsData:
+      sources:
+      - source: malacards
+        call: searchDiseases
+        path: $passthrough
+        rank: 2
+      reason: MalaCards integrated disease cards — gene, variant, and pathway data
+  mendelianInheritance:
+    mendelianEntries:
+      sources:
+      - source: omim
+        call: search
+        path: omim.searchResponse.searchResultList
+        rank: 1
+      reason: OMIM Mendelian disease entries — inheritance patterns and gene information
+  pathways:
+    reactomePathways:
+      sources:
+      - source: reactome
+        call: search
+        path: results
+        rank: 1
+      reason: Reactome biological pathways associated with this disease
+  geneticRisk:
+    polygenicScores:
+      sources:
+      - source: pgs-catalog
+        call: searchTraits
+        path: results
+        rank: 1
+      reason: PGS Catalog — polygenic risk scores and trait associations for disease risk prediction
+    traitCount:
+      sources:
+      - source: pgs-catalog
+        call: searchTraits
+        path: count
+        rank: 1
+  cancerGeneAnnotation:
+    cancerGeneList:
+      sources:
+      - source: oncokb
+        call: getCancerGeneList
+        path: $passthrough
+        rank: 1
+      reason: OncoKB curated cancer gene list — oncogenes and tumor suppressors with therapeutic levels
+  cancerHotspots:
+    hotspotResidues:
+      sources:
+      - source: cancerhotspots
+        call: getHotspotsByGene
+        path: $passthrough
+        rank: 1
+      reason: Cancer Hotspots — statistically significant recurrent somatic mutation hotspots by gene
+  functionalAssays:
+    mavedbExperiments:
+      sources:
+      - source: mavedb
+        call: searchExperiments
+        path: $passthrough
+        rank: 1
+      reason: MaveDB experiments — multiplexed assay variant effect experiments for functional characterization
+    mavedbScoreSets:
+      sources:
+      - source: mavedb
+        call: searchScoreSets
+        path: $passthrough
+        rank: 2
+      reason: MaveDB score sets — variant effect score data for functional impact assessment
+  geneVariantDatabases:
+    lovdVariants:
+      sources:
+      - source: lovd
+        call: searchVariants
+        path: $passthrough
+        rank: 1
+      reason: LOVD reported variants — gene-centered DNA variants with clinical effect classifications

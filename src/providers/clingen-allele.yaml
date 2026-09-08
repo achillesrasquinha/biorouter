@@ -2,18 +2,18 @@ name: clingen-allele
 displayName: ClinGen Allele Registry
 description: ClinGen Allele Registry — canonical allele identifiers linking variants across nomenclatures
 tags:
-  - variant
-  - allele
-  - clinical-genetics
-  - clingen
-  - nomenclature
+- variant
+- allele
+- clinical-genetics
+- clingen
+- nomenclature
 baseUrl: https://reg.clinicalgenome.org
 tools:
   lookupByHGVS:
     description: Look up a variant allele by HGVS expression
     tags:
-      - variant-lookup
-      - hgvs
+    - variant-lookup
+    - hgvs
     method: GET
     path: /allele
     params:
@@ -24,18 +24,19 @@ tools:
     response:
       format: json
       fields:
-        - "@id"
-        - communityStandardTitle
-        - genomicAlleles[].referenceGenome
-        - genomicAlleles[].chromosome
-        - genomicAlleles[].coordinates[].start
-        - genomicAlleles[].coordinates[].end
-        - externalRecords
+      - '@id'
+      - communityStandardTitle
+      - genomicAlleles[].referenceGenome
+      - genomicAlleles[].chromosome
+      - genomicAlleles[].coordinates[].start
+      - genomicAlleles[].coordinates[].end
+      - externalRecords
+    entity: variant
   lookupById:
     description: Look up an allele by ClinGen canonical allele ID
     tags:
-      - allele-lookup
-      - canonical-id
+    - allele-lookup
+    - canonical-id
     method: GET
     path: /allele/{alleleId}
     params:
@@ -46,15 +47,16 @@ tools:
     response:
       format: json
       fields:
-        - "@id"
-        - communityStandardTitle
-        - genomicAlleles[].referenceGenome
-        - externalRecords
+      - '@id'
+      - communityStandardTitle
+      - genomicAlleles[].referenceGenome
+      - externalRecords
+    entity: identifier
 tests:
   lookupByHGVS:
-    - name: looks up BRAF V600E variant
-      params:
-        hgvs: "NC_000007.14:g.140753336A>T"
-      assert:
-        - path: communityStandardTitle
-        - path: externalRecords
+  - name: looks up BRAF V600E variant
+    params:
+      hgvs: NC_000007.14:g.140753336A>T
+    assert:
+    - path: communityStandardTitle
+    - path: externalRecords

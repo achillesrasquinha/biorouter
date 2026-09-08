@@ -2,18 +2,18 @@ name: kegg
 displayName: KEGG
 description: Kyoto Encyclopedia of Genes and Genomes — pathway and molecular interaction database
 tags:
-  - pathway
-  - gene
-  - compound
-  - metabolism
-  - kegg
+- pathway
+- gene
+- compound
+- metabolism
+- kegg
 baseUrl: https://rest.kegg.jp
 tools:
   searchGenes:
     description: Search KEGG for genes matching a keyword
     tags:
-      - gene-search
-      - kegg-search
+    - gene-search
+    - kegg-search
     method: GET
     path: /find/genes/{query}
     params:
@@ -24,16 +24,17 @@ tools:
     response:
       format: tsv
       columns:
-        - id
-        - description
+      - id
+      - description
       fields:
-        - "[].id"
-        - "[].description"
+      - '[].id'
+      - '[].description'
+    entity: gene
   searchDrugs:
     description: Search KEGG for drugs by name
     tags:
-      - drug-search
-      - kegg-drug
+    - drug-search
+    - kegg-drug
     method: GET
     path: /find/drug/{query}
     params:
@@ -44,16 +45,17 @@ tools:
     response:
       format: tsv
       columns:
-        - id
-        - description
+      - id
+      - description
       fields:
-        - "[].id"
-        - "[].description"
+      - '[].id'
+      - '[].description'
+    entity: compound
   searchCompounds:
     description: Search KEGG for chemical compounds by name
     tags:
-      - compound-search
-      - kegg-compound
+    - compound-search
+    - kegg-compound
     method: GET
     path: /find/compound/{query}
     params:
@@ -64,16 +66,17 @@ tools:
     response:
       format: tsv
       columns:
-        - id
-        - description
+      - id
+      - description
       fields:
-        - "[].id"
-        - "[].description"
+      - '[].id'
+      - '[].description'
+    entity: compound
   searchPathways:
     description: Search KEGG for pathways by keyword
     tags:
-      - pathway-search
-      - kegg-pathway
+    - pathway-search
+    - kegg-pathway
     method: GET
     path: /find/pathway/{query}
     params:
@@ -84,16 +87,17 @@ tools:
     response:
       format: tsv
       columns:
-        - id
-        - description
+      - id
+      - description
       fields:
-        - "[].id"
-        - "[].description"
+      - '[].id'
+      - '[].description'
+    entity: pathway
   getEntry:
     description: Get a KEGG database entry by ID (gene, drug, compound, pathway, enzyme)
     tags:
-      - entry-info
-      - kegg-entry
+    - entry-info
+    - kegg-entry
     method: GET
     path: /get/{entryId}
     params:
@@ -104,22 +108,23 @@ tools:
     response:
       format: keyvalue
       fields:
-        - ENTRY
-        - NAME
-        - FORMULA
-        - MOL_WEIGHT
-        - EFFICACY
-        - TARGET
-        - METABOLISM
-        - PATHWAY
-        - ORTHOLOGY
-        - ORGANISM
-        - DBLINKS
+      - ENTRY
+      - NAME
+      - FORMULA
+      - MOL_WEIGHT
+      - EFFICACY
+      - TARGET
+      - METABOLISM
+      - PATHWAY
+      - ORTHOLOGY
+      - ORGANISM
+      - DBLINKS
+    entity: gene
   getLinked:
     description: Find cross-references between KEGG databases (e.g. drug→enzyme, compound→pathway)
     tags:
-      - cross-reference
-      - kegg-link
+    - cross-reference
+    - kegg-link
     method: GET
     path: /link/{targetDb}/{sourceId}
     params:
@@ -134,16 +139,17 @@ tools:
     response:
       format: tsv
       columns:
-        - source
-        - target
+      - source
+      - target
       fields:
-        - "[].source"
-        - "[].target"
+      - '[].source'
+      - '[].target'
+    entity: compound
   getPathway:
     description: Get a KEGG pathway entry by pathway ID
     tags:
-      - pathway-info
-      - kegg-pathway-detail
+    - pathway-info
+    - kegg-pathway-detail
     method: GET
     path: /get/{pathwayId}
     params:
@@ -154,19 +160,20 @@ tools:
     response:
       format: keyvalue
       fields:
-        - ENTRY
-        - NAME
-        - DESCRIPTION
-        - CLASS
-        - PATHWAY_MAP
-        - ORGANISM
-        - GENE
-        - COMPOUND
+      - ENTRY
+      - NAME
+      - DESCRIPTION
+      - CLASS
+      - PATHWAY_MAP
+      - ORGANISM
+      - GENE
+      - COMPOUND
+    entity: pathway
   listPathways:
     description: List all pathways for an organism
     tags:
-      - pathway-list
-      - kegg-pathway-list
+    - pathway-list
+    - kegg-pathway-list
     method: GET
     path: /list/pathway/{org}
     params:
@@ -177,16 +184,17 @@ tools:
     response:
       format: tsv
       columns:
-        - id
-        - description
+      - id
+      - description
       fields:
-        - "[].id"
-        - "[].description"
+      - '[].id'
+      - '[].description'
+    entity: pathway
   getCompound:
     description: Get a KEGG compound entry by compound ID
     tags:
-      - compound-info
-      - kegg-compound-detail
+    - compound-info
+    - kegg-compound-detail
     method: GET
     path: /get/{compoundId}
     params:
@@ -197,58 +205,59 @@ tools:
     response:
       format: keyvalue
       fields:
-        - ENTRY
-        - NAME
-        - FORMULA
-        - EXACT_MASS
-        - MOL_WEIGHT
-        - PATHWAY
-        - ENZYME
-        - DBLINKS
+      - ENTRY
+      - NAME
+      - FORMULA
+      - EXACT_MASS
+      - MOL_WEIGHT
+      - PATHWAY
+      - ENZYME
+      - DBLINKS
+    entity: compound
 tests:
   searchGenes:
-    - name: searches for insulin genes
-      params:
-        query: insulin
-      assert:
-        - isArray: true
-        - path: 0.id
+  - name: searches for insulin genes
+    params:
+      query: insulin
+    assert:
+    - isArray: true
+    - path: 0.id
   searchDrugs:
-    - name: searches for metformin drug
-      params:
-        query: metformin
-      assert:
-        - isArray: true
-        - path: 0.id
+  - name: searches for metformin drug
+    params:
+      query: metformin
+    assert:
+    - isArray: true
+    - path: 0.id
   searchPathways:
-    - name: searches for drug metabolism pathways
-      params:
-        query: drug metabolism cytochrome
-      assert:
-        - isArray: true
-        - path: 0.id
+  - name: searches for drug metabolism pathways
+    params:
+      query: drug metabolism cytochrome
+    assert:
+    - isArray: true
+    - path: 0.id
   getEntry:
-    - name: gets KEGG entry for human insulin gene
-      params:
-        entryId: hsa:3630
-      assert:
-        - path: ENTRY
+  - name: gets KEGG entry for human insulin gene
+    params:
+      entryId: hsa:3630
+    assert:
+    - path: ENTRY
   getPathway:
-    - name: gets KEGG pathway for glycolysis
-      params:
-        pathwayId: hsa00010
-      assert:
-        - path: ENTRY
+  - name: gets KEGG pathway for glycolysis
+    params:
+      pathwayId: hsa00010
+    assert:
+    - path: ENTRY
   listPathways:
-    - name: lists human pathways
-      params:
-        org: hsa
-      assert:
-        - isArray: true
-        - path: 0.id
+  - name: lists human pathways
+    params:
+      org: hsa
+    assert:
+    - isArray: true
+    - path: 0.id
   getCompound:
-    - name: gets KEGG compound for glucose
-      params:
-        compoundId: cpd:C00031
-      assert:
-        - path: ENTRY
+  - name: gets KEGG compound for glucose
+    params:
+      compoundId: cpd:C00031
+    assert:
+    - path: ENTRY

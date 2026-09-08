@@ -1,0 +1,825 @@
+description: Annotate a genetic variant — pathogenicity, population frequency, consequence predictions, and pharmacogenomics
+tags:
+- variant
+- annotate
+- pathogenicity
+- frequency
+- pharmacogenomics
+- biorouter
+input:
+  query:
+    type: string
+    required: true
+    description: Variant identifier (rsID like rs699, HGVS notation, ClinVar ID, or gene variant description)
+phases:
+- name: resolve
+  parallel: false
+  calls:
+  - source: myvariant
+    tool: search
+    params:
+      query: '{input.query}'
+      size: 10
+    pick_best:
+      array: hits
+      match_field: _id
+      against: input.query
+      as: best_variant
+    extract:
+      variant_id: best_variant._id
+      rsid: best_variant.dbsnp.rsid
+      chrom: best_variant.chrom
+      hg19_start: best_variant.dbsnp.hg19.start
+      hg19_end: best_variant.dbsnp.hg19.end
+      ref: best_variant.dbsnp.ref
+      alt: best_variant.dbsnp.alt
+      gene_symbol: best_variant.dbsnp.gene.symbol
+    provides: []
+  - source: ensembl
+    tool: lookupSymbol
+    params:
+      symbol: '{resolved.gene_symbol}'
+      species: homo_sapiens
+    skip_if: '!resolved.gene_symbol'
+    extract:
+      ensembl_gene_id: id
+    provides: []
+- name: fetch
+  parallel: true
+  calls:
+  - source: myvariant
+    tool: getVariant
+    params:
+      variantId: '{resolved.variant_id}'
+    skip_if: '!resolved.variant_id'
+    provides:
+    - variant
+  - source: clinvar
+    tool: search
+    params:
+      query: '{resolved.rsid}'
+      maxResults: 5
+    skip_if: '!resolved.rsid'
+    provides:
+    - clinicalSignificance
+  - source: dbsnp
+    tool: search
+    params:
+      query: '{resolved.rsid}'
+      maxResults: 3
+    skip_if: '!resolved.rsid'
+    provides:
+    - populationFrequencies
+  - source: ensembl
+    tool: getVariantConsequences
+    params:
+      id: '{resolved.rsid}'
+    skip_if: '!resolved.rsid'
+    provides:
+    - variant
+  - source: gnomad
+    tool: getVariant
+    params:
+      variantId: '{resolved.chrom}-{resolved.hg19_start}-{resolved.ref}-{resolved.alt}'
+      dataset: gnomad_r2_1
+    skip_if: '!resolved.chrom || !resolved.hg19_start || !resolved.ref || !resolved.alt'
+    provides:
+    - populationFrequencies
+  - source: gwas-catalog
+    tool: getSingleNucleotidePolymorphism
+    params:
+      rsId: '{resolved.rsid}'
+    skip_if: '!resolved.rsid'
+    provides:
+    - gwasAssociations
+  - source: pharmgkb
+    tool: getGene
+    params:
+      symbol: '{resolved.gene_symbol}'
+    skip_if: '!resolved.gene_symbol'
+    provides:
+    - pharmacogenomics
+  - source: clingen
+    tool: getGeneValidity
+    params:
+      gene: '{resolved.gene_symbol}'
+    skip_if: '!resolved.gene_symbol'
+    provides:
+    - geneContext
+  - source: ensembl-vep
+    tool: predictByHgvs
+    params:
+      hgvs: '{resolved.variant_id}'
+    skip_if: '!resolved.variant_id'
+    provides:
+    - deleteriousnessScores
+  - source: cadd
+    tool: score
+    params:
+      chrom: '{resolved.chrom}'
+      pos: '{resolved.hg19_start}'
+    skip_if: '!resolved.chrom || !resolved.hg19_start'
+    provides:
+    - deleteriousnessScores
+  - source: opentargets
+    tool: getEvidence
+    params:
+      ensemblId: '{resolved.ensembl_gene_id}'
+      efoId: EFO_0000311
+      size: 10
+    skip_if: '!resolved.ensembl_gene_id'
+    provides:
+    - targetDiseaseEvidence
+  - source: regulomedb
+    tool: search
+    params:
+      regions: chr{resolved.chrom}:{resolved.hg19_start}-{resolved.hg19_end}
+      genome: GRCh37
+    skip_if: '!resolved.chrom || !resolved.hg19_start || !resolved.hg19_end'
+    provides:
+    - regulatoryAnnotation
+  - source: dbvar
+    tool: search
+    params:
+      term: '{resolved.rsid}'
+      retmax: 10
+    skip_if: '!resolved.rsid'
+    provides:
+    - structuralVariants
+  - source: pharmvar
+    tool: getAlleles
+    params:
+      gene: '{resolved.gene_symbol}'
+    skip_if: '!resolved.gene_symbol'
+    provides:
+    - pharmacogenomicsAlleles
+  - source: clingen-allele
+    tool: lookupByHGVS
+    params:
+      hgvs: '{resolved.variant_id}'
+    skip_if: '!resolved.variant_id'
+    provides:
+    - canonicalIdentifiers
+  - source: europepmc
+    tool: search
+    params:
+      query: '{resolved.rsid}'
+      pageSize: 5
+    skip_if: '!resolved.rsid'
+    provides:
+    - literature
+  - source: monarch
+    tool: search
+    params:
+      query: '{resolved.rsid}'
+      limit: 5
+    skip_if: '!resolved.rsid'
+    provides:
+    - knowledgeGraph
+  - source: oncokb
+    tool: searchByGene
+    params:
+      gene: '{resolved.gene_symbol}'
+    skip_if: '!resolved.gene_symbol'
+    provides:
+    - cancerActionability
+  - source: mavedb
+    tool: searchScoreSets
+    params:
+      query: '{resolved.gene_symbol}'
+    skip_if: '!resolved.gene_symbol'
+    provides:
+    - functionalAssays
+  - source: cancerhotspots
+    tool: getHotspotsByGene
+    params:
+      gene: '{resolved.gene_symbol}'
+    skip_if: '!resolved.gene_symbol'
+    provides:
+    - cancerHotspots
+  - source: lovd
+    tool: searchVariants
+    params:
+      gene: '{resolved.gene_symbol}'
+    skip_if: '!resolved.gene_symbol'
+    provides:
+    - geneVariantDatabases
+  - source: pgs-catalog
+    tool: searchTraits
+    params:
+      term: '{resolved.gene_symbol}'
+      limit: 10
+    skip_if: '!resolved.gene_symbol'
+    provides:
+    - polygenicScores
+  - source: screen
+    tool: searchCCREs
+    params:
+      assembly: GRCh38
+      range:
+      - chrom: chr{resolved.chrom}
+        start: '{resolved.hg19_start}'
+        end: '{resolved.hg19_end}'
+      limit: 10
+    skip_if: '!resolved.chrom || !resolved.hg19_start || !resolved.hg19_end'
+    provides:
+    - regulatoryElements
+  - source: gnomad
+    tool: getStructuralVariants
+    params:
+      geneSymbol: '{resolved.gene_symbol}'
+      referenceGenome: GRCh37
+    skip_if: '!resolved.gene_symbol'
+    provides:
+    - structuralVariants
+  - source: gnomad
+    tool: getCopyNumberVariants
+    params:
+      geneSymbol: '{resolved.gene_symbol}'
+      referenceGenome: GRCh38
+    skip_if: '!resolved.gene_symbol'
+    provides:
+    - copyNumberVariants
+  - source: gnomad
+    tool: getMitochondrialVariants
+    params:
+      variantId: '{resolved.variant_id}'
+    skip_if: '!resolved.variant_id'
+    provides:
+    - mitochondrialVariants
+  - source: gnomad
+    tool: getGeneVariants
+    params:
+      geneId: '{resolved.ensembl_gene_id}'
+      dataset: gnomad_r2_1
+      referenceGenome: GRCh37
+    skip_if: '!resolved.ensembl_gene_id'
+    provides:
+    - geneVariantFrequencies
+  - source: cadd
+    tool: getAnnotation
+    params:
+      chrom: '{resolved.chrom}'
+      pos: '{resolved.hg19_start}'
+    skip_if: '!resolved.chrom || !resolved.hg19_start'
+    provides:
+    - deleteriousnessScores
+  - source: cancerhotspots
+    tool: get3dHotspotsByGene
+    params:
+      gene: '{resolved.gene_symbol}'
+    skip_if: '!resolved.gene_symbol'
+    provides:
+    - cancerHotspots
+  - source: clingen
+    tool: getDosageSensitivity
+    params:
+      search: '{resolved.gene_symbol}'
+    skip_if: '!resolved.gene_symbol'
+    provides:
+    - geneContext
+  - source: clingen
+    tool: searchGenes
+    params:
+      search: '{resolved.gene_symbol}'
+    skip_if: '!resolved.gene_symbol'
+    provides:
+    - geneContext
+  - source: dbsnp
+    tool: getSummary
+    params:
+      id: '{resolved.rsid}'
+    skip_if: '!resolved.rsid'
+    provides:
+    - populationFrequencies
+  - source: ensembl
+    tool: getVariants
+    params:
+      id: '{resolved.ensembl_gene_id}'
+    skip_if: '!resolved.ensembl_gene_id'
+    provides:
+    - variant
+  - source: ensembl
+    tool: variantRecoder
+    params:
+      id: '{resolved.rsid}'
+    skip_if: '!resolved.rsid'
+    provides:
+    - variant
+  - source: ensembl-vep
+    tool: predictByRegion
+    params:
+      region: '{resolved.chrom}:{resolved.hg19_start}-{resolved.hg19_start}:1'
+      allele: '{resolved.alt}'
+    skip_if: '!resolved.chrom || !resolved.hg19_start || !resolved.alt'
+    provides:
+    - deleteriousnessScores
+  - source: gnomad
+    tool: getRegion
+    params:
+      chrom: '{resolved.chrom}'
+      start: '{resolved.hg19_start}'
+      stop: '{resolved.hg19_end}'
+      dataset: gnomad_r2_1
+      referenceGenome: GRCh37
+    skip_if: '!resolved.chrom || !resolved.hg19_start || !resolved.hg19_end'
+    provides:
+    - populationFrequencies
+  - source: oncokb
+    tool: searchByHgvs
+    params:
+      hgvsg: '{resolved.variant_id}'
+    skip_if: '!resolved.variant_id'
+    provides:
+    - cancerActionability
+  - source: pharmgkb
+    tool: getAlleles
+    params:
+      genesymbol: '{resolved.gene_symbol}'
+    skip_if: '!resolved.gene_symbol'
+    provides:
+    - pharmacogenomics
+output:
+  variant:
+    id:
+      sources:
+      - source: myvariant
+        call: getVariant
+        path: _id
+        rank: 1
+      reason: MyVariant.info provides canonical HGVS variant identifiers
+    rsid:
+      sources:
+      - source: myvariant
+        call: getVariant
+        path: dbsnp.rsid
+        rank: 1
+      - source: gnomad
+        call: getVariant
+        path: variant.rsids[0]
+        rank: 2
+      reason: dbSNP reference SNP ID for cross-referencing
+    chromosome:
+      sources:
+      - source: myvariant
+        call: getVariant
+        path: chrom
+        rank: 1
+      reason: Chromosomal location
+    position:
+      sources:
+      - source: myvariant
+        call: getVariant
+        path: dbsnp.hg19.start
+        rank: 1
+      - source: gwas-catalog
+        call: getSingleNucleotidePolymorphism
+        path: locations[0].chromosomePosition
+        rank: 2
+      reason: Genomic position (GRCh37/hg19)
+    alleles:
+      sources:
+      - source: myvariant
+        call: getVariant
+        path: dbsnp.alleles
+        rank: 1
+      reason: Reference and alternate alleles
+    gene:
+      sources:
+      - source: myvariant
+        call: getVariant
+        path: dbsnp.gene
+        rank: 1
+      - source: ensembl
+        call: getVariantConsequences
+        path: transcript_consequences[0].gene_symbol
+        rank: 2
+      reason: Associated gene symbol and details
+    overlappingVariants:
+      sources:
+      - source: ensembl
+        call: getVariants
+        path: $passthrough
+        rank: 1
+      reason: Ensembl overlapping variants — known variants in the gene region with consequence types and alleles
+    variantRecoded:
+      sources:
+      - source: ensembl
+        call: variantRecoder
+        path: $passthrough
+        rank: 1
+      reason: Ensembl Variant Recoder — variant notation conversions between rsID, HGVS, and SPDI formats
+  clinicalSignificance:
+    clinvar:
+      sources:
+      - source: myvariant
+        call: getVariant
+        path: clinvar
+        rank: 1
+      reason: ClinVar pathogenicity classification from aggregated MyVariant data
+    clinvarDetails:
+      sources:
+      - source: clinvar
+        call: search
+        path: $passthrough
+        rank: 1
+      reason: Detailed ClinVar entries for the variant
+    clinicalClassification:
+      sources:
+      - source: myvariant
+        call: getVariant
+        path: clinvar.rcv.clinical_significance
+        rank: 1
+      reason: Clinical interpretation (pathogenic, benign, VUS, etc.)
+    reviewStatus:
+      sources:
+      - source: myvariant
+        call: getVariant
+        path: clinvar.rcv.review_status
+        rank: 1
+      reason: Evidence review status from ClinVar
+  populationFrequencies:
+    gnomadExome:
+      sources:
+      - source: myvariant
+        call: getVariant
+        path: gnomad_exome
+        rank: 1
+      - source: gnomad
+        call: getVariant
+        path: variant.exome
+        rank: 2
+      reason: gnomAD exome allele frequencies across populations
+    gnomadGenome:
+      sources:
+      - source: myvariant
+        call: getVariant
+        path: gnomad_genome
+        rank: 1
+      - source: gnomad
+        call: getVariant
+        path: variant.genome
+        rank: 2
+      reason: gnomAD genome allele frequencies
+    globalMaf:
+      sources:
+      - source: dbsnp
+        call: search
+        path: esearchresult
+        rank: 1
+      reason: Global minor allele frequency from dbSNP
+    dbsnpSummary:
+      sources:
+      - source: dbsnp
+        call: getSummary
+        path: $passthrough
+        rank: 1
+      reason: dbSNP variant summary — allele frequencies, functional class, and validation status
+    gnomadRegionVariants:
+      sources:
+      - source: gnomad
+        call: getRegion
+        path: region.variants
+        rank: 1
+      reason: gnomAD region variants — population allele frequencies for all variants in the genomic region
+  consequencePredictions:
+    mostSevereConsequence:
+      sources:
+      - source: ensembl
+        call: getVariantConsequences
+        path: transcript_consequences[0].consequence_terms[0]
+        rank: 1
+      - source: myvariant
+        call: getVariant
+        path: cadd.consequence
+        rank: 2
+      reason: Most severe predicted molecular consequence
+    transcriptConsequences:
+      sources:
+      - source: ensembl
+        call: getVariantConsequences
+        path: transcript_consequences
+        rank: 1
+      reason: Per-transcript consequence predictions from Ensembl VEP
+    impact:
+      sources:
+      - source: ensembl
+        call: getVariantConsequences
+        path: transcript_consequences[0].impact
+        rank: 1
+      reason: Variant impact level (HIGH, MODERATE, LOW, MODIFIER)
+  deleteriousnessScores:
+    cadd:
+      sources:
+      - source: myvariant
+        call: getVariant
+        path: cadd
+        rank: 1
+      - source: cadd
+        call: score
+        path: $passthrough
+        rank: 2
+      reason: Combined Annotation Dependent Depletion score
+    caddAnnotation:
+      sources:
+      - source: cadd
+        call: getAnnotation
+        path: $passthrough
+        rank: 1
+      reason: Full CADD annotation details — regulatory, conservation, and protein-level impact scores
+    dbnsfpScores:
+      sources:
+      - source: myvariant
+        call: getVariant
+        path: dbnsfp
+        rank: 1
+      reason: Multiple functional prediction scores (SIFT, PolyPhen, MutationTaster, etc.)
+    sift:
+      sources:
+      - source: myvariant
+        call: getVariant
+        path: dbnsfp.sift.pred
+        rank: 1
+      - source: ensembl-vep
+        call: predictByHgvs
+        path: '[0].transcript_consequences[].sift_prediction'
+        rank: 2
+      reason: SIFT (Sorting Intolerant From Tolerant) prediction
+    polyphen:
+      sources:
+      - source: myvariant
+        call: getVariant
+        path: dbnsfp.polyphen2.hdiv.pred
+        rank: 1
+      - source: ensembl-vep
+        call: predictByHgvs
+        path: '[0].transcript_consequences[].polyphen_prediction'
+        rank: 2
+      reason: PolyPhen-2 functional impact prediction
+    vepPredictions:
+      sources:
+      - source: ensembl-vep
+        call: predictByHgvs
+        path: $passthrough
+        rank: 1
+      reason: Ensembl VEP comprehensive variant effect predictions with SIFT/PolyPhen scores
+    vepRegionPredictions:
+      sources:
+      - source: ensembl-vep
+        call: predictByRegion
+        path: $passthrough
+        rank: 1
+      reason: Ensembl VEP region-based variant effect predictions — consequences for a specific genomic position and allele
+  pharmacogenomics:
+    pgxAnnotations:
+      sources:
+      - source: pharmgkb
+        call: getGene
+        path: $passthrough
+        rank: 1
+      reason: PharmGKB pharmacogenomics gene data from CPIC
+    drugInteractions:
+      sources:
+      - source: pharmgkb
+        call: getGene
+        path: cpicPairs
+        rank: 1
+      reason: Drugs affected by this gene variant
+    phenotypes:
+      sources:
+      - source: pharmgkb
+        call: getGene
+        path: phenotypes
+        rank: 1
+      reason: Clinical phenotypes associated with pharmacogenomic variants
+    cpicAlleles:
+      sources:
+      - source: pharmgkb
+        call: getAlleles
+        path: $passthrough
+        rank: 1
+      reason: CPIC allele definitions — functional status, clinical functional status, and activity values for pharmacogene alleles
+  gwasAssociations:
+    snpInfo:
+      sources:
+      - source: gwas-catalog
+        call: getSingleNucleotidePolymorphism
+        path: $passthrough
+        rank: 1
+      reason: GWAS Catalog SNP metadata
+    functionalClass:
+      sources:
+      - source: gwas-catalog
+        call: getSingleNucleotidePolymorphism
+        path: functionalClass
+        rank: 1
+      reason: Functional classification from GWAS Catalog
+    chromosomalLocation:
+      sources:
+      - source: gwas-catalog
+        call: getSingleNucleotidePolymorphism
+        path: locations
+        rank: 1
+      reason: Chromosomal locations from GWAS Catalog
+  geneContext:
+    geneValidity:
+      sources:
+      - source: clingen
+        call: getGeneValidity
+        path: $passthrough
+        rank: 1
+      reason: ClinGen gene-disease validity classifications
+    dosageSensitivity:
+      sources:
+      - source: clingen
+        call: getDosageSensitivity
+        path: $passthrough
+        rank: 1
+      reason: ClinGen dosage sensitivity — haploinsufficiency and triplosensitivity classifications
+    clingenGenes:
+      sources:
+      - source: clingen
+        call: searchGenes
+        path: $passthrough
+        rank: 1
+      reason: ClinGen gene search — gene details and curation status from the Clinical Genome Resource
+    ensemblGeneId:
+      from: resolved.ensembl_gene_id
+  literature:
+    publications:
+      sources:
+      - source: europepmc
+        call: search
+        path: resultList.result
+        rank: 1
+      reason: Relevant scientific publications from Europe PMC
+    citationCount:
+      sources:
+      - source: europepmc
+        call: search
+        path: resultList.result[0].citedByCount
+        rank: 1
+      reason: Citation metrics for top publications
+  knowledgeGraph:
+    monarchEntities:
+      sources:
+      - source: monarch
+        call: search
+        path: items
+        rank: 1
+      reason: Related entities from Monarch Initiative knowledge graph
+  regulatoryAnnotation:
+    regulomedbScore:
+      sources:
+      - source: regulomedb
+        call: search
+        path: regulome_score
+        rank: 1
+      reason: RegulomeDB regulatory variant score and ranking
+    regulatoryVariants:
+      sources:
+      - source: regulomedb
+        call: search
+        path: variants
+        rank: 1
+      reason: RegulomeDB variants in regulatory regions with epigenomic annotations
+    nearbyRegulatorySnps:
+      sources:
+      - source: regulomedb
+        call: search
+        path: nearby_snps
+        rank: 1
+      reason: Nearby regulatory SNPs from RegulomeDB
+  structuralVariants:
+    dbvarResults:
+      sources:
+      - source: dbvar
+        call: search
+        path: esearchresult
+        rank: 1
+      reason: dbVar structural variant search results — CNVs, deletions, insertions, inversions
+  pharmacogenomicsAlleles:
+    pharmvarAlleles:
+      sources:
+      - source: pharmvar
+        call: getAlleles
+        path: $passthrough
+        rank: 1
+      reason: PharmVar pharmacogenomic allele definitions for this gene
+  canonicalIdentifiers:
+    clingenAllele:
+      sources:
+      - source: clingen-allele
+        call: lookupByHGVS
+        path: $passthrough
+        rank: 1
+      reason: ClinGen canonical allele ID linking variant nomenclatures across databases
+    communityStandardTitle:
+      sources:
+      - source: clingen-allele
+        call: lookupByHGVS
+        path: communityStandardTitle
+        rank: 1
+      reason: ClinGen community standard nomenclature
+  targetDiseaseEvidence:
+    variantDiseaseEvidence:
+      sources:
+      - source: opentargets
+        call: getEvidence
+        path: disease.evidences
+        rank: 1
+      reason: Open Targets variant-disease evidence with literature support
+  cancerActionability:
+    annotatedVariants:
+      sources:
+      - source: oncokb
+        call: searchByGene
+        path: $passthrough
+        rank: 1
+      reason: OncoKB annotated variants — oncogenicity, mutation effect, and therapeutic sensitivity/resistance levels
+    hgvsAnnotation:
+      sources:
+      - source: oncokb
+        call: searchByHgvs
+        path: $passthrough
+        rank: 1
+      reason: OncoKB HGVSg annotation — oncogenicity, mutation effect, and treatment implications by genomic notation
+  functionalAssays:
+    mavedbScoreSets:
+      sources:
+      - source: mavedb
+        call: searchScoreSets
+        path: $passthrough
+        rank: 1
+      reason: MaveDB score sets — multiplexed assay variant effect data for functional impact assessment
+  cancerHotspots:
+    hotspotResidues:
+      sources:
+      - source: cancerhotspots
+        call: getHotspotsByGene
+        path: $passthrough
+        rank: 1
+      reason: Cancer Hotspots — statistically significant recurrent somatic mutation hotspots
+    hotspot3dClusters:
+      sources:
+      - source: cancerhotspots
+        call: get3dHotspotsByGene
+        path: $passthrough
+        rank: 1
+      reason: Cancer Hotspots 3D clusters — spatially clustered somatic mutation hotspots identified in protein structures
+  geneVariantDatabases:
+    reportedVariants:
+      sources:
+      - source: lovd
+        call: searchVariants
+        path: $passthrough
+        rank: 1
+      reason: LOVD reported variants — gene-centered DNA variants with clinical effect classifications
+  polygenicScores:
+    pgsTraits:
+      sources:
+      - source: pgs-catalog
+        call: searchTraits
+        path: results
+        rank: 1
+      reason: PGS Catalog traits — polygenic risk scores associated with disease traits for the gene
+  regulatoryElements:
+    screenCcres:
+      sources:
+      - source: screen
+        call: searchCCREs
+        path: cCREQuery
+        rank: 1
+      reason: ENCODE SCREEN cCREs — candidate cis-regulatory elements with DNase, H3K4me3, H3K27ac, and CTCF signals
+  structuralVariantFrequencies:
+    structuralVariants:
+      sources:
+      - source: gnomad
+        call: getStructuralVariants
+        path: gene.structural_variants
+        rank: 1
+      reason: gnomAD structural variants — deletions, duplications, inversions, and complex SVs with population frequencies
+  copyNumberVariants:
+    copyNumberVariants:
+      sources:
+      - source: gnomad
+        call: getCopyNumberVariants
+        path: gene.copy_number_variants
+        rank: 1
+      reason: gnomAD copy number variants — gene-level CNVs with sample count and frequency data
+  mitochondrialVariants:
+    mitochondrialVariants:
+      sources:
+      - source: gnomad
+        call: getMitochondrialVariants
+        path: mitochondrial_variants
+        rank: 1
+      reason: gnomAD mitochondrial variants — MT genome variants with heteroplasmy and homoplasmy frequencies
+  geneVariantFrequencies:
+    geneVariants:
+      sources:
+      - source: gnomad
+        call: getGeneVariants
+        path: gene.variants
+        rank: 1
+      reason: gnomAD gene-level variants — all variants in the gene with population allele frequencies, consequences, and HGVS notation

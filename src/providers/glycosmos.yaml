@@ -2,18 +2,18 @@ name: glycosmos
 displayName: GlyCosmos
 description: GlyCosmos — integrated glycoscience portal for glycan structures, pathways, and diseases
 tags:
-  - glycoscience
-  - glycan
-  - carbohydrate
-  - pathway
-  - glycosmos
+- glycoscience
+- glycan
+- carbohydrate
+- pathway
+- glycosmos
 baseUrl: https://glycosmos.org/api
 tools:
   searchGlycans:
     description: Search GlyCosmos for glycan structures by keyword or motif
     tags:
-      - glycan-search
-      - carbohydrate-search
+    - glycan-search
+    - carbohydrate-search
     method: GET
     path: /glycan/search
     params:
@@ -23,11 +23,12 @@ tools:
         description: Search term for glycans (e.g. "sialyl Lewis x", "N-glycan")
     response:
       format: json
+    entity: compound
   getPathway:
     description: Get glycan biosynthesis or metabolic pathway by ID
     tags:
-      - pathway-detail
-      - glycan-pathway
+    - pathway-detail
+    - glycan-pathway
     method: GET
     path: /pathway/{id}
     params:
@@ -37,18 +38,19 @@ tools:
         description: GlyCosmos pathway identifier
     response:
       format: json
+    entity: pathway
 tests:
   searchGlycans:
-    - name: searches for N-glycan structures
-      params:
-        query: N-glycan
-      assert:
-        - {}
-      allowError: true
+  - name: searches for N-glycan structures
+    params:
+      query: N-glycan
+    assert:
+    - {}
+    allowError: true
   getPathway:
-    - name: gets a glycan pathway
-      params:
-        id: "R-HSA-446203"
-      assert:
-        - {}
-      allowError: true
+  - name: gets a glycan pathway
+    params:
+      id: R-HSA-446203
+    assert:
+    - {}
+    allowError: true

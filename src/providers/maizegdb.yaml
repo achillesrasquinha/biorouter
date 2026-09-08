@@ -1,13 +1,20 @@
 name: maizegdb
 displayName: MaizeGDB
 description: MaizeGDB — maize genetics and genomics database for corn research
-tags: [maize, corn, genetics, genomics, crop-science, maizegdb]
+tags:
+- maize
+- corn
+- genetics
+- genomics
+- crop-science
+- maizegdb
 baseUrl: https://www.maizegdb.org/api
-
 tools:
   searchGenes:
     description: Search MaizeGDB for maize genes by name
-    tags: [gene-search, maize-gene]
+    tags:
+    - gene-search
+    - maize-gene
     method: GET
     path: /gene
     params:
@@ -17,10 +24,12 @@ tools:
         description: Gene name or symbol to search (e.g. "opaque2", "Zm00001d034472")
     response:
       format: json
-
+    entity: gene
   getGene:
     description: Get detailed information about a specific maize gene
-    tags: [gene-detail, maize-gene-info]
+    tags:
+    - gene-detail
+    - maize-gene-info
     method: GET
     path: /gene/{id}
     params:
@@ -30,10 +39,12 @@ tools:
         description: MaizeGDB gene identifier
     response:
       format: json
-
+    entity: gene
   getLocus:
     description: Get information about a specific maize genetic locus
-    tags: [locus-detail, genetic-locus]
+    tags:
+    - locus-detail
+    - genetic-locus
     method: GET
     path: /locus/{id}
     params:
@@ -43,19 +54,19 @@ tools:
         description: MaizeGDB locus identifier
     response:
       format: json
-
+    entity: gene
 tests:
   searchGenes:
-    - name: searches for opaque2 gene
-      params:
-        name: opaque2
-      assert:
-        - minLength: 1
-      allowError: true
+  - name: searches for opaque2 gene
+    params:
+      name: opaque2
+    assert:
+    - minLength: 1
+    allowError: true
   getGene:
-    - name: gets gene detail by ID
-      params:
-        id: "1"
-      assert:
-        - minLength: 1
-      allowError: true
+  - name: gets gene detail by ID
+    params:
+      id: '1'
+    assert:
+    - minLength: 1
+    allowError: true

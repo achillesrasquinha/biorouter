@@ -2,28 +2,29 @@ name: plasmodb
 displayName: PlasmoDB
 description: PlasmoDB — VEuPathDB resource for Plasmodium (malaria parasite) genomics
 tags:
-  - malaria
-  - plasmodium
-  - parasite
-  - veupathdb
-  - genomics
+- malaria
+- plasmodium
+- parasite
+- veupathdb
+- genomics
 baseUrl: https://plasmodb.org/plasmo/service
 tools:
   listRecordTypes:
     description: List available record types in PlasmoDB
     tags:
-      - record-types
-      - metadata
+    - record-types
+    - metadata
     method: GET
     path: /record-types
     params: {}
     response:
       format: json
+    entity: dataset
   search:
     description: Search PlasmoDB for genes, proteins, and genomic features
     tags:
-      - gene-search
-      - parasite-search
+    - gene-search
+    - parasite-search
     method: GET
     path: /search
     params:
@@ -41,9 +42,10 @@ tools:
         description: Number of results
     response:
       format: json
+    entity: gene
 tests:
   listRecordTypes:
-    - name: lists record types
-      params: {}
-      assert:
-        - minLength: 1
+  - name: lists record types
+    params: {}
+    assert:
+    - minLength: 1

@@ -2,19 +2,19 @@ name: allen-brain
 displayName: Allen Brain Atlas
 description: Allen Institute brain gene expression and connectivity data
 tags:
-  - brain
-  - neuroscience
-  - gene-expression
-  - allen-institute
-  - mouse
-  - human
+- brain
+- neuroscience
+- gene-expression
+- allen-institute
+- mouse
+- human
 baseUrl: https://api.brain-map.org/api/v2
 tools:
   searchGene:
     description: Search gene expression data
     tags:
-      - gene-search
-      - brain-expression
+    - gene-search
+    - brain-expression
     method: GET
     path: /data/query.json
     params:
@@ -25,17 +25,18 @@ tools:
     response:
       format: json
       fields:
-        - msg[].id
-        - msg[].acronym
-        - msg[].name
-        - msg[].entrez_id
-        - msg[].chromosome_id
-        - msg[].organism_id
+      - msg[].id
+      - msg[].acronym
+      - msg[].name
+      - msg[].entrez_id
+      - msg[].chromosome_id
+      - msg[].organism_id
+    entity: gene
   getStructures:
     description: Get brain structures
     tags:
-      - brain-structures
-      - anatomy
+    - brain-structures
+    - anatomy
     method: GET
     path: /data/Structure/query.json
     params:
@@ -46,16 +47,17 @@ tools:
     response:
       format: json
       fields:
-        - msg[].id
-        - msg[].acronym
-        - msg[].name
-        - msg[].parent_structure_id
-        - msg[].ontology_id
-        - msg[].depth
-        - msg[].structure_id_path
+      - msg[].id
+      - msg[].acronym
+      - msg[].name
+      - msg[].parent_structure_id
+      - msg[].ontology_id
+      - msg[].depth
+      - msg[].structure_id_path
+    entity: structure
 tests:
   getStructures:
-    - name: gets brain structures with default criteria
-      params: {}
-      assert:
-        - {}
+  - name: gets brain structures with default criteria
+    params: {}
+    assert:
+    - {}

@@ -2,19 +2,19 @@ name: clinicaltrials
 displayName: ClinicalTrials.gov
 description: Registry of clinical studies conducted around the world
 tags:
-  - clinical-trials
-  - drugs
-  - diseases
-  - interventions
-  - fda
+- clinical-trials
+- drugs
+- diseases
+- interventions
+- fda
 baseUrl: https://clinicaltrials.gov/api/v2
 tools:
   search:
     description: Search clinical trials by condition, drug, or keyword
     tags:
-      - trial-search
-      - condition
-      - intervention
+    - trial-search
+    - condition
+    - intervention
     method: GET
     path: /studies
     params:
@@ -30,17 +30,18 @@ tools:
     response:
       format: json
       fields:
-        - studies[].protocolSection.identificationModule.nctId
-        - studies[].protocolSection.identificationModule.briefTitle
-        - studies[].protocolSection.statusModule.overallStatus
-        - studies[].protocolSection.designModule.phases
-        - studies[].protocolSection.conditionsModule.conditions
-        - studies[].protocolSection.armsInterventionsModule.interventions[].name
+      - studies[].protocolSection.identificationModule.nctId
+      - studies[].protocolSection.identificationModule.briefTitle
+      - studies[].protocolSection.statusModule.overallStatus
+      - studies[].protocolSection.designModule.phases
+      - studies[].protocolSection.conditionsModule.conditions
+      - studies[].protocolSection.armsInterventionsModule.interventions[].name
+    entity: compound
   getStudy:
     description: Get details of a specific clinical trial by NCT ID
     tags:
-      - trial-info
-      - nct
+    - trial-info
+    - nct
     method: GET
     path: /studies/{nctId}
     params:
@@ -51,21 +52,22 @@ tools:
     response:
       format: json
       fields:
-        - protocolSection.identificationModule.nctId
-        - protocolSection.identificationModule.briefTitle
-        - protocolSection.identificationModule.officialTitle
-        - protocolSection.statusModule.overallStatus
-        - protocolSection.designModule.phases
-        - protocolSection.designModule.enrollmentInfo
-        - protocolSection.conditionsModule.conditions
-        - protocolSection.descriptionModule.briefSummary
-        - protocolSection.armsInterventionsModule.interventions
-        - protocolSection.sponsorCollaboratorsModule.leadSponsor
+      - protocolSection.identificationModule.nctId
+      - protocolSection.identificationModule.briefTitle
+      - protocolSection.identificationModule.officialTitle
+      - protocolSection.statusModule.overallStatus
+      - protocolSection.designModule.phases
+      - protocolSection.designModule.enrollmentInfo
+      - protocolSection.conditionsModule.conditions
+      - protocolSection.descriptionModule.briefSummary
+      - protocolSection.armsInterventionsModule.interventions
+      - protocolSection.sponsorCollaboratorsModule.leadSponsor
+    entity: dataset
 tests:
   search:
-    - name: searches for lung cancer trials
-      params:
-        query: lung cancer pembrolizumab
-      assert:
-        - path: studies
-          minLength: 1
+  - name: searches for lung cancer trials
+    params:
+      query: lung cancer pembrolizumab
+    assert:
+    - path: studies
+      minLength: 1

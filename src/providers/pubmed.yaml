@@ -2,18 +2,18 @@ name: pubmed
 displayName: PubMed
 description: Biomedical literature search engine (NCBI)
 tags:
-  - literature
-  - publications
-  - abstracts
-  - ncbi
-  - medline
+- literature
+- publications
+- abstracts
+- ncbi
+- medline
 baseUrl: https://eutils.ncbi.nlm.nih.gov/entrez/eutils
 tools:
   search:
     description: Search PubMed for biomedical literature
     tags:
-      - literature-search
-      - paper-search
+    - literature-search
+    - paper-search
     method: GET
     path: /esearch.fcgi
     params:
@@ -35,16 +35,17 @@ tools:
     response:
       format: json
       fields:
-        - esearchresult.count
-        - esearchresult.retmax
-        - esearchresult.idlist
-        - esearchresult.querytranslation
+      - esearchresult.count
+      - esearchresult.retmax
+      - esearchresult.idlist
+      - esearchresult.querytranslation
+    entity: publication
   getSummary:
     description: Get article summaries by PubMed IDs
     tags:
-      - article-info
-      - abstract
-      - citation
+    - article-info
+    - abstract
+    - citation
     method: GET
     path: /esummary.fcgi
     params:
@@ -61,22 +62,12 @@ tools:
         default: json
     response:
       format: json
-      fields:
-        - result.uids
-        - result.*.uid
-        - result.*.title
-        - result.*.pubdate
-        - result.*.source
-        - result.*.authors[].name
-        - result.*.fulljournalname
-        - result.*.volume
-        - result.*.issue
-        - result.*.pages
+    entity: publication
   getArticle:
     description: Get full article details by PubMed ID using efetch
     tags:
-      - article-detail
-      - full-record
+    - article-detail
+    - full-record
     method: GET
     path: /efetch.fcgi
     params:
@@ -97,26 +88,27 @@ tools:
     response:
       format: xml
       fields:
-        - PubmedArticleSet.PubmedArticle.MedlineCitation.Article.ArticleTitle
-        - PubmedArticleSet.PubmedArticle.MedlineCitation.Article.Abstract.AbstractText
-        - PubmedArticleSet.PubmedArticle.MedlineCitation.Article.AuthorList.Author
+      - PubmedArticleSet.PubmedArticle.MedlineCitation.Article.ArticleTitle
+      - PubmedArticleSet.PubmedArticle.MedlineCitation.Article.Abstract.AbstractText
+      - PubmedArticleSet.PubmedArticle.MedlineCitation.Article.AuthorList.Author
+    entity: publication
 tests:
   search:
-    - name: searches for CRISPR papers
-      params:
-        query: CRISPR cas9 therapy
-      assert:
-        - path: esearchresult.idlist
-          minLength: 1
+  - name: searches for CRISPR papers
+    params:
+      query: CRISPR cas9 therapy
+    assert:
+    - path: esearchresult.idlist
+      minLength: 1
   getSummary:
-    - name: gets article summary by PMID
-      params:
-        ids: "33086985"
-      assert:
-        - path: result.33086985.title
+  - name: gets article summary by PMID
+    params:
+      ids: '33086985'
+    assert:
+    - path: result.33086985.title
   getArticle:
-    - name: gets full article details for PMID 33086985
-      params:
-        pmid: "33086985"
-      assert:
-        - {}
+  - name: gets full article details for PMID 33086985
+    params:
+      pmid: '33086985'
+    assert:
+    - {}

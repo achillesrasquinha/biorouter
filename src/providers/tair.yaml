@@ -1,0 +1,77 @@
+name: tair
+displayName: TAIR / BAR
+description: The Arabidopsis Information Resource via Bio-Analytic Resource (BAR) — expression and subcellular localization data for Arabidopsis thaliana
+tags:
+- arabidopsis
+- plant
+- model-organism
+- expression
+baseUrl: https://bar.utoronto.ca
+tools:
+  getExpression:
+    description: Get developmental expression data for an Arabidopsis gene from the eFP Browser
+    tags:
+    - expression-data
+    - developmental-map
+    method: GET
+    path: /efp/cgi-bin/efpWeb.cgi
+    params:
+      gene:
+        type: string
+        required: true
+        mapsTo: primaryGene
+        description: AGI locus identifier (e.g. "AT1G01010", "AT3G24650")
+      dataSource:
+        type: string
+        default: Developmental_Map
+        description: Data source for expression lookup (e.g. "Developmental_Map", "Abiotic_Stress")
+      modeInput:
+        type: string
+        default: Absolute
+        description: Expression mode — Absolute for raw values, Relative for fold-change
+    response:
+      format: json
+      fields:
+      - maxSignal
+      - minSignal
+      - stddev
+      - datasource
+    entity: expression
+  getExpressionAnatomical:
+    description: Get subcellular localization predictions for an Arabidopsis protein via SUBA4
+    tags:
+    - subcellular-localization
+    - protein-localization
+    method: GET
+    path: /eplant/cgi-bin/suba4.cgi
+    params:
+      gene:
+        type: string
+        required: true
+        mapsTo: id
+        description: AGI locus identifier (e.g. "AT1G01010")
+    response:
+      format: json
+      fields:
+      - '[].locus'
+      - '[].location'
+      - '[].source'
+      - '[].reliability'
+    entity: expression
+tests:
+  getExpression:
+  - name: gets developmental expression for AT1G01010
+    params:
+      gene: AT1G01010
+      dataSource: Developmental_Map
+      modeInput: Absolute
+    assert:
+    - path: maxSignal
+    allowError: true
+  getExpressionAnatomical:
+  - name: gets subcellular localization for AT1G01010
+    params:
+      gene: AT1G01010
+    assert:
+    - minLength: 1
+    allowError: true

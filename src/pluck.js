@@ -54,7 +54,7 @@ function setValue(obj, path, value) {
 function spreadArray(arr, values, parts, i) {
   if (!Array.isArray(values)) return;
   for (let vi = 0; vi < values.length; vi++) {
-    if (!arr[vi]) arr[vi] = {};
+    if (arr[vi] === undefined || arr[vi] === null) arr[vi] = {};
     if (i >= parts.length) { arr[vi] = values[vi]; continue; }
     let key = parts[i];
     const isArr = key.endsWith("[]");

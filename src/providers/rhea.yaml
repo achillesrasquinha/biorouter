@@ -2,18 +2,18 @@ name: rhea
 displayName: Rhea
 description: Expert-curated knowledgebase of biochemical reactions
 tags:
-  - reaction
-  - biochemistry
-  - enzyme
-  - metabolism
-  - rhea
+- reaction
+- biochemistry
+- enzyme
+- metabolism
+- rhea
 baseUrl: https://www.rhea-db.org/rhea
 tools:
   search:
     description: Search Rhea for biochemical reactions by keyword
     tags:
-      - reaction-search
-      - biochemistry-search
+    - reaction-search
+    - biochemistry-search
     method: GET
     path: /
     params:
@@ -32,17 +32,18 @@ tools:
     response:
       format: json
       fields:
-        - count
-        - results[].id
-        - results[].equation
-        - results[].status
-        - results[].balanced
-        - results[].transport
+      - count
+      - results[].id
+      - results[].equation
+      - results[].status
+      - results[].balanced
+      - results[].transport
+    entity: compound
   getReaction:
     description: Get a specific Rhea reaction by ID
     tags:
-      - reaction-info
-      - reaction-lookup
+    - reaction-info
+    - reaction-lookup
     method: GET
     path: /
     params:
@@ -57,28 +58,29 @@ tools:
     response:
       format: json
       fields:
-        - count
-        - results[].id
-        - results[].equation
-        - results[].status
-        - results[].balanced
-        - results[].transport
+      - count
+      - results[].id
+      - results[].equation
+      - results[].status
+      - results[].balanced
+      - results[].transport
+    entity: reaction
 tests:
   search:
-    - name: searches for ATP reactions
-      params:
-        query: ATP
-      assert:
-        - path: count
-          gt: 0
-        - path: results
-          minLength: 1
-        - path: results.0.equation
+  - name: searches for ATP reactions
+    params:
+      query: ATP
+    assert:
+    - path: count
+      gt: 0
+    - path: results
+      minLength: 1
+    - path: results.0.equation
   getReaction:
-    - name: gets reaction RHEA:10000
-      params:
-        rheaId: RHEA:10000
-      assert:
-        - path: count
-          gte: 1
-        - path: results.0.equation
+  - name: gets reaction RHEA:10000
+    params:
+      rheaId: RHEA:10000
+    assert:
+    - path: count
+      gte: 1
+    - path: results.0.equation

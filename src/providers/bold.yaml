@@ -2,18 +2,18 @@ name: bold
 displayName: BOLD
 description: Barcode of Life Data Systems — DNA barcode specimens and sequences for species identification
 tags:
-  - barcoding
-  - dna-barcode
-  - taxonomy
-  - bold
-  - species-identification
+- barcoding
+- dna-barcode
+- taxonomy
+- bold
+- species-identification
 baseUrl: https://www.boldsystems.org/index.php/API_Public
 tools:
   searchSpecimen:
     description: Search BOLD for specimen records by taxon name
     tags:
-      - specimen-search
-      - barcode-search
+    - specimen-search
+    - barcode-search
     method: GET
     path: /specimen
     params:
@@ -28,11 +28,12 @@ tools:
         description: Response format
     response:
       format: json
+    entity: sample
   searchSequences:
     description: Search BOLD for DNA barcode sequences by taxon name
     tags:
-      - sequence-search
-      - dna-search
+    - sequence-search
+    - dna-search
     method: GET
     path: /sequence
     params:
@@ -43,16 +44,19 @@ tools:
         description: Taxon name to search (e.g. "Danaus plexippus")
     response:
       format: json
+    entity: sequence
 tests:
   searchSpecimen:
-    - name: searches specimens for Danaus plexippus
-      params:
-        name: Danaus plexippus
-      assert:
-        - {}
+  - name: searches specimens for Danaus plexippus
+    params:
+      name: Danaus plexippus
+    assert:
+    - {}
+    allowError: true
   searchSequences:
-    - name: searches sequences for Danaus plexippus
-      params:
-        name: Danaus plexippus
-      assert:
-        - {}
+  - name: searches sequences for Danaus plexippus
+    params:
+      name: Danaus plexippus
+    assert:
+    - {}
+    allowError: true

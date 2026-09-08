@@ -2,17 +2,17 @@ name: europepmc-annotations
 displayName: Europe PMC Annotations
 description: Europe PMC Annotations — text-mined named entities (genes, diseases, GO terms) from publications
 tags:
-  - text-mining
-  - annotations
-  - publications
-  - named-entities
+- text-mining
+- annotations
+- publications
+- named-entities
 baseUrl: https://www.ebi.ac.uk/europepmc/annotations_api
 tools:
   getAnnotations:
     description: Get text-mined annotations for articles by PMC IDs
     tags:
-      - article-annotations
-      - text-mining
+    - article-annotations
+    - text-mining
     method: GET
     path: /annotationsByArticleIds
     params:
@@ -31,17 +31,18 @@ tools:
     response:
       format: json
       fields:
-        - '[].source'
-        - '[].extId'
-        - '[].annotations[].exact'
-        - '[].annotations[].type'
-        - '[].annotations[].tags[].name'
+      - '[].source'
+      - '[].extId'
+      - '[].annotations[].exact'
+      - '[].annotations[].type'
+      - '[].annotations[].tags[].name'
+    entity: annotation
 tests:
   getAnnotations:
-    - name: gets annotations for a PMC article
-      params:
-        articleIds: PMC:PMC4765621
-        provider: Europe PMC
-        format: JSON
-      assert:
-        - minLength: 1
+  - name: gets annotations for a PMC article
+    params:
+      articleIds: PMC:PMC4765621
+      provider: Europe PMC
+      format: JSON
+    assert:
+    - minLength: 1

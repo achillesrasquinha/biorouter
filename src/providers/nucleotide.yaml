@@ -2,20 +2,20 @@ name: nucleotide
 displayName: NCBI Nucleotide
 description: GenBank and RefSeq nucleotide sequence database
 tags:
-  - nucleotide
-  - sequence
-  - genbank
-  - refseq
-  - ncbi
-  - dna
-  - rna
+- nucleotide
+- sequence
+- genbank
+- refseq
+- ncbi
+- dna
+- rna
 baseUrl: https://eutils.ncbi.nlm.nih.gov/entrez/eutils
 tools:
   search:
     description: Search NCBI Nucleotide database for DNA and RNA sequences
     tags:
-      - sequence-search
-      - nucleotide-search
+    - sequence-search
+    - nucleotide-search
     method: GET
     path: /esearch.fcgi
     params:
@@ -37,14 +37,15 @@ tools:
     response:
       format: json
       fields:
-        - esearchresult.count
-        - esearchresult.idlist
-        - esearchresult.querytranslation
+      - esearchresult.count
+      - esearchresult.idlist
+      - esearchresult.querytranslation
+    entity: sequence
   getSummary:
     description: Get nucleotide sequence summary by GenBank accession or GI
     tags:
-      - sequence-info
-      - genbank-info
+    - sequence-info
+    - genbank-info
     method: GET
     path: /esummary.fcgi
     params:
@@ -60,17 +61,18 @@ tools:
         default: json
     response:
       format: json
+    entity: sequence
 tests:
   search:
-    - name: searches for insulin mRNA human sequences
-      params:
-        query: insulin mRNA human
-      assert:
-        - path: esearchresult.idlist
-          minLength: 1
+  - name: searches for insulin mRNA human sequences
+    params:
+      query: insulin mRNA human
+    assert:
+    - path: esearchresult.idlist
+      minLength: 1
   getSummary:
-    - name: gets nucleotide summary by ID
-      params:
-        id: "224589800"
-      assert:
-        - path: result.224589800
+  - name: gets nucleotide summary by ID
+    params:
+      id: '224589800'
+    assert:
+    - path: result.224589800

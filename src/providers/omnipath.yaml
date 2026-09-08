@@ -2,18 +2,18 @@ name: omnipath
 displayName: OmniPath
 description: OmniPath — comprehensive signaling network and enzyme-substrate interactions
 tags:
-  - signaling
-  - interactions
-  - omnipath
-  - pathways
-  - network
+- signaling
+- interactions
+- omnipath
+- pathways
+- network
 baseUrl: https://omnipathdb.org
 tools:
   getInteractions:
     description: Get signaling interactions for a gene from the OmniPath database
     tags:
-      - interaction-search
-      - signaling-network
+    - interaction-search
+    - signaling-network
     method: GET
     path: /interactions
     params:
@@ -23,7 +23,7 @@ tools:
         description: Gene symbol to query (e.g. TP53, EGFR)
       genesymbols:
         type: string
-        default: yes
+        default: true
         description: Return gene symbols instead of UniProt IDs
       limit:
         type: integer
@@ -36,19 +36,20 @@ tools:
     response:
       format: json
       fields:
-        - '[].source_genesymbol'
-        - '[].target_genesymbol'
-        - '[].is_directed'
-        - '[].is_stimulation'
-        - '[].is_inhibition'
-        - '[].consensus_direction'
-        - '[].consensus_stimulation'
-        - '[].consensus_inhibition'
+      - '[].source_genesymbol'
+      - '[].target_genesymbol'
+      - '[].is_directed'
+      - '[].is_stimulation'
+      - '[].is_inhibition'
+      - '[].consensus_direction'
+      - '[].consensus_stimulation'
+      - '[].consensus_inhibition'
+    entity: interaction
   getEnzSubstrate:
     description: Get enzyme-substrate relationships for a gene
     tags:
-      - enzyme-substrate
-      - phosphorylation
+    - enzyme-substrate
+    - phosphorylation
     method: GET
     path: /enzsub
     params:
@@ -58,7 +59,7 @@ tools:
         description: Gene symbol to query (e.g. TP53, AKT1)
       genesymbols:
         type: string
-        default: yes
+        default: true
         description: Return gene symbols instead of UniProt IDs
       limit:
         type: integer
@@ -71,16 +72,17 @@ tools:
     response:
       format: json
       fields:
-        - '[].enzyme_genesymbol'
-        - '[].substrate_genesymbol'
-        - '[].residue_type'
-        - '[].residue_offset'
-        - '[].modification'
+      - '[].enzyme_genesymbol'
+      - '[].substrate_genesymbol'
+      - '[].residue_type'
+      - '[].residue_offset'
+      - '[].modification'
+    entity: gene
   getAnnotations:
     description: Get protein annotations from OmniPath
     tags:
-      - protein-annotations
-      - functional-data
+    - protein-annotations
+    - functional-data
     method: GET
     path: /annotations
     params:
@@ -93,7 +95,7 @@ tools:
         description: Filter by annotation resource
       genesymbols:
         type: string
-        default: yes
+        default: true
         description: Use gene symbols instead of UniProt IDs
       format:
         type: string
@@ -102,15 +104,16 @@ tools:
     response:
       format: json
       fields:
-        - '[].uniprot'
-        - '[].source'
-        - '[].value'
-        - '[].record_id'
+      - '[].uniprot'
+      - '[].source'
+      - '[].value'
+      - '[].record_id'
+    entity: annotation
   getComplexes:
     description: Get protein complexes from OmniPath
     tags:
-      - protein-complexes
-      - complex-data
+    - protein-complexes
+    - complex-data
     method: GET
     path: /complexes
     params:
@@ -120,7 +123,7 @@ tools:
         description: Comma-separated UniProt IDs or gene symbols (e.g. TP53, EGFR)
       genesymbols:
         type: string
-        default: yes
+        default: true
         description: Use gene symbols instead of UniProt IDs
       format:
         type: string
@@ -129,38 +132,39 @@ tools:
     response:
       format: json
       fields:
-        - '[].name'
-        - '[].components'
-        - '[].sources'
+      - '[].name'
+      - '[].components'
+      - '[].sources'
+    entity: interaction
 tests:
   getInteractions:
-    - name: gets signaling interactions for TP53
-      params:
-        partners: TP53
-        limit: 5
-      assert:
-        - isArray: true
-        - anyOf:
-            - 0.source_genesymbol
-            - 0.target_genesymbol
+  - name: gets signaling interactions for TP53
+    params:
+      partners: TP53
+      limit: 5
+    assert:
+    - isArray: true
+    - anyOf:
+      - 0.source_genesymbol
+      - 0.target_genesymbol
   getEnzSubstrate:
-    - name: gets enzyme-substrate relationships for AKT1
-      params:
-        partners: AKT1
-        limit: 5
-      assert:
-        - isArray: true
+  - name: gets enzyme-substrate relationships for AKT1
+    params:
+      partners: AKT1
+      limit: 5
+    assert:
+    - isArray: true
   getAnnotations:
-    - name: gets annotations for TP53
-      params:
-        proteins: TP53
-      assert:
-        - isArray: true
-          minLength: 1
+  - name: gets annotations for TP53
+    params:
+      proteins: TP53
+    assert:
+    - isArray: true
+      minLength: 1
   getComplexes:
-    - name: gets complexes for TP53
-      params:
-        proteins: TP53
-      assert:
-        - isArray: true
-          minLength: 1
+  - name: gets complexes for TP53
+    params:
+      proteins: TP53
+    assert:
+    - isArray: true
+      minLength: 1

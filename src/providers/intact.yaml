@@ -2,18 +2,18 @@ name: intact
 displayName: IntAct
 description: Molecular interaction database — curated protein-protein interactions
 tags:
-  - interaction
-  - protein
-  - molecular
-  - binding
-  - intact
+- interaction
+- protein
+- molecular
+- binding
+- intact
 baseUrl: https://www.ebi.ac.uk/intact/ws
 tools:
   search:
     description: Search IntAct for molecular interactions by gene or protein name
     tags:
-      - interaction-search
-      - protein-interaction
+    - interaction-search
+    - protein-interaction
     method: GET
     path: /interaction/findInteractions/{query}
     params:
@@ -30,21 +30,22 @@ tools:
     response:
       format: json
       fields:
-        - content[].ac
-        - content[].moleculeA
-        - content[].moleculeB
-        - content[].uniqueIdA
-        - content[].uniqueIdB
-        - content[].typeA
-        - content[].typeB
-        - content[].taxIdA
-        - content[].taxIdB
-        - content[].miscore
+      - content[].ac
+      - content[].moleculeA
+      - content[].moleculeB
+      - content[].uniqueIdA
+      - content[].uniqueIdB
+      - content[].typeA
+      - content[].typeB
+      - content[].taxIdA
+      - content[].taxIdB
+      - content[].miscore
+    entity: gene
   findInteractor:
     description: Find interactor details by gene or protein name
     tags:
-      - interactor-search
-      - protein-info
+    - interactor-search
+    - protein-info
     method: GET
     path: /interactor/findInteractor/{query}
     params:
@@ -61,38 +62,48 @@ tools:
     response:
       format: json
       fields:
-        - content[].interactorAc
-        - content[].interactorName
-        - content[].interactorPreferredIdentifier
-        - content[].interactorDescription
-        - content[].interactorType
-        - content[].interactorSpecies
-        - content[].interactorTaxId
-        - content[].interactionCount
+      - content[].interactorAc
+      - content[].interactorName
+      - content[].interactorPreferredIdentifier
+      - content[].interactorDescription
+      - content[].interactorType
+      - content[].interactorSpecies
+      - content[].interactorTaxId
+      - content[].interactionCount
+    entity: interaction
   getInteraction:
-    description: Get interaction details by IntAct accession
+    description: Get interaction details by searching for an IntAct accession
     tags:
-      - interaction-details
-      - accession
+    - interaction-details
+    - accession
     method: GET
-    path: /interaction/{ac}
+    path: /interaction/findInteractions/{ac}
     params:
       ac:
         type: string
         required: true
-        description: IntAct interaction accession (e.g. EBI-12345678)
+        description: IntAct interaction accession (e.g. EBI-1562402)
+      page:
+        type: integer
+        default: 0
+      pageSize:
+        type: integer
+        default: 10
     response:
       format: json
       fields:
-        - interaction.ac
-        - interaction.detectionMethods[].name
-        - interaction.type.name
-        - interaction.participants[].interactor.accession
+      - content[].ac
+      - content[].moleculeA
+      - content[].moleculeB
+      - content[].typeA
+      - content[].typeB
+      - content[].miscore
+    entity: interaction
   getComplex:
     description: Search protein complexes in IntAct Complex Portal
     tags:
-      - complex
-      - protein-complex
+    - complex
+    - protein-complex
     method: GET
     path: /complex/search
     params:
@@ -111,65 +122,80 @@ tools:
     response:
       format: json
       fields:
-        - elements[].complexAC
-        - elements[].complexName
-        - elements[].description
-        - elements[].organismName
+      - elements[].complexAC
+      - elements[].complexName
+      - elements[].description
+      - elements[].organismName
+    entity: interaction
   getInteractorDetails:
-    description: Get detailed information about a specific interactor
+    description: Get detailed information about a specific interactor by accession
     tags:
-      - interactor-details
-      - protein-info
+    - interactor-details
+    - protein-info
     method: GET
-    path: /interactor/{ac}
+    path: /interactor/findInteractor/{ac}
     params:
       ac:
         type: string
         required: true
-        description: IntAct interactor accession (e.g. EBI-12345678)
+        description: IntAct interactor accession (e.g. EBI-366083)
+      page:
+        type: integer
+        default: 0
+      pageSize:
+        type: integer
+        default: 10
     response:
       format: json
       fields:
-        - interactor.accession
-        - interactor.organism.taxId
-        - interactor.type.name
-        - interactor.xrefs[].id
+      - content[].interactorAc
+      - content[].interactorName
+      - content[].interactorPreferredIdentifier
+      - content[].interactorDescription
+      - content[].interactorType
+      - content[].interactorSpecies
+      - content[].interactorTaxId
+      - content[].interactionCount
+    entity: interaction
 tests:
   search:
-    - name: searches for TP53 interactions
-      params:
-        query: P04637
-      assert:
-        - path: content
-          minLength: 1
-        - anyOf:
-            - content.0.moleculeA
-            - content.0.moleculeB
+  - name: searches for TP53 interactions
+    params:
+      query: P04637
+    assert:
+    - path: content
+      minLength: 1
+    - anyOf:
+      - content.0.moleculeA
+      - content.0.moleculeB
   findInteractor:
-    - name: finds interactor details for TP53
-      params:
-        query: TP53
-      assert:
-        - path: content
-          minLength: 1
-        - path: content.0.interactorName
+  - name: finds interactor details for TP53
+    params:
+      query: TP53
+    assert:
+    - path: content
+      minLength: 1
+    - path: content.0.interactorName
   getInteraction:
-    - name: gets interaction details by accession
-      params:
-        ac: EBI-12345678
-      assert:
-        - path: interaction.ac
+  - name: gets interaction details by accession
+    params:
+      ac: EBI-1562402
+    assert:
+    - path: content
+      minLength: 1
   getComplex:
-    - name: searches for p53 protein complexes
-      params:
-        query: p53
-      assert:
-        - path: elements
-          minLength: 1
-        - path: elements.0.complexAC
+  - name: searches for p53 protein complexes
+    params:
+      query: p53
+    assert:
+    - path: elements
+      minLength: 1
+    - path: elements.0.complexAC
   getInteractorDetails:
-    - name: gets interactor details by accession
-      params:
-        ac: EBI-12345678
-      assert:
-        - path: interactor.accession
+  - name: gets interactor details by accession
+    params:
+      ac: EBI-366083
+    assert:
+    - path: content
+      minLength: 1
+    - path: content.0.interactorAc

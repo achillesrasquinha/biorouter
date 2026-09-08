@@ -1,0 +1,103 @@
+name: figshare
+displayName: Figshare
+description: Figshare — research data repository for datasets, figures, and supplementary materials
+tags:
+- data-repository
+- research-data
+- figshare
+baseUrl: https://api.figshare.com/v2
+tools:
+  searchArticles:
+    description: Search for research articles and datasets on Figshare
+    tags:
+    - article-search
+    - dataset-search
+    method: POST
+    path: /articles/search
+    params:
+      query:
+        type: string
+        required: true
+        description: Search query (e.g. genomics, CRISPR, single-cell RNA-seq)
+        mapsTo: search_for
+      limit:
+        type: integer
+        default: 10
+        description: Number of results to return (max 1000)
+        mapsTo: page_size
+    response:
+      format: json
+      fields:
+      - '[].id'
+      - '[].title'
+      - '[].doi'
+      - '[].url'
+      - '[].published_date'
+      - '[].defined_type_name'
+      - '[].tags'
+    entity: dataset
+  getArticle:
+    description: Get detailed metadata for a specific Figshare article by ID
+    tags:
+    - article-info
+    - dataset-info
+    method: GET
+    path: /articles/{articleId}
+    params:
+      articleId:
+        type: integer
+        required: true
+        description: Figshare article ID (e.g. 123456)
+    response:
+      format: json
+      fields:
+      - id
+      - title
+      - doi
+      - description
+      - authors[].full_name
+      - categories[].title
+      - tags
+      - files[].name
+      - files[].size
+      - files[].download_url
+      - license.name
+      - published_date
+    entity: dataset
+  searchCollections:
+    description: Search for collections of research data on Figshare
+    tags:
+    - collection-search
+    method: POST
+    path: /collections/search
+    params:
+      query:
+        type: string
+        required: true
+        description: Search query for collections (e.g. proteomics, cancer, microbiome)
+        mapsTo: search_for
+    response:
+      format: json
+      fields:
+      - '[].id'
+      - '[].title'
+      - '[].doi'
+      - '[].url'
+      - '[].published_date'
+    entity: dataset
+tests:
+  searchArticles:
+  - name: searches for genomics articles
+    params:
+      query: genomics
+      limit: 5
+    assert:
+    - isArray: true
+    - minLength: 1
+  getArticle:
+  - name: gets article details by ID
+    params:
+      articleId: 123456
+    assert:
+    - path: id
+    allowError: true

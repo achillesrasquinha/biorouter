@@ -2,19 +2,19 @@ name: ena
 displayName: European Nucleotide Archive
 description: Open-access nucleotide sequence data and associated information
 tags:
-  - nucleotide
-  - sequence
-  - genomics
-  - ena
-  - dna
-  - rna
+- nucleotide
+- sequence
+- genomics
+- ena
+- dna
+- rna
 baseUrl: https://www.ebi.ac.uk/ena
 tools:
   search:
     description: Search ENA for nucleotide sequences
     tags:
-      - sequence-search
-      - nucleotide-search
+    - sequence-search
+    - nucleotide-search
     method: GET
     path: /portal/api/search
     params:
@@ -41,14 +41,15 @@ tools:
     response:
       format: json
       fields:
-        - "[].accession"
-        - "[].description"
-        - "[].tax_id"
+      - '[].accession'
+      - '[].description'
+      - '[].tax_id'
+    entity: sequence
   getSummary:
     description: Get summary information for an ENA accession
     tags:
-      - sequence-info
-      - accession-lookup
+    - sequence-info
+    - accession-lookup
     method: GET
     path: /browser/api/summary/{accession}
     params:
@@ -59,26 +60,27 @@ tools:
     response:
       format: json
       fields:
-        - "summaries[].accession"
-        - "summaries[].description"
-        - "summaries[].moleculeType"
-        - "summaries[].sequenceLength"
-        - "summaries[].taxon"
-        - "summaries[].firstPublic"
+      - summaries[].accession
+      - summaries[].description
+      - summaries[].moleculeType
+      - summaries[].sequenceLength
+      - summaries[].taxon
+      - summaries[].firstPublic
+    entity: dataset
 tests:
   search:
-    - name: searches for insulin sequences
-      params:
-        query: description="*insulin*"
-      assert:
-        - isArray: true
-        - path: 0.accession
+  - name: searches for insulin sequences
+    params:
+      query: description="*insulin*"
+    assert:
+    - isArray: true
+    - path: 0.accession
   getSummary:
-    - name: gets summary for accession AB000100
-      params:
-        accession: AB000100
-      assert:
-        - path: summaries
-          minLength: 1
-        - path: summaries.0.accession
-          equals: AB000100
+  - name: gets summary for accession AB000100
+    params:
+      accession: AB000100
+    assert:
+    - path: summaries
+      minLength: 1
+    - path: summaries.0.accession
+      equals: AB000100

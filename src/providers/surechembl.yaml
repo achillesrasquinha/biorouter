@@ -2,18 +2,18 @@ name: surechembl
 displayName: SureChEMBL
 description: Patent chemistry database linking chemical structures to patent documents
 tags:
-  - patents
-  - chemistry
-  - compounds
-  - intellectual-property
-  - surechembl
+- patents
+- chemistry
+- compounds
+- intellectual-property
+- surechembl
 baseUrl: https://www.surechembl.org/api
 tools:
   search:
     description: Search compounds in patent literature by SMILES or name
     tags:
-      - compound-search
-      - patent-chemistry
+    - compound-search
+    - patent-chemistry
     method: GET
     path: /compounds/search
     params:
@@ -23,11 +23,12 @@ tools:
         description: SMILES string or compound name to search (e.g. "aspirin" or "CC(=O)OC1=CC=CC=C1C(=O)O")
     response:
       format: json
+    entity: compound
   getCompound:
     description: Get compound details by SureChEMBL compound ID
     tags:
-      - compound-info
-      - patent-compound
+    - compound-info
+    - patent-compound
     method: GET
     path: /compounds/{id}
     params:
@@ -37,18 +38,19 @@ tools:
         description: SureChEMBL compound ID (e.g. SCHEMBL1234)
     response:
       format: json
+    entity: compound
 tests:
   search:
-    - name: searches for aspirin in patent chemistry
-      params:
-        query: aspirin
-      assert:
-        - minLength: 1
-      allowError: true
+  - name: searches for aspirin in patent chemistry
+    params:
+      query: aspirin
+    assert:
+    - minLength: 1
+    allowError: true
   getCompound:
-    - name: gets compound by SureChEMBL ID
-      params:
-        id: SCHEMBL1234
-      assert:
-        - {}
-      allowError: true
+  - name: gets compound by SureChEMBL ID
+    params:
+      id: SCHEMBL1234
+    assert:
+    - {}
+    allowError: true

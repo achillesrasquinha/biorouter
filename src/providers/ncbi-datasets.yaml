@@ -2,19 +2,19 @@ name: ncbi-datasets
 displayName: NCBI Datasets
 description: NCBI Datasets API v2 — modern REST interface for genes, genomes, and taxonomy
 tags:
-  - ncbi
-  - gene
-  - genome
-  - assembly
-  - taxonomy
-  - datasets
+- ncbi
+- gene
+- genome
+- assembly
+- taxonomy
+- datasets
 baseUrl: https://api.ncbi.nlm.nih.gov/datasets/v2
 tools:
   getGeneBySymbol:
     description: Get gene info by symbol and taxon
     tags:
-      - gene-info
-      - gene-symbol
+    - gene-info
+    - gene-symbol
     method: GET
     path: /gene/symbol/{symbol}/taxon/{taxon}
     params:
@@ -30,19 +30,20 @@ tools:
     response:
       format: json
       fields:
-        - total_count
-        - reports[].gene.gene_id
-        - reports[].gene.symbol
-        - reports[].gene.description
-        - reports[].gene.taxname
-        - reports[].gene.common_name
-        - reports[].gene.type
-        - reports[].gene.chromosomes
+      - total_count
+      - reports[].gene.gene_id
+      - reports[].gene.symbol
+      - reports[].gene.description
+      - reports[].gene.taxname
+      - reports[].gene.common_name
+      - reports[].gene.type
+      - reports[].gene.chromosomes
+    entity: gene
   getGenomeByAccession:
     description: Get genome assembly report by accession
     tags:
-      - genome-info
-      - assembly-report
+    - genome-info
+    - assembly-report
     method: GET
     path: /genome/accession/{accession}/dataset_report
     params:
@@ -53,18 +54,19 @@ tools:
     response:
       format: json
       fields:
-        - total_count
-        - reports[].accession
-        - reports[].organism
-        - reports[].assembly_info.assembly_level
-        - reports[].assembly_info.assembly_name
-        - reports[].assembly_stats
-        - reports[].annotation_info.name
+      - total_count
+      - reports[].accession
+      - reports[].organism
+      - reports[].assembly_info.assembly_level
+      - reports[].assembly_info.assembly_name
+      - reports[].assembly_stats
+      - reports[].annotation_info.name
+    entity: organism
   searchTaxonomy:
     description: Get taxonomy info by taxon name or ID
     tags:
-      - taxonomy-info
-      - taxonomy-search
+    - taxonomy-info
+    - taxonomy-search
     method: GET
     path: /taxonomy/taxon/{taxon}
     params:
@@ -75,17 +77,18 @@ tools:
     response:
       format: json
       fields:
-        - taxonomy_nodes[].taxonomy.tax_id
-        - taxonomy_nodes[].taxonomy.organism_name
-        - taxonomy_nodes[].taxonomy.genbank_common_name
-        - taxonomy_nodes[].taxonomy.rank
-        - taxonomy_nodes[].taxonomy.lineage
-        - taxonomy_nodes[].taxonomy.genomic_moltype
+      - taxonomy_nodes[].taxonomy.tax_id
+      - taxonomy_nodes[].taxonomy.organism_name
+      - taxonomy_nodes[].taxonomy.genbank_common_name
+      - taxonomy_nodes[].taxonomy.rank
+      - taxonomy_nodes[].taxonomy.lineage
+      - taxonomy_nodes[].taxonomy.genomic_moltype
+    entity: organism
   getGeneById:
     description: Get gene information by NCBI gene ID
     tags:
-      - gene-info
-      - gene-id
+    - gene-info
+    - gene-id
     method: GET
     path: /gene/id/{geneId}
     params:
@@ -96,28 +99,30 @@ tools:
     response:
       format: json
       fields:
-        - genes[].gene.gene_id
-        - genes[].gene.symbol
-        - genes[].gene.description
-        - genes[].gene.type
-        - genes[].gene.chromosomes
+      - total_count
+      - reports[].gene.gene_id
+      - reports[].gene.symbol
+      - reports[].gene.description
+      - reports[].gene.type
+      - reports[].gene.chromosomes
+    entity: gene
 tests:
   getGeneBySymbol:
-    - name: gets gene info for TP53 in human
-      params:
-        symbol: TP53
-        taxon: human
-      assert:
-        - path: reports
-          minLength: 1
-        - path: reports.0.gene.symbol
-          equals: TP53
+  - name: gets gene info for TP53 in human
+    params:
+      symbol: TP53
+      taxon: human
+    assert:
+    - path: reports
+      minLength: 1
+    - path: reports.0.gene.symbol
+      equals: TP53
   getGeneById:
-    - name: gets gene info by NCBI gene ID
-      params:
-        geneId: 7157
-      assert:
-        - path: genes
-          minLength: 1
-        - path: genes.0.gene.symbol
-          equals: TP53
+  - name: gets gene info by NCBI gene ID
+    params:
+      geneId: 7157
+    assert:
+    - path: reports
+      minLength: 1
+    - path: reports.0.gene.symbol
+      equals: TP53

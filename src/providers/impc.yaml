@@ -2,18 +2,18 @@ name: impc
 displayName: IMPC
 description: International Mouse Phenotyping Consortium — phenotype data for knockout mouse lines
 tags:
-  - mouse
-  - phenotype
-  - knockout
-  - impc
-  - model-organism
+- mouse
+- phenotype
+- knockout
+- impc
+- model-organism
 baseUrl: https://www.ebi.ac.uk/mi/impc/solr
 tools:
   searchGenes:
     description: Search for mouse genes with phenotype data
     tags:
-      - gene-search
-      - mouse-gene
+    - gene-search
+    - mouse-gene
     method: GET
     path: /gene/select
     params:
@@ -32,16 +32,17 @@ tools:
     response:
       format: json
       fields:
-        - response.numFound
-        - response.docs[].mgi_accession_id
-        - response.docs[].marker_symbol
-        - response.docs[].marker_name
-        - response.docs[].marker_type
+      - response.numFound
+      - response.docs[].mgi_accession_id
+      - response.docs[].marker_symbol
+      - response.docs[].marker_name
+      - response.docs[].marker_type
+    entity: gene
   searchPhenotypes:
     description: Search phenotype associations for mouse genes
     tags:
-      - phenotype-search
-      - genotype-phenotype
+    - phenotype-search
+    - genotype-phenotype
     method: GET
     path: /genotype-phenotype/select
     params:
@@ -60,31 +61,32 @@ tools:
     response:
       format: json
       fields:
-        - response.numFound
-        - response.docs[].marker_symbol
-        - response.docs[].mp_term_name
-        - response.docs[].mp_term_id
-        - response.docs[].top_level_mp_term_name
-        - response.docs[].p_value
-        - response.docs[].effect_size
+      - response.numFound
+      - response.docs[].marker_symbol
+      - response.docs[].mp_term_name
+      - response.docs[].mp_term_id
+      - response.docs[].top_level_mp_term_name
+      - response.docs[].p_value
+      - response.docs[].effect_size
+    entity: disease
 tests:
   searchGenes:
-    - name: searches for Braf gene
-      params:
-        q: "marker_symbol:Braf"
-        rows: 5
-      assert:
-        - path: response.numFound
-          gt: 0
-        - path: response.docs.0.marker_symbol
-          equals: Braf
+  - name: searches for Braf gene
+    params:
+      q: marker_symbol:Braf
+      rows: 5
+    assert:
+    - path: response.numFound
+      gt: 0
+    - path: response.docs.0.marker_symbol
+      equals: Braf
   searchPhenotypes:
-    - name: searches for phenotype associations
-      params:
-        q: "*:*"
-        rows: 2
-      assert:
-        - path: response.numFound
-          gt: 0
-        - path: response.docs
-          minLength: 1
+  - name: searches for phenotype associations
+    params:
+      q: '*:*'
+      rows: 2
+    assert:
+    - path: response.numFound
+      gt: 0
+    - path: response.docs
+      minLength: 1

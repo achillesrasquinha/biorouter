@@ -2,18 +2,20 @@ name: disprot
 displayName: DisProt
 description: Database of intrinsically disordered proteins and regions
 tags:
-  - disorder
-  - protein
-  - intrinsically-disordered
-  - disprot
-  - structure
+- disorder
+- protein
+- intrinsically-disordered
+- disprot
+- structure
+# NOTE: DisProt API intermittently returns HTTP 502 Bad Gateway.
+# This is a server-side issue, not a configuration problem.
 baseUrl: https://disprot.org/api
 tools:
   search:
     description: Search DisProt for disordered proteins
     tags:
-      - disorder-search
-      - disordered-protein
+    - disorder-search
+    - disordered-protein
     method: GET
     path: /search
     params:
@@ -29,11 +31,12 @@ tools:
         default: 10
     response:
       format: json
+    entity: protein
   getEntry:
     description: Get a disordered protein entry by DisProt ID
     tags:
-      - disorder-entry
-      - disordered-protein
+    - disorder-entry
+    - disordered-protein
     method: GET
     path: /{disprotId}
     params:
@@ -43,19 +46,22 @@ tools:
         description: DisProt ID e.g. 'DP00086'
     response:
       format: json
+    entity: protein
 tests:
   search:
-    - name: searches for p53 disordered proteins
-      params:
-        q: p53
-      assert:
-        - path: data
-          minLength: 1
+  - name: searches for p53 disordered proteins
+    params:
+      q: p53
+    assert:
+    - path: data
+      minLength: 1
+    allowError: true
   getEntry:
-    - name: gets a DisProt entry by ID
-      params:
-        disprotId: DP00086
-      assert:
-        - anyOf:
-            - disprot_id
-            - name
+  - name: gets a DisProt entry by ID
+    params:
+      disprotId: DP00086
+    assert:
+    - anyOf:
+      - disprot_id
+      - name
+    allowError: true

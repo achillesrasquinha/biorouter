@@ -2,17 +2,17 @@ name: igvf
 displayName: IGVF
 description: IGVF — Impact of Genomic Variation on Function consortium data portal
 tags:
-  - genomic-variation
-  - functional-genomics
-  - encode
-  - gene
+- genomic-variation
+- functional-genomics
+- encode
+- gene
 baseUrl: https://api.data.igvf.org
 tools:
   searchGenes:
     description: Search IGVF for genes
     tags:
-      - gene-search
-      - genomic-variation
+    - gene-search
+    - genomic-variation
     method: GET
     path: /search/
     params:
@@ -34,15 +34,16 @@ tools:
     response:
       format: json
       fields:
-        - '@graph[].@id'
-        - '@graph[].symbol'
-        - '@graph[].geneid'
-        - '@graph[].dbxrefs'
+      - '@graph[].@id'
+      - '@graph[].symbol'
+      - '@graph[].geneid'
+      - '@graph[].dbxrefs'
+    entity: gene
   searchDatasets:
     description: Search IGVF measurement sets and datasets
     tags:
-      - dataset-search
-      - experiment-search
+    - dataset-search
+    - experiment-search
     method: GET
     path: /search/
     params:
@@ -63,14 +64,15 @@ tools:
         description: Response format
     response:
       format: json
+    entity: dataset
 tests:
   searchGenes:
-    - name: searches for BRCA1
-      params:
-        type: Gene
-        symbol: BRCA1
-        limit: 2
-        format: json
-      assert:
-        - path: '@graph'
-          minLength: 1
+  - name: searches for BRCA1
+    params:
+      type: Gene
+      symbol: BRCA1
+      limit: 2
+      format: json
+    assert:
+    - path: '@graph'
+      minLength: 1

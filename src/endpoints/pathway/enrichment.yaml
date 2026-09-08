@@ -1,0 +1,301 @@
+description: Analyze gene-set enrichment — GO terms, pathways, and functional categories for a gene list
+tags:
+- pathway
+- enrichment
+- gene-set
+- functional
+- go-terms
+- biorouter
+input:
+  query:
+    type: string
+    required: true
+    description: Comma-separated gene symbols (e.g. TP53,BRCA1,EGFR,BRAF,PIK3CA)
+phases:
+- name: resolve
+  parallel: false
+  calls:
+  - source: enrichr
+    tool: addList
+    params:
+      list: '{input.query}'
+      description: enrichment analysis
+    extract:
+      enrichr_list_id: userListId
+- name: fetch
+  parallel: true
+  calls:
+  - source: panther
+    tool: getEnrichment
+    as: panther.goBiologicalProcess
+    params:
+      geneInputList: '{input.query}'
+      annotDataSet: GO:0008150
+    provides:
+    - goBiologicalProcess
+  - source: panther
+    tool: getEnrichment
+    as: panther.goMolecularFunction
+    params:
+      geneInputList: '{input.query}'
+      annotDataSet: GO:0003674
+    provides:
+    - goMolecularFunction
+  - source: panther
+    tool: getEnrichment
+    as: panther.goCellularComponent
+    params:
+      geneInputList: '{input.query}'
+      annotDataSet: GO:0005575
+    provides:
+    - goCellularComponent
+  - source: panther
+    tool: getEnrichment
+    as: panther.pathways
+    params:
+      geneInputList: '{input.query}'
+      annotDataSet: PANTHER_Pathways
+    provides:
+    - pathways
+  - source: panther
+    tool: getEnrichment
+    as: panther.proteinClasses
+    params:
+      geneInputList: '{input.query}'
+      annotDataSet: PANTHER_Protein_Class
+    provides:
+    - proteinClasses
+  - source: europepmc
+    tool: search
+    params:
+      query: '{input.query} pathway enrichment'
+      pageSize: 5
+    provides:
+    - literature
+  - source: gprofiler
+    tool: analyzeEnrichment
+    params:
+      query:
+      - '{input.query}'
+      organism: hsapiens
+    provides:
+    - multiSourceEnrichment
+  - source: enrichr
+    tool: enrich
+    as: enrichr.kegg
+    params:
+      userListId: '{resolved.enrichr_list_id}'
+      backgroundType: KEGG_2021_Human
+    skip_if: '!resolved.enrichr_list_id'
+    provides:
+    - libraryEnrichment
+  - source: enrichr
+    tool: enrich
+    as: enrichr.goBP
+    params:
+      userListId: '{resolved.enrichr_list_id}'
+      backgroundType: GO_Biological_Process_2023
+    skip_if: '!resolved.enrichr_list_id'
+    provides:
+    - libraryEnrichment
+  - source: enrichr
+    tool: enrich
+    as: enrichr.reactome
+    params:
+      userListId: '{resolved.enrichr_list_id}'
+      backgroundType: Reactome_2022
+    skip_if: '!resolved.enrichr_list_id'
+    provides:
+    - libraryEnrichment
+  - source: string
+    tool: getEnrichment
+    params:
+      identifiers: '{input.query}'
+      species: 9606
+    provides:
+    - networkEnrichment
+  - source: reactome
+    tool: analyzeIdentifiers
+    params:
+      ids: '{input.query}'
+    provides:
+    - reactionEnrichment
+  - source: msigdb
+    tool: getGeneSet
+    params:
+      geneSetName: '{input.query}'
+      fileType: json
+    allowError: true
+    provides:
+    - geneSetAnnotation
+output:
+  goBiologicalProcess:
+    enrichedTerms:
+      sources:
+      - source: panther
+        call: goBiologicalProcess
+        path: results.result
+        rank: 1
+      reason: GO biological process terms enriched in this gene list with fold enrichment and FDR
+    inputGenesCount:
+      sources:
+      - source: panther
+        call: goBiologicalProcess
+        path: results.input_list.number_of_genes
+        rank: 1
+    referenceGenesCount:
+      sources:
+      - source: panther
+        call: goBiologicalProcess
+        path: results.reference.number_of_genes
+        rank: 1
+  goMolecularFunction:
+    enrichedTerms:
+      sources:
+      - source: panther
+        call: goMolecularFunction
+        path: results.result
+        rank: 1
+      reason: GO molecular function terms enriched in this gene list
+    inputGenesCount:
+      sources:
+      - source: panther
+        call: goMolecularFunction
+        path: results.input_list.number_of_genes
+        rank: 1
+  goCellularComponent:
+    enrichedTerms:
+      sources:
+      - source: panther
+        call: goCellularComponent
+        path: results.result
+        rank: 1
+      reason: GO cellular component terms enriched in this gene list
+    inputGenesCount:
+      sources:
+      - source: panther
+        call: goCellularComponent
+        path: results.input_list.number_of_genes
+        rank: 1
+  pathways:
+    enrichedPathways:
+      sources:
+      - source: panther
+        call: pathways
+        path: results.result
+        rank: 1
+      reason: PANTHER pathway enrichment with statistical significance
+    inputGenesCount:
+      sources:
+      - source: panther
+        call: pathways
+        path: results.input_list.number_of_genes
+        rank: 1
+  proteinClasses:
+    enrichedClasses:
+      sources:
+      - source: panther
+        call: proteinClasses
+        path: results.result
+        rank: 1
+      reason: PANTHER protein class enrichment — functional classification of proteins
+  literature:
+    publications:
+      sources:
+      - source: europepmc
+        call: search
+        path: resultList.result
+        rank: 1
+      reason: Recent publications on pathway enrichment for these genes
+  multiSourceEnrichment:
+    enrichedTerms:
+      sources:
+      - source: gprofiler
+        call: analyzeEnrichment
+        path: result
+        rank: 1
+      reason: g:Profiler multi-source enrichment analysis (GO, KEGG, Reactome, WikiPathways, TF, miRNA)
+    significantTerms:
+      sources:
+      - source: gprofiler
+        call: analyzeEnrichment
+        path: result
+        rank: 1
+      reason: Significantly enriched terms with p-values and term sizes
+  libraryEnrichment:
+    keggPathways:
+      sources:
+      - source: enrichr
+        call: kegg
+        path: KEGG_2021_Human
+        rank: 1
+      reason: Enrichr KEGG pathway enrichment results
+    goBiologicalProcess:
+      sources:
+      - source: enrichr
+        call: goBP
+        path: GO_Biological_Process_2023
+        rank: 1
+      reason: Enrichr GO Biological Process enrichment results
+    reactomePathways:
+      sources:
+      - source: enrichr
+        call: reactome
+        path: Reactome_2022
+        rank: 1
+      reason: Enrichr Reactome pathway enrichment results
+  networkEnrichment:
+    functionalEnrichment:
+      sources:
+      - source: string
+        call: getEnrichment
+        path: $passthrough
+        rank: 1
+      reason: STRING functional enrichment analysis (GO, KEGG, Pfam domains) with FDR correction
+    enrichmentCategories:
+      sources:
+      - source: string
+        call: getEnrichment
+        path: '[*].category'
+        rank: 1
+    enrichmentTerms:
+      sources:
+      - source: string
+        call: getEnrichment
+        path: '[*].term'
+        rank: 1
+    pValues:
+      sources:
+      - source: string
+        call: getEnrichment
+        path: '[*].p_value'
+        rank: 1
+    fdrValues:
+      sources:
+      - source: string
+        call: getEnrichment
+        path: '[*].fdr'
+        rank: 1
+  reactionEnrichment:
+    enrichedPathways:
+      sources:
+      - source: reactome
+        call: analyzeIdentifiers
+        path: pathways
+        rank: 1
+      reason: Reactome pathway enrichment analysis with statistical significance
+    analysisToken:
+      sources:
+      - source: reactome
+        call: analyzeIdentifiers
+        path: summary.token
+        rank: 1
+      reason: Reactome analysis token for retrieving detailed results
+  geneSetAnnotation:
+    geneSet:
+      sources:
+      - source: msigdb
+        call: getGeneSet
+        path: $passthrough
+        rank: 1
+      reason: MSigDB curated gene set — hallmark, KEGG, Reactome, or other collection with member genes and metadata

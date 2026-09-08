@@ -2,19 +2,19 @@ name: rxnorm
 displayName: RxNorm
 description: NLM drug terminology for normalized drug names and interactions
 tags:
-  - drug
-  - terminology
-  - rxnorm
-  - medication
-  - prescription
-  - nlm
+- drug
+- terminology
+- rxnorm
+- medication
+- prescription
+- nlm
 baseUrl: https://rxnav.nlm.nih.gov/REST
 tools:
   search:
     description: Search drugs by name in RxNorm
     tags:
-      - drug-search
-      - rxnorm-search
+    - drug-search
+    - rxnorm-search
     method: GET
     path: /drugs.json
     params:
@@ -25,17 +25,18 @@ tools:
     response:
       format: json
       fields:
-        - drugGroup.name
-        - drugGroup.conceptGroup[].tty
-        - drugGroup.conceptGroup[].conceptProperties[].rxcui
-        - drugGroup.conceptGroup[].conceptProperties[].name
-        - drugGroup.conceptGroup[].conceptProperties[].synonym
-        - drugGroup.conceptGroup[].conceptProperties[].tty
+      - drugGroup.name
+      - drugGroup.conceptGroup[].tty
+      - drugGroup.conceptGroup[].conceptProperties[].rxcui
+      - drugGroup.conceptGroup[].conceptProperties[].name
+      - drugGroup.conceptGroup[].conceptProperties[].synonym
+      - drugGroup.conceptGroup[].conceptProperties[].tty
+    entity: compound
   getProperties:
     description: Get drug concept properties by RxCUI
     tags:
-      - drug-properties
-      - rxcui
+    - drug-properties
+    - rxcui
     method: GET
     path: /rxcui/{rxcui}/properties.json
     params:
@@ -46,17 +47,18 @@ tools:
     response:
       format: json
       fields:
-        - properties.rxcui
-        - properties.name
-        - properties.synonym
-        - properties.tty
-        - properties.language
+      - properties.rxcui
+      - properties.name
+      - properties.synonym
+      - properties.tty
+      - properties.language
+    entity: compound
   getAllRelated:
     description: Get all related drug concepts (brand names, ingredients, dose forms) by RxCUI
     tags:
-      - drug-related
-      - rxcui
-      - concepts
+    - drug-related
+    - rxcui
+    - concepts
     method: GET
     path: /rxcui/{rxcui}/allrelated.json
     params:
@@ -67,16 +69,17 @@ tools:
     response:
       format: json
       fields:
-        - allRelatedGroup.rxcui
-        - allRelatedGroup.conceptGroup[].tty
-        - allRelatedGroup.conceptGroup[].conceptProperties[].rxcui
-        - allRelatedGroup.conceptGroup[].conceptProperties[].name
-        - allRelatedGroup.conceptGroup[].conceptProperties[].tty
+      - allRelatedGroup.rxcui
+      - allRelatedGroup.conceptGroup[].tty
+      - allRelatedGroup.conceptGroup[].conceptProperties[].rxcui
+      - allRelatedGroup.conceptGroup[].conceptProperties[].name
+      - allRelatedGroup.conceptGroup[].conceptProperties[].tty
+    entity: compound
   getDrugInteractions:
     description: Get drug interactions by RxCUI
     tags:
-      - drug-interaction
-      - rxcui
+    - drug-interaction
+    - rxcui
     method: GET
     path: /interaction/interaction.json
     params:
@@ -87,13 +90,14 @@ tools:
     response:
       format: json
       fields:
-        - interactionTypeGroup[].interactionType[].interactionPair[].interactionConcept[].minConceptItem.name
-        - interactionTypeGroup[].interactionType[].interactionPair[].description
+      - interactionTypeGroup[].interactionType[].interactionPair[].interactionConcept[].minConceptItem.name
+      - interactionTypeGroup[].interactionType[].interactionPair[].description
+    entity: compound
   getSpellingSuggestions:
     description: Get spelling suggestions for a drug name
     tags:
-      - drug-spelling
-      - suggestions
+    - drug-spelling
+    - suggestions
     method: GET
     path: /spellingsuggestions.json
     params:
@@ -104,13 +108,14 @@ tools:
     response:
       format: json
       fields:
-        - suggestionGroup.suggestionList.suggestion
-        - suggestionGroup.name
+      - suggestionGroup.suggestionList.suggestion
+      - suggestionGroup.name
+    entity: compound
   getRxcuiByString:
     description: Get RxCUI for a drug by name string
     tags:
-      - rxcui-lookup
-      - drug-id
+    - rxcui-lookup
+    - drug-id
     method: GET
     path: /rxcui.json
     params:
@@ -121,14 +126,15 @@ tools:
     response:
       format: json
       fields:
-        - idGroup.rxnormId
-        - idGroup.name
+      - idGroup.rxnormId
+      - idGroup.name
+    entity: compound
   getRelated:
     description: Get related drug concepts by RxCUI and term type
     tags:
-      - drug-related
-      - rxcui
-      - term-type
+    - drug-related
+    - rxcui
+    - term-type
     method: GET
     path: /rxcui/{rxcui}/related.json
     params:
@@ -143,58 +149,59 @@ tools:
     response:
       format: json
       fields:
-        - relatedGroup.conceptGroup[].conceptProperties[].rxcui
-        - relatedGroup.conceptGroup[].conceptProperties[].name
-        - relatedGroup.conceptGroup[].conceptProperties[].tty
+      - relatedGroup.conceptGroup[].conceptProperties[].rxcui
+      - relatedGroup.conceptGroup[].conceptProperties[].name
+      - relatedGroup.conceptGroup[].conceptProperties[].tty
+    entity: compound
 tests:
   search:
-    - name: searches for metformin
-      params:
-        name: metformin
-      assert:
-        - {}
-        - anyOf:
-            - drugGroup
-            - conceptGroup
+  - name: searches for metformin
+    params:
+      name: metformin
+    assert:
+    - {}
+    - anyOf:
+      - drugGroup
+      - conceptGroup
   getProperties:
-    - name: gets properties for an RxCUI
-      params:
-        rxcui: "861004"
-      assert:
-        - {}
-        - path: properties
+  - name: gets properties for an RxCUI
+    params:
+      rxcui: '861004'
+    assert:
+    - {}
+    - path: properties
   getAllRelated:
-    - name: gets all related concepts for metformin
-      params:
-        rxcui: "6809"
-      assert:
-        - {}
-        - path: allRelatedGroup
+  - name: gets all related concepts for metformin
+    params:
+      rxcui: '6809'
+    assert:
+    - {}
+    - path: allRelatedGroup
   getDrugInteractions:
-    - name: gets drug interactions for acetaminophen (161)
-      params:
-        rxcui: "161"
-      assert:
-        - {}
-      allowError: true
+  - name: gets drug interactions for acetaminophen (161)
+    params:
+      rxcui: '161'
+    assert:
+    - {}
+    allowError: true
   getSpellingSuggestions:
-    - name: gets spelling suggestions for ambienn
-      params:
-        name: ambienn
-      assert:
-        - {}
-        - path: suggestionGroup
+  - name: gets spelling suggestions for ambienn
+    params:
+      name: ambienn
+    assert:
+    - {}
+    - path: suggestionGroup
   getRxcuiByString:
-    - name: gets RxCUI for metformin
-      params:
-        name: metformin
-      assert:
-        - {}
-        - path: idGroup
+  - name: gets RxCUI for metformin
+    params:
+      name: metformin
+    assert:
+    - {}
+    - path: idGroup
   getRelated:
-    - name: gets related concepts for metformin (6809)
-      params:
-        rxcui: "6809"
-      assert:
-        - {}
-        - path: relatedGroup
+  - name: gets related concepts for metformin (6809)
+    params:
+      rxcui: '6809'
+    assert:
+    - {}
+    - path: relatedGroup

@@ -1,18 +1,25 @@
 name: bioportal
 displayName: BioPortal
 description: NCBO BioPortal — search 900+ biomedical ontologies and annotate text with ontology concepts
-tags: [ontology, biomedical, annotation, entity-linking, bioportal, ncbo]
+tags:
+- ontology
+- biomedical
+- annotation
+- entity-linking
+- bioportal
+- ncbo
 baseUrl: https://data.bioontology.org
-
 auth:
   type: apiKey
   param: apikey
   env: LS_BIOPORTAL_API_KEY
-
 tools:
   search:
     description: Search across all biomedical ontologies for terms and concepts
-    tags: [ontology-search, term-search, concept-lookup]
+    tags:
+    - ontology-search
+    - term-search
+    - concept-lookup
     method: GET
     path: /search
     params:
@@ -34,10 +41,13 @@ tools:
         description: Page number
     response:
       format: json
-
-  annotate:
+    entity: ontology-term
+  annotateText:
     description: Annotate free text with matching biomedical ontology concepts
-    tags: [text-annotation, entity-recognition, ner]
+    tags:
+    - text-annotation
+    - entity-recognition
+    - ner
     method: GET
     path: /annotator
     params:
@@ -54,10 +64,12 @@ tools:
         description: Return only the longest matches
     response:
       format: json
-
+    entity: annotation
   getClass:
     description: Get details of a specific ontology class/concept
-    tags: [ontology-lookup, concept-details]
+    tags:
+    - ontology-lookup
+    - concept-details
     method: GET
     path: /ontologies/{ontology}/classes/{classId}
     params:
@@ -71,22 +83,22 @@ tools:
         description: Class URI (e.g. http://purl.bioontology.org/ontology/SNOMEDCT/73211009)
     response:
       format: json
-
+    entity: ontology-term
 tests:
   search:
-    - name: searches for melanoma across ontologies
-      params:
-        query: melanoma
-        pagesize: 5
-      assert:
-        - path: collection
-          minLength: 1
-        - path: collection.0.prefLabel
-      allowError: true
-  annotate:
-    - name: annotates text about cancer
-      params:
-        text: "The patient was diagnosed with breast cancer and started chemotherapy"
-      assert:
-        - minLength: 1
-      allowError: true
+  - name: searches for melanoma across ontologies
+    params:
+      query: melanoma
+      pagesize: 5
+    assert:
+    - path: collection
+      minLength: 1
+    - path: collection.0.prefLabel
+    allowError: true
+  annotateText:
+  - name: annotates text about cancer
+    params:
+      text: The patient was diagnosed with breast cancer and started chemotherapy
+    assert:
+    - minLength: 1
+    allowError: true

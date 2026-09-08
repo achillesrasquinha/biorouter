@@ -2,73 +2,72 @@ name: brainspan
 displayName: BrainSpan
 description: BrainSpan developmental transcriptome — human brain gene expression across developmental stages
 tags:
-  - brain
-  - neuroscience
-  - gene-expression
-  - developmental
-  - transcriptome
+- brain
+- neuroscience
+- gene-expression
+- developmental
+- transcriptome
 baseUrl: https://api.brain-map.org/api/v2/data
-
 tools:
   searchGenes:
     description: Search for gene expression data in the BrainSpan developmental human brain atlas
     tags:
-      - gene-search
-      - brain-expression
+    - gene-search
+    - brain-expression
     method: GET
     path: /query.json
     params:
       criteria:
         type: string
         required: true
-        description: "RMA query criteria (e.g. model::Gene,rma::criteria,[acronym$eq'BDNF'],products[abbreviation$eq'DevHumanBrain'])"
+        description: RMA query criteria (e.g. model::Gene,rma::criteria,[acronym$eq'BDNF'],products[abbreviation$eq'DevHumanBrain'])
     response:
       format: json
       fields:
-        - success
-        - num_rows
-        - total_rows
-        - msg[].id
-        - msg[].acronym
-        - msg[].name
-        - msg[].entrez_id
-        - msg[].ensembl_id
-        - msg[].homologene_id
-        - msg[].organism_id
-        - msg[].chromosome_id
-
+      - success
+      - num_rows
+      - total_rows
+      - msg[].id
+      - msg[].acronym
+      - msg[].name
+      - msg[].entrez_id
+      - msg[].ensembl_id
+      - msg[].homologene_id
+      - msg[].organism_id
+      - msg[].chromosome_id
+    entity: gene
   getExpression:
     description: Get expression data for a section data set from the developmental human brain atlas
     tags:
-      - expression-data
-      - brain-development
+    - expression-data
+    - brain-development
     method: GET
     path: /query.json
     params:
       criteria:
         type: string
         required: true
-        description: "RMA query for expression data (e.g. model::StructureUnionize,rma::criteria,structure_unionizes[section_data_set_id$eq100041420])"
+        description: RMA query for expression data (e.g. model::StructureUnionize,rma::criteria,structure_unionizes[section_data_set_id$eq100041420])
     response:
       format: json
       fields:
-        - success
-        - num_rows
-        - total_rows
-        - msg
-
+      - success
+      - num_rows
+      - total_rows
+      - msg
+    entity: expression
 tests:
   searchGenes:
-    - name: searches for BDNF in developmental brain
-      params:
-        criteria: "model::Gene,rma::criteria,[acronym$eq'BDNF'],products[abbreviation$eq'DevHumanBrain']"
-      assert:
-        - {}
-      allowError: true
+  - name: searches for BDNF in developmental brain
+    params:
+      criteria: model::Gene,rma::criteria,[acronym$eq'BDNF'],products[abbreviation$eq'DevHumanBrain']
+    assert:
+    - {}
+    allowError: true
   getExpression:
-    - name: gets expression data for a section data set
-      params:
-        criteria: "model::StructureUnionize,rma::criteria,structure_unionizes[section_data_set_id$eq100041420]"
-      assert:
-        - {}
-      allowError: true
+  - name: gets expression data for a section data set
+    params:
+      criteria: model::StructureUnionize,rma::criteria,structure_unionizes[section_data_set_id$eq100041420]
+    assert:
+    - {}
+    allowError: true

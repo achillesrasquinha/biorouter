@@ -2,18 +2,18 @@ name: biorxiv
 displayName: bioRxiv
 description: bioRxiv preprint server — access preprints in biology and related sciences
 tags:
-  - preprints
-  - biorxiv
-  - medrxiv
-  - literature
-  - open-access
+- preprints
+- biorxiv
+- medrxiv
+- literature
+- open-access
 baseUrl: https://api.biorxiv.org
 tools:
   getRecent:
     description: Get recent bioRxiv preprints from a date range
     tags:
-      - preprint-search
-      - recent-papers
+    - preprint-search
+    - recent-papers
     method: GET
     path: /details/biorxiv/{startDate}/{endDate}/{cursor}
     params:
@@ -32,21 +32,22 @@ tools:
     response:
       format: json
       fields:
-        - collection[].doi
-        - collection[].title
-        - collection[].authors
-        - collection[].author_corresponding
-        - collection[].author_corresponding_institution
-        - collection[].date
-        - collection[].version
-        - collection[].type
-        - collection[].category
-        - collection[].abstract
+      - collection[].doi
+      - collection[].title
+      - collection[].authors
+      - collection[].author_corresponding
+      - collection[].author_corresponding_institution
+      - collection[].date
+      - collection[].version
+      - collection[].type
+      - collection[].category
+      - collection[].abstract
+    entity: publication
   getByDoi:
     description: Get a specific bioRxiv preprint by DOI suffix
     tags:
-      - preprint-lookup
-      - doi-lookup
+    - preprint-lookup
+    - doi-lookup
     method: GET
     path: /details/biorxiv/10.1101/{doiSuffix}/na/json
     params:
@@ -57,24 +58,25 @@ tools:
     response:
       format: json
       fields:
-        - collection[].doi
-        - collection[].title
-        - collection[].authors
-        - collection[].author_corresponding
-        - collection[].author_corresponding_institution
-        - collection[].date
-        - collection[].version
-        - collection[].type
-        - collection[].category
-        - collection[].abstract
+      - collection[].doi
+      - collection[].title
+      - collection[].authors
+      - collection[].author_corresponding
+      - collection[].author_corresponding_institution
+      - collection[].date
+      - collection[].version
+      - collection[].type
+      - collection[].category
+      - collection[].abstract
+    entity: publication
 tests:
   getRecent:
-    - name: gets recent preprints from a date range
-      params:
-        startDate: 2024-01-01
-        endDate: 2024-01-02
-      assert:
-        - path: collection
-          minLength: 1
-        - path: collection.0.title
-        - path: collection.0.doi
+  - name: gets recent preprints from a date range
+    params:
+      startDate: 2024-01-01
+      endDate: 2024-01-02
+    assert:
+    - path: collection
+      minLength: 1
+    - path: collection.0.title
+    - path: collection.0.doi

@@ -2,18 +2,18 @@ name: obis
 displayName: OBIS
 description: Ocean Biodiversity Information System — marine species occurrence and distribution data
 tags:
-  - marine
-  - ocean
-  - biodiversity
-  - obis
-  - species-distribution
+- marine
+- ocean
+- biodiversity
+- obis
+- species-distribution
 baseUrl: https://api.obis.org/v3
 tools:
   searchOccurrences:
     description: Search OBIS for marine species occurrence records by scientific name
     tags:
-      - occurrence-search
-      - marine-distribution
+    - occurrence-search
+    - marine-distribution
     method: GET
     path: /occurrence
     params:
@@ -29,20 +29,21 @@ tools:
     response:
       format: json
       fields:
-        - total
-        - results[].scientificName
-        - results[].species
-        - results[].taxonID
-        - results[].decimalLatitude
-        - results[].decimalLongitude
-        - results[].eventDate
-        - results[].country
-        - results[].depth
+      - total
+      - results[].scientificName
+      - results[].species
+      - results[].taxonID
+      - results[].decimalLatitude
+      - results[].decimalLongitude
+      - results[].eventDate
+      - results[].country
+      - results[].depth
+    entity: organism
   searchTaxa:
     description: Search OBIS checklist for marine taxa by scientific name
     tags:
-      - taxon-search
-      - marine-taxonomy
+    - taxon-search
+    - marine-taxonomy
     method: GET
     path: /checklist
     params:
@@ -54,23 +55,24 @@ tools:
     response:
       format: json
       fields:
-        - total
-        - results[].scientificName
-        - results[].taxonID
-        - results[].taxonRank
-        - results[].taxonomicStatus
-        - results[].kingdom
-        - results[].phylum
-        - results[].class
-        - results[].order
-        - results[].family
-        - results[].genus
-        - results[].records
+      - total
+      - results[].scientificName
+      - results[].taxonID
+      - results[].taxonRank
+      - results[].taxonomicStatus
+      - results[].kingdom
+      - results[].phylum
+      - results[].class
+      - results[].order
+      - results[].family
+      - results[].genus
+      - results[].records
+    entity: organism
   getTaxon:
     description: Get OBIS taxon details by AphiaID
     tags:
-      - taxon-info
-      - marine-record
+    - taxon-info
+    - marine-record
     method: GET
     path: /taxon/{taxonId}
     params:
@@ -81,37 +83,38 @@ tools:
     response:
       format: json
       fields:
-        - total
-        - results[].scientificName
-        - results[].taxonID
-        - results[].taxonRank
-        - results[].taxonomicStatus
-        - results[].category
-        - results[].family
-        - results[].order
-        - results[].vernacularNames
+      - total
+      - results[].scientificName
+      - results[].taxonID
+      - results[].taxonRank
+      - results[].taxonomicStatus
+      - results[].category
+      - results[].family
+      - results[].order
+      - results[].vernacularNames
+    entity: organism
 tests:
   searchOccurrences:
-    - name: searches occurrences for Carcharodon carcharias
-      params:
-        name: Carcharodon carcharias
-      assert:
-        - path: results
-          minLength: 1
+  - name: searches occurrences for Carcharodon carcharias
+    params:
+      name: Carcharodon carcharias
+    assert:
+    - path: results
+      minLength: 1
   searchTaxa:
-    - name: searches checklist for Carcharodon carcharias
-      params:
-        name: Carcharodon carcharias
-      assert:
-        - path: results
-          minLength: 1
-        - path: results.0.taxonID
+  - name: searches checklist for Carcharodon carcharias
+    params:
+      name: Carcharodon carcharias
+    assert:
+    - path: results
+      minLength: 1
+    - path: results.0.taxonID
   getTaxon:
-    - name: gets taxon by AphiaID 105838
-      params:
-        taxonId: 105838
-      assert:
-        - path: results
-          minLength: 1
-        - path: results.0.scientificName
-          equals: Carcharodon carcharias
+  - name: gets taxon by AphiaID 105838
+    params:
+      taxonId: 105838
+    assert:
+    - path: results
+      minLength: 1
+    - path: results.0.scientificName
+      equals: Carcharodon carcharias

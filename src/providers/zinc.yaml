@@ -2,17 +2,17 @@ name: zinc
 displayName: ZINC
 description: Free database of commercially available compounds for virtual screening
 tags:
-  - compounds
-  - virtual-screening
-  - drug-discovery
-  - chemistry
-  - docking
+- compounds
+- virtual-screening
+- drug-discovery
+- chemistry
+- docking
 baseUrl: https://zinc15.docking.org
 tools:
   search:
     description: Search ZINC compound database by name or SMILES
     tags:
-      - compound-search
+    - compound-search
     method: GET
     path: /substances/search/
     params:
@@ -24,16 +24,17 @@ tools:
     response:
       format: json
       fields:
-        - "[].zinc_id"
-        - "[].name"
-        - "[].smiles"
-        - "[].mwt"
-        - "[].logp"
+      - '[].zinc_id'
+      - '[].name'
+      - '[].smiles'
+      - '[].mwt'
+      - '[].logp'
+    entity: compound
   getSubstance:
     description: Get substance details by ZINC ID
     tags:
-      - compound-info
-      - substance-info
+    - compound-info
+    - substance-info
     method: GET
     path: /substances/{zincId}.json
     params:
@@ -44,29 +45,30 @@ tools:
     response:
       format: json
       fields:
-        - zinc_id
-        - name
-        - smiles
-        - mwt
-        - logp
-        - purchasability
+      - zinc_id
+      - name
+      - smiles
+      - mwt
+      - logp
+      - purchasability
+    entity: compound
 tests:
   search:
-    - name: searches for aspirin
-      params:
-        query: aspirin
-      assert:
-        - {}
-        - anyOf:
-            - isArray: true
-              minLength: 1
-            - path: substances
+  - name: searches for aspirin
+    params:
+      query: aspirin
+    assert:
+    - {}
+    - anyOf:
+      - isArray: true
+        minLength: 1
+      - path: substances
   getSubstance:
-    - name: gets substance by ZINC ID
-      params:
-        zincId: ZINC000000000001
-      assert:
-        - {}
-        - anyOf:
-            - zinc_id
-            - name
+  - name: gets substance by ZINC ID
+    params:
+      zincId: ZINC000000000001
+    assert:
+    - {}
+    - anyOf:
+      - zinc_id
+      - name

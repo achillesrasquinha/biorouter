@@ -2,18 +2,18 @@ name: myvariant
 displayName: MyVariant.info
 description: Variant annotation query service — aggregates genetic variant data from multiple sources
 tags:
-  - variant
-  - snp
-  - mutation
-  - biothings
-  - genomics
+- variant
+- snp
+- mutation
+- biothings
+- genomics
 baseUrl: https://myvariant.info/v1
 tools:
   search:
     description: Search for genetic variants by keyword or query
     tags:
-      - variant-search
-      - snp-search
+    - variant-search
+    - snp-search
     method: GET
     path: /query
     params:
@@ -29,18 +29,19 @@ tools:
     response:
       format: json
       fields:
-        - total
-        - hits[]._id
-        - hits[]._score
-        - hits[].chrom
-        - hits[].dbsnp
-        - hits[].clinvar
-        - hits[].cadd
+      - total
+      - hits[]._id
+      - hits[]._score
+      - hits[].chrom
+      - hits[].dbsnp
+      - hits[].clinvar
+      - hits[].cadd
+    entity: gene
   getVariant:
     description: Get variant annotation by HGVS ID
     tags:
-      - variant-info
-      - variant-annotation
+    - variant-info
+    - variant-annotation
     method: GET
     path: /variant/{variantId}
     params:
@@ -51,26 +52,27 @@ tools:
     response:
       format: json
       fields:
-        - _id
-        - chrom
-        - dbsnp
-        - clinvar
-        - cadd
-        - dbnsfp
-        - gnomad_exome
+      - _id
+      - chrom
+      - dbsnp
+      - clinvar
+      - cadd
+      - dbnsfp
+      - gnomad_exome
+    entity: variant
 tests:
   search:
-    - name: searches for rs7412 variant
-      params:
-        query: rs7412
-      assert:
-        - path: hits
-          minLength: 1
+  - name: searches for rs7412 variant
+    params:
+      query: rs7412
+    assert:
+    - path: hits
+      minLength: 1
   getVariant:
-    - name: gets variant annotation by HGVS ID
-      params:
-        variantId: chr19:g.45412079C>T
-      assert:
-        - anyOf:
-            - _id
-            - dbsnp
+  - name: gets variant annotation by HGVS ID
+    params:
+      variantId: chr19:g.45412079C>T
+    assert:
+    - anyOf:
+      - _id
+      - dbsnp

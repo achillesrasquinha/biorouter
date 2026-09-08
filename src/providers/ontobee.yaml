@@ -2,17 +2,17 @@ name: ontobee
 displayName: Ontobee
 description: Ontobee — ontology term search and browsing across OBO and OWL ontologies
 tags:
-  - ontology
-  - search
-  - obo
-  - owl
+- ontology
+- search
+- obo
+- owl
 baseUrl: https://ontobee.org/api
 tools:
   search:
     description: Search for ontology terms across all loaded ontologies
     tags:
-      - ontology-search
-      - term-search
+    - ontology-search
+    - term-search
     method: GET
     path: /search
     params:
@@ -30,16 +30,17 @@ tools:
     response:
       format: json
       fields:
-        - '[].id'
-        - '[].ontology'
-        - '[].label'
-        - '[].value'
+      - '[].id'
+      - '[].ontology'
+      - '[].label'
+      - '[].value'
+    entity: ontology-term
 tests:
   search:
-    - name: searches for diabetes in Disease Ontology
-      params:
-        term: diabetes
-        ontology: DOID
-        max: 5
-      assert:
-        - minLength: 1
+  - name: searches for diabetes in Disease Ontology
+    params:
+      term: diabetes
+      ontology: DOID
+      max: 5
+    assert:
+    - minLength: 1

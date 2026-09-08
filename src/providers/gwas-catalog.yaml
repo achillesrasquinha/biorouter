@@ -2,18 +2,18 @@ name: gwas-catalog
 displayName: GWAS Catalog
 description: NHGRI-EBI Catalog of genome-wide association studies
 tags:
-  - gwas
-  - genetic-associations
-  - snp
-  - disease-traits
-  - ebi
+- gwas
+- genetic-associations
+- snp
+- disease-traits
+- ebi
 baseUrl: https://www.ebi.ac.uk/gwas/rest/api
 tools:
   search:
     description: Search GWAS Catalog studies by disease trait name
     tags:
-      - gwas-search
-      - association-search
+    - gwas-search
+    - association-search
     method: GET
     path: /studies/search/findByDiseaseTrait
     params:
@@ -33,19 +33,20 @@ tools:
     response:
       format: json
       fields:
-        - _embedded.studies[].accessionId
-        - _embedded.studies[].diseaseTrait.trait
-        - _embedded.studies[].initialSampleSize
-        - _embedded.studies[].snpCount
-        - _embedded.studies[].publicationInfo.pubmedId
-        - _embedded.studies[].publicationInfo.title
-        - _embedded.studies[].publicationInfo.publication
-        - _embedded.studies[].publicationInfo.author.fullname
+      - _embedded.studies[].accessionId
+      - _embedded.studies[].diseaseTrait.trait
+      - _embedded.studies[].initialSampleSize
+      - _embedded.studies[].snpCount
+      - _embedded.studies[].publicationInfo.pubmedId
+      - _embedded.studies[].publicationInfo.title
+      - _embedded.studies[].publicationInfo.publication
+      - _embedded.studies[].publicationInfo.author.fullname
+    entity: disease
   getStudy:
     description: Get GWAS study details by study accession ID
     tags:
-      - study-info
-      - gwas-study
+    - study-info
+    - gwas-study
     method: GET
     path: /studies/{studyId}
     params:
@@ -56,51 +57,44 @@ tools:
     response:
       format: json
       fields:
-        - accessionId
-        - diseaseTrait.trait
-        - initialSampleSize
-        - replicationSampleSize
-        - snpCount
-        - publicationInfo.pubmedId
-        - publicationInfo.title
-        - publicationInfo.publication
-        - publicationInfo.author.fullname
-        - genotypingTechnologies[].genotypingTechnology
+      - accessionId
+      - diseaseTrait.trait
+      - initialSampleSize
+      - replicationSampleSize
+      - snpCount
+      - publicationInfo.pubmedId
+      - publicationInfo.title
+      - publicationInfo.publication
+      - publicationInfo.author.fullname
+      - genotypingTechnologies[].genotypingTechnology
+    entity: dataset
   getAssociations:
     description: Get SNP-trait associations for a GWAS study
     tags:
-      - associations
-      - snp-trait
+    - associations
+    - snp-trait
     method: GET
-    path: /associations/search/findByStudyAccession
+    path: /studies/{studyId}/associations
     params:
       studyId:
         type: string
         required: true
-        mapsTo: accession
         description: GWAS study accession (e.g. GCST90038633)
-      page:
-        type: integer
-        default: 0
-        description: Page number (zero-based)
-      size:
-        type: integer
-        default: 10
-        description: Number of results per page
     response:
       format: json
       fields:
-        - _embedded.associations[].snpInteraction
-        - _embedded.associations[].pvalue
-        - _embedded.associations[].orPerCopyNum
-        - _embedded.associations[].betaNum
+      - _embedded.associations[].snpInteraction
+      - _embedded.associations[].pvalue
+      - _embedded.associations[].orPerCopyNum
+      - _embedded.associations[].betaNum
+    entity: dataset
   searchByPubmed:
     description: Find GWAS studies by PubMed ID
     tags:
-      - pubmed
-      - study-search
+    - pubmed
+    - study-search
     method: GET
-    path: /studies/search/findByPubmedId
+    path: /studies/search/findByPublicationIdPubmedId
     params:
       pubmedId:
         type: string
@@ -113,13 +107,14 @@ tools:
     response:
       format: json
       fields:
-        - _embedded.studies[].accessionId
-        - _embedded.studies[].diseaseTrait.trait
+      - _embedded.studies[].accessionId
+      - _embedded.studies[].diseaseTrait.trait
+    entity: publication
   getSingleNucleotidePolymorphism:
     description: Get SNP details by rsId
     tags:
-      - snp
-      - variant
+    - snp
+    - variant
     method: GET
     path: /singleNucleotidePolymorphisms/{rsId}
     params:
@@ -130,16 +125,17 @@ tools:
     response:
       format: json
       fields:
-        - rsId
-        - merged
-        - functionalClass
-        - locations[].chromosomeName
-        - locations[].chromosomePosition
+      - rsId
+      - merged
+      - functionalClass
+      - locations[].chromosomeName
+      - locations[].chromosomePosition
+    entity: sequence
   getAssociationsByEfoTrait:
     description: Get associations for an EFO trait
     tags:
-      - efo
-      - associations
+    - efo
+    - associations
     method: GET
     path: /efoTraits/{efoId}/associations
     params:
@@ -158,20 +154,21 @@ tools:
     response:
       format: json
       fields:
-        - _embedded.associations[].pvalue
-        - _embedded.associations[].snpInteraction
-  searchByGene:
-    description: Find GWAS studies by gene symbol
+      - _embedded.associations[].pvalue
+      - _embedded.associations[].snpInteraction
+    entity: dataset
+  searchByEfoTrait:
+    description: Find GWAS studies by EFO trait URI
     tags:
-      - gene-search
-      - study-search
+    - efo-search
+    - study-search
     method: GET
-    path: /studies/search/findByGeneSymbol
+    path: /studies/search/findByEfoTrait
     params:
-      geneSymbol:
+      efoTrait:
         type: string
         required: true
-        description: Gene symbol (e.g. BRCA2)
+        description: EFO trait name (e.g. diabetes mellitus)
       page:
         type: integer
         default: 0
@@ -183,14 +180,15 @@ tools:
     response:
       format: json
       fields:
-        - _embedded.studies[].accessionId
-        - _embedded.studies[].diseaseTrait.trait
-        - _embedded.studies[].publicationInfo.title
-  getStudySummary:
+      - _embedded.studies[].accessionId
+      - _embedded.studies[].diseaseTrait.trait
+      - _embedded.studies[].publicationInfo.title
+    entity: disease
+  getStudySnps:
     description: Get SNPs associated with a GWAS study
     tags:
-      - study-snps
-      - summary
+    - study-snps
+    - summary
     method: GET
     path: /studies/{studyId}/snps
     params:
@@ -201,13 +199,14 @@ tools:
     response:
       format: json
       fields:
-        - _embedded.singleNucleotidePolymorphisms[].rsId
-        - _embedded.singleNucleotidePolymorphisms[].functionalClass
+      - _embedded.singleNucleotidePolymorphisms[].rsId
+      - _embedded.singleNucleotidePolymorphisms[].functionalClass
+    entity: dataset
   listEfoTraits:
     description: Browse available EFO traits
     tags:
-      - efo
-      - browse
+    - efo
+    - browse
     method: GET
     path: /efoTraits
     params:
@@ -222,15 +221,16 @@ tools:
     response:
       format: json
       fields:
-        - _embedded.efoTraits[].shortForm
-        - _embedded.efoTraits[].trait
-  getAncestries:
-    description: Get ancestry information for a GWAS study
+      - _embedded.efoTraits[].shortForm
+      - _embedded.efoTraits[].trait
+    entity: dataset
+  getStudyEfoTraits:
+    description: Get EFO traits associated with a GWAS study
     tags:
-      - ancestry
-      - study-info
+    - efo
+    - study-info
     method: GET
-    path: /studies/{studyId}/ancestries
+    path: /studies/{studyId}/efoTraits
     params:
       studyId:
         type: string
@@ -239,79 +239,77 @@ tools:
     response:
       format: json
       fields:
-        - _embedded.ancestries[].type
-        - _embedded.ancestries[].numberOfIndividuals
-        - _embedded.ancestries[].ancestralGroups[].ancestralGroup
+      - _embedded.efoTraits[].shortForm
+      - _embedded.efoTraits[].trait
+    entity: dataset
 tests:
   search:
-    - name: searches for diabetes studies by trait
-      params:
-        query: diabetes
-      assert:
-        - path: _embedded.studies
-          minLength: 1
+  - name: searches for diabetes studies by trait
+    params:
+      query: diabetes
+    assert:
+    - path: _embedded.studies
+      minLength: 1
   getStudy:
-    - name: gets a specific GWAS study by accession
-      params:
-        studyId: GCST90038633
-      assert:
-        - anyOf:
-            - accessionId
-            - diseaseTrait
+  - name: gets a specific GWAS study by accession
+    params:
+      studyId: GCST90038633
+    assert:
+    - anyOf:
+      - accessionId
+      - diseaseTrait
   getAssociations:
-    - name: gets associations for a GWAS study
-      params:
-        studyId: GCST90038633
-        page: 0
-        size: 5
-      assert:
-        - path: _embedded.associations
+  - name: gets associations for a GWAS study
+    params:
+      studyId: GCST90038633
+    assert:
+    - path: _embedded.associations
   searchByPubmed:
-    - name: finds studies by PubMed ID
-      params:
-        pubmedId: "25673413"
-      assert:
-        - path: _embedded.studies
+  - name: finds studies by PubMed ID
+    params:
+      pubmedId: '25673413'
+    assert:
+    - path: _embedded.studies
   getSingleNucleotidePolymorphism:
-    - name: gets SNP details for rs7412
-      params:
-        rsId: rs7412
-      assert:
-        - path: rsId
-          equals: rs7412
-        - path: functionalClass
+  - name: gets SNP details for rs7412
+    params:
+      rsId: rs7412
+    assert:
+    - path: rsId
+      equals: rs7412
+    - path: functionalClass
   getAssociationsByEfoTrait:
-    - name: gets associations for EFO_0000270
-      params:
-        efoId: EFO_0000270
-        page: 0
-        size: 5
-      assert:
-        - path: _embedded.associations
-  searchByGene:
-    - name: finds studies for BRCA2 gene
-      params:
-        geneSymbol: BRCA2
-        page: 0
-        size: 5
-      assert:
-        - path: _embedded.studies
-  getStudySummary:
-    - name: gets SNPs for a GWAS study
-      params:
-        studyId: GCST90038633
-      assert:
-        - path: _embedded.singleNucleotidePolymorphisms
+  - name: gets associations for EFO_0000270
+    params:
+      efoId: EFO_0000270
+      page: 0
+      size: 5
+    assert:
+    - path: _embedded.associations
+  searchByEfoTrait:
+  - name: finds studies for diabetes mellitus EFO trait
+    params:
+      efoTrait: diabetes mellitus
+      page: 0
+      size: 5
+    assert:
+    - path: _embedded.studies
+  getStudySnps:
+  - name: gets SNPs for a GWAS study
+    params:
+      studyId: GCST90038633
+    assert:
+    - path: _embedded.singleNucleotidePolymorphisms
   listEfoTraits:
-    - name: lists available EFO traits
-      params:
-        page: 0
-        size: 10
-      assert:
-        - path: _embedded.efoTraits
-  getAncestries:
-    - name: gets ancestry info for a GWAS study
-      params:
-        studyId: GCST90038633
-      assert:
-        - path: _embedded.ancestries
+  - name: lists available EFO traits
+    params:
+      page: 0
+      size: 10
+    assert:
+    - path: _embedded.efoTraits
+  getStudyEfoTraits:
+  - name: gets EFO traits for a GWAS study
+    params:
+      studyId: GCST90038633
+    assert:
+    - path: _embedded.efoTraits

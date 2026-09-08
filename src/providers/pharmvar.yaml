@@ -2,11 +2,11 @@ name: pharmvar
 displayName: PharmVar
 description: PharmVar — Pharmacogene Variation Consortium database of pharmacogenomic variant alleles
 tags:
-  - pharmacogenomics
-  - variant
-  - allele
-  - pharmvar
-  - cyp
+- pharmacogenomics
+- variant
+- allele
+- pharmvar
+- cyp
 baseUrl: https://www.pharmvar.org/api-service
 auth:
   type: apiKey
@@ -16,8 +16,8 @@ tools:
   getAlleles:
     description: Get alleles for a pharmacogene (e.g. CYP2D6, CYP2C19)
     tags:
-      - allele-list
-      - pharmacogene
+    - allele-list
+    - pharmacogene
     method: GET
     path: /alleles
     params:
@@ -27,19 +27,21 @@ tools:
         description: Gene name (e.g. CYP2D6, CYP2C19, CYP3A4)
     response:
       format: json
+    entity: variant
   getGenes:
     description: List all pharmacogenes tracked by PharmVar
     tags:
-      - gene-list
-      - pharmacogene
+    - gene-list
+    - pharmacogene
     method: GET
     path: /genes
     params: {}
     response:
       format: json
+    entity: gene
 tests:
   getGenes:
-    - name: lists pharmacogenes
-      params: {}
-      assert: []
-      allowError: true
+  - name: lists pharmacogenes
+    params: {}
+    assert: []
+    allowError: true

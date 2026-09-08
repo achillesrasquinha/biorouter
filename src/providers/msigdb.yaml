@@ -2,19 +2,19 @@ name: msigdb
 displayName: MSigDB
 description: Molecular Signatures Database — curated gene set collections for enrichment analysis
 tags:
-  - gene-set
-  - enrichment
-  - msigdb
-  - hallmark
-  - pathway
-  - signature
+- gene-set
+- enrichment
+- msigdb
+- hallmark
+- pathway
+- signature
 baseUrl: https://www.gsea-msigdb.org/gsea/msigdb/human
 tools:
   getGeneSet:
     description: Get a gene set with all member genes
     tags:
-      - gene-set-info
-      - enrichment-lookup
+    - gene-set-info
+    - enrichment-lookup
     method: GET
     path: /download_geneset.jsp
     params:
@@ -28,18 +28,19 @@ tools:
     response:
       format: json
       fields:
-        - "{geneSetName}.systematicName"
-        - "{geneSetName}.collection"
-        - "{geneSetName}.geneSymbols"
-        - "{geneSetName}.pmid"
-        - "{geneSetName}.msigdbURL"
-        - "{geneSetName}.exactSource"
+      - '{geneSetName}.systematicName'
+      - '{geneSetName}.collection'
+      - '{geneSetName}.geneSymbols'
+      - '{geneSetName}.pmid'
+      - '{geneSetName}.msigdbURL'
+      - '{geneSetName}.exactSource'
+    entity: gene
 tests:
   getGeneSet:
-    - name: gets HALLMARK_APOPTOSIS gene set
-      params:
-        geneSetName: HALLMARK_APOPTOSIS
-      assert:
-        - path: HALLMARK_APOPTOSIS
-        - path: HALLMARK_APOPTOSIS.geneSymbols
-          minLength: 1
+  - name: gets HALLMARK_APOPTOSIS gene set
+    params:
+      geneSetName: HALLMARK_APOPTOSIS
+    assert:
+    - path: HALLMARK_APOPTOSIS
+    - path: HALLMARK_APOPTOSIS.geneSymbols
+      minLength: 1

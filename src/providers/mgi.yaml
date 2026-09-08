@@ -1,0 +1,144 @@
+name: mgi
+displayName: Mouse Genome Informatics
+description: Mouse Genome Informatics (MGI) — mouse genetics, genomics, phenotyping, and gene expression data
+tags:
+- mouse
+- model-organism
+- genetics
+- phenotype
+- mgi
+baseUrl: https://www.informatics.jax.org
+tools:
+  search:
+    description: Search MGI for mouse markers (genes, QTLs, etc.) by keyword
+    tags:
+    - gene-search
+    - marker-search
+    method: GET
+    path: /api/marker/search
+    params:
+      query:
+        type: string
+        required: true
+        description: Search term for mouse markers (e.g. "Trp53", "Brca1")
+      limit:
+        type: integer
+        default: 10
+        description: Maximum number of results to return
+    response:
+      format: json
+      fields:
+      - totalCount
+      - summaryRows[].mgiId
+      - summaryRows[].symbol
+      - summaryRows[].name
+      - summaryRows[].chr
+      - summaryRows[].featureType
+    entity: gene
+  getMarker:
+    description: Get detailed marker (gene) information by MGI accession ID
+    tags:
+    - gene-detail
+    - marker-info
+    method: GET
+    path: /api/marker/{mgiId}
+    params:
+      mgiId:
+        type: string
+        required: true
+        description: MGI accession ID (e.g. "MGI:98834" for Trp53)
+    response:
+      format: json
+      fields:
+      - mgiId
+      - symbol
+      - name
+      - chr
+      - featureType
+      - genomicPosition
+      - synonyms
+    entity: gene
+  searchAlleles:
+    description: Search MGI for mouse alleles by keyword
+    tags:
+    - allele-search
+    - variant-search
+    method: GET
+    path: /api/allele/search
+    params:
+      query:
+        type: string
+        required: true
+        description: Search term for alleles (e.g. "Trp53", "knockout")
+      limit:
+        type: integer
+        default: 10
+        description: Maximum number of results to return
+    response:
+      format: json
+      fields:
+      - totalCount
+      - summaryRows[].alleleId
+      - summaryRows[].alleleSymbol
+      - summaryRows[].alleleName
+      - summaryRows[].alleleType
+      - summaryRows[].markerSymbol
+    entity: variant
+  searchPhenotypes:
+    description: Search MGI gene expression data (GXD) by keyword
+    tags:
+    - phenotype-search
+    - expression-search
+    method: GET
+    path: /api/gxd/search
+    params:
+      query:
+        type: string
+        required: true
+        description: Search term for gene expression / phenotype data (e.g. "Pax6", "brain")
+      limit:
+        type: integer
+        default: 10
+        description: Maximum number of results to return
+    response:
+      format: json
+      fields:
+      - totalCount
+      - summaryRows[].gene
+      - summaryRows[].assayType
+      - summaryRows[].stage
+      - summaryRows[].structure
+      - summaryRows[].detectionLevel
+    entity: phenotype
+tests:
+  search:
+  - name: searches for Trp53 marker
+    params:
+      query: Trp53
+      limit: 5
+    assert:
+    - {}
+    allowError: true
+  getMarker:
+  - name: gets marker details for Trp53
+    params:
+      mgiId: MGI:98834
+    assert:
+    - {}
+    allowError: true
+  searchAlleles:
+  - name: searches for Trp53 alleles
+    params:
+      query: Trp53
+      limit: 5
+    assert:
+    - {}
+    allowError: true
+  searchPhenotypes:
+  - name: searches for Pax6 expression data
+    params:
+      query: Pax6
+      limit: 5
+    assert:
+    - {}
+    allowError: true

@@ -1,0 +1,431 @@
+description: Search and retrieve sequences — nucleotide, protein, genomic context, alignments, and domain annotations
+tags:
+- sequence
+- search
+- nucleotide
+- alignment
+- genomic
+- biorouter
+input:
+  query:
+    type: string
+    required: true
+    description: Gene name, accession, genomic coordinates, or raw sequence (e.g. "BRCA1", "NM_007294.4", "chr17:43044295-43125483",
+      "MVLSPADKTNV...")
+phases:
+- name: resolve
+  parallel: false
+  calls:
+  - source: ncbi-datasets
+    tool: getGeneBySymbol
+    params:
+      symbol: '{input.query}'
+    extract:
+      gene_id: genes[0].gene.gene_id
+      gene_symbol: genes[0].gene.symbol
+      description: genes[0].gene.description
+      organism: genes[0].gene.tax_name
+      chromosome: genes[0].gene.chromosomes[0]
+      accession: genes[0].gene.genomic_ranges[0].accession_version
+      start: genes[0].gene.genomic_ranges[0].range[0].begin
+      end: genes[0].gene.genomic_ranges[0].range[0].end
+      strand: genes[0].gene.genomic_ranges[0].range[0].orientation
+- name: fetch
+  parallel: true
+  calls:
+  - source: nucleotide
+    tool: search
+    params:
+      query: '{resolved.gene_symbol}'
+    skip_if: '!resolved.gene_symbol'
+    provides:
+    - sequences
+  - source: nucleotide
+    tool: getSummary
+    params:
+      id: '{resolved.accession}'
+    skip_if: '!resolved.accession'
+    provides:
+    - sequences
+  - source: ncbi-protein
+    tool: search
+    params:
+      query: '{resolved.gene_symbol}'
+    skip_if: '!resolved.gene_symbol'
+    provides:
+    - sequences
+  - source: ena
+    tool: search
+    params:
+      query: '{resolved.gene_symbol}'
+    skip_if: '!resolved.gene_symbol'
+    provides:
+    - sequences
+  - source: uniparc
+    tool: search
+    params:
+      query: '{resolved.gene_symbol}'
+    skip_if: '!resolved.gene_symbol'
+    provides:
+    - sequences
+  - source: uniref
+    tool: search
+    params:
+      query: '{resolved.gene_symbol}'
+    skip_if: '!resolved.gene_symbol'
+    provides:
+    - sequences
+  - source: ddbj
+    tool: getEntry
+    params:
+      id: '{resolved.accession}'
+    skip_if: '!resolved.accession'
+    provides:
+    - crossReferences
+  - source: dbfetch
+    tool: fetchEntry
+    params:
+      db: ena_sequence
+      id: '{resolved.accession}'
+    skip_if: '!resolved.accession'
+    provides:
+    - crossReferences
+  - source: ucsc-api
+    tool: getTrackData
+    params:
+      genome: hg38
+      track: knownGene
+      chrom: chr{resolved.chromosome}
+      start: '{resolved.start}'
+      end: '{resolved.end}'
+    skip_if: '!resolved.chromosome || !resolved.start || !resolved.end'
+    provides:
+    - genomeContext
+  - source: ucsc-api
+    tool: getSequence
+    params:
+      genome: hg38
+      chrom: chr{resolved.chromosome}
+      start: '{resolved.start}'
+      end: '{resolved.end}'
+    skip_if: '!resolved.chromosome || !resolved.start || !resolved.end'
+    provides:
+    - genomeContext
+  - source: ncbi-blast
+    tool: submitBlast
+    params:
+      CMD: Put
+      QUERY: '{input.query}'
+      DATABASE: nr
+      PROGRAM: blastn
+    provides:
+    - alignment
+  - source: hmmer
+    tool: search
+    params:
+      seqdb: pdb
+      seq: '{input.query}'
+    provides:
+    - alignment
+  - source: clustal-omega
+    tool: submitAlignment
+    params:
+      email: biorouter@example.org
+      sequence: '{input.query}'
+    provides:
+    - alignment
+  - source: rfam
+    tool: search
+    params:
+      query: '{resolved.gene_symbol}'
+    skip_if: '!resolved.gene_symbol'
+    provides:
+    - noncodingRna
+  - source: rnacentral
+    tool: search
+    params:
+      query: '{resolved.gene_symbol}'
+    skip_if: '!resolved.gene_symbol'
+    provides:
+    - noncodingRna
+  - source: ncbi-gene
+    tool: search
+    params:
+      query: '{resolved.gene_symbol}'
+    skip_if: '!resolved.gene_symbol'
+    provides:
+    - geneFunction
+  - source: ncbi-gene
+    tool: getSummary
+    params:
+      id: '{resolved.gene_id}'
+    skip_if: '!resolved.gene_id'
+    provides:
+    - geneFunction
+  - source: cdd
+    tool: search
+    params:
+      queries: '{input.query}'
+    provides:
+    - domainAnnotations
+  - source: pfam
+    tool: searchFamily
+    params:
+      query: '{resolved.gene_symbol}'
+    skip_if: '!resolved.gene_symbol'
+    provides:
+    - proteinFamilies
+  - source: ena
+    tool: getSummary
+    params:
+      accession: '{resolved.accession}'
+    skip_if: '!resolved.accession'
+    provides:
+    - sequences
+  - source: ncbi-datasets
+    tool: getGeneById
+    params:
+      geneId: '{resolved.gene_id}'
+    skip_if: '!resolved.gene_id'
+    provides:
+    - geneFunction
+  - source: ncbi-protein
+    tool: getSummary
+    params:
+      id: '{resolved.gene_id}'
+    skip_if: '!resolved.gene_id'
+    provides:
+    - sequences
+  - source: ucsc-api
+    tool: search
+    params:
+      genome: hg38
+      search: '{resolved.gene_symbol}'
+    skip_if: '!resolved.gene_symbol'
+    provides:
+    - genomeContext
+  - source: ucsc
+    tool: getGenomes
+    params: {}
+    provides:
+    - genomeContext
+output:
+  identity:
+    geneId:
+      sources:
+      - source: ncbi-datasets
+        call: getGeneBySymbol
+        path: genes[0].gene.gene_id
+        rank: 1
+      reason: NCBI Gene ID — canonical numeric identifier for the gene
+    geneSymbol:
+      sources:
+      - source: ncbi-datasets
+        call: getGeneBySymbol
+        path: genes[0].gene.symbol
+        rank: 1
+      reason: Official HGNC gene symbol
+    accession:
+      sources:
+      - source: ncbi-datasets
+        call: getGeneBySymbol
+        path: genes[0].gene.genomic_ranges[0].accession_version
+        rank: 1
+      reason: RefSeq genomic accession for the gene locus
+    organism:
+      sources:
+      - source: ncbi-datasets
+        call: getGeneBySymbol
+        path: genes[0].gene.tax_name
+        rank: 1
+      reason: Source organism for this gene
+    description:
+      sources:
+      - source: ncbi-datasets
+        call: getGeneBySymbol
+        path: genes[0].gene.description
+        rank: 1
+      reason: NCBI gene description — full gene name and function
+    genomicLocation:
+      sources:
+      - source: ncbi-datasets
+        call: getGeneBySymbol
+        path: genes[0].gene.genomic_ranges[0]
+        rank: 1
+      reason: Chromosome, start, end, and strand for the gene
+  sequences:
+    nucleotideRecords:
+      sources:
+      - source: nucleotide
+        call: search
+        path: $passthrough
+        rank: 1
+      reason: NCBI Nucleotide database — RefSeq and GenBank nucleotide records
+    nucleotideSummary:
+      sources:
+      - source: nucleotide
+        call: getSummary
+        path: $passthrough
+        rank: 1
+      reason: NCBI Nucleotide document summary — accession metadata, titles, lengths
+    proteinRecords:
+      sources:
+      - source: ncbi-protein
+        call: search
+        path: $passthrough
+        rank: 1
+      reason: NCBI Protein database — RefSeq and GenBank protein records matching the gene symbol
+    enaRecords:
+      sources:
+      - source: ena
+        call: search
+        path: $passthrough
+        rank: 1
+      reason: European Nucleotide Archive — EMBL-EBI sequence records and assembled/annotated data
+    enaSummary:
+      sources:
+      - source: ena
+        call: getSummary
+        path: summaries
+        rank: 1
+      reason: ENA accession summary — molecule type, sequence length, taxon, and publication date
+    proteinSummary:
+      sources:
+      - source: ncbi-protein
+        call: getSummary
+        path: $passthrough
+        rank: 1
+      reason: NCBI Protein summary — accession metadata, protein name, and organism details
+    uniparcEntries:
+      sources:
+      - source: uniparc
+        call: search
+        path: $passthrough
+        rank: 1
+      reason: UniParc — non-redundant cross-archive protein sequence repository
+    unirefClusters:
+      sources:
+      - source: uniref
+        call: search
+        path: $passthrough
+        rank: 1
+      reason: UniRef — clustered protein sequences at 100/90/50% identity thresholds
+  genomeContext:
+    ucscTracks:
+      sources:
+      - source: ucsc-api
+        call: getTrackData
+        path: $passthrough
+        rank: 1
+      reason: UCSC Genome Browser track data — gene models and annotations in the locus
+    genomicSequence:
+      sources:
+      - source: ucsc-api
+        call: getSequence
+        path: $passthrough
+        rank: 1
+      reason: UCSC genomic DNA sequence for the specified chromosomal region
+    ucscSearchResults:
+      sources:
+      - source: ucsc-api
+        call: search
+        path: positionMatches
+        rank: 1
+      reason: UCSC genome search — gene position matches and coordinate lookups
+    genomeAssemblies:
+      sources:
+      - source: ucsc
+        call: getGenomes
+        path: ucscGenomes
+        rank: 1
+      reason: UCSC genome assemblies — available reference genomes with metadata for species, clade, and build
+  alignment:
+    blastResults:
+      sources:
+      - source: ncbi-blast
+        call: submitBlast
+        path: $passthrough
+        rank: 1
+      reason: NCBI BLAST job submission — returns request ID for async polling (use ncbi-blast/getResults to retrieve)
+    hmmerResults:
+      sources:
+      - source: hmmer
+        call: search
+        path: $passthrough
+        rank: 1
+      reason: HMMER profile-based sequence search — domain hits and E-values from phmmer/hmmscan
+    clustalAlignment:
+      sources:
+      - source: clustal-omega
+        call: submitAlignment
+        path: $passthrough
+        rank: 1
+      reason: Clustal Omega MSA job submission — returns job ID for async polling (use clustal-omega/getStatus and getResult)
+  noncodingRna:
+    rfamFamilies:
+      sources:
+      - source: rfam
+        call: search
+        path: $passthrough
+        rank: 1
+      reason: Rfam — curated non-coding RNA families, conserved structures, and covariance models
+    rnacentralEntries:
+      sources:
+      - source: rnacentral
+        call: search
+        path: $passthrough
+        rank: 1
+      reason: RNAcentral — comprehensive non-coding RNA sequence database aggregating 40+ member databases
+  geneFunction:
+    ncbiGeneIds:
+      sources:
+      - source: ncbi-gene
+        call: search
+        path: esearchresult.idlist
+        rank: 1
+      reason: NCBI Gene search — matching Gene IDs for the query symbol
+    ncbiGeneSummary:
+      sources:
+      - source: ncbi-gene
+        call: getSummary
+        path: $passthrough
+        rank: 1
+      reason: NCBI Gene summary — gene function, nomenclature, and genomic context from Entrez Gene
+    ncbiGeneById:
+      sources:
+      - source: ncbi-datasets
+        call: getGeneById
+        path: $passthrough
+        rank: 1
+      reason: NCBI Datasets gene info by ID — detailed gene report with type, chromosomes, and descriptions
+  domainAnnotations:
+    cddDomains:
+      sources:
+      - source: cdd
+        call: search
+        path: $passthrough
+        rank: 1
+      reason: CDD — NCBI Conserved Domain Database hits identifying functional domains in the query sequence
+  proteinFamilies:
+    pfamFamilies:
+      sources:
+      - source: pfam
+        call: searchFamily
+        path: results
+        rank: 1
+      reason: Pfam — protein family and domain classifications matching the gene from InterPro
+  crossReferences:
+    dbfetchEntry:
+      sources:
+      - source: dbfetch
+        call: fetchEntry
+        path: $passthrough
+        rank: 1
+      reason: EBI dbfetch — cross-database entry retrieval by accession from EMBL, UniProt, PDB, and more
+    ddbjEntry:
+      sources:
+      - source: ddbj
+        call: getEntry
+        path: $passthrough
+        rank: 1
+      reason: DDBJ — DNA Data Bank of Japan sequence entry for INSDC shared accessions

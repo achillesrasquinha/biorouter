@@ -2,11 +2,11 @@ name: regulomedb
 displayName: RegulomeDB
 description: RegulomeDB — annotate and score regulatory variants in the human genome
 tags:
-  - regulatory
-  - variant
-  - epigenomics
-  - regulome
-  - functional-annotation
+- regulatory
+- variant
+- epigenomics
+- regulome
+- functional-annotation
 baseUrl: https://regulomedb.org
 headers:
   Accept: application/json
@@ -14,8 +14,8 @@ tools:
   search:
     description: Search for regulatory variants in a genomic region
     tags:
-      - regulatory-search
-      - variant-annotation
+    - regulatory-search
+    - variant-annotation
     method: GET
     path: /regulome-search/
     params:
@@ -30,17 +30,18 @@ tools:
     response:
       format: json
       fields:
-        - total
-        - regulome_score.probability
-        - regulome_score.ranking
-        - variants
-        - nearby_snps
-        - assembly
-        - query_coordinates
+      - total
+      - regulome_score.probability
+      - regulome_score.ranking
+      - variants
+      - nearby_snps
+      - assembly
+      - query_coordinates
+    entity: variant
 tests:
   search:
-    - name: searches for regulatory variants in a region
-      params:
-        regions: chr1:39447519-39447520
-        genome: GRCh38
-      assert: []
+  - name: searches for regulatory variants in a region
+    params:
+      regions: chr1:39447519-39447520
+      genome: GRCh38
+    assert: []

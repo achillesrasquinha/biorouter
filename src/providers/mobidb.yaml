@@ -2,18 +2,18 @@ name: mobidb
 displayName: MobiDB
 description: Protein disorder and mobility annotations
 tags:
-  - disorder
-  - protein
-  - mobility
-  - annotation
-  - mobidb
+- disorder
+- protein
+- mobility
+- annotation
+- mobidb
 baseUrl: https://mobidb.org/api
 tools:
   getEntry:
     description: Get disorder annotations for a protein by UniProt accession
     tags:
-      - disorder-annotation
-      - protein-mobility
+    - disorder-annotation
+    - protein-mobility
     method: GET
     path: /download
     params:
@@ -27,20 +27,21 @@ tools:
     response:
       format: json
       fields:
-        - acc
-        - gene
-        - name
-        - organism
-        - length
-        - ncbi_taxon_id
-        - sequence
+      - acc
+      - gene
+      - name
+      - organism
+      - length
+      - ncbi_taxon_id
+      - sequence
+    entity: protein
 tests:
   getEntry:
-    - name: gets disorder annotations for P04637 (TP53)
-      params:
-        acc: P04637
-      assert:
-        - {}
-        - anyOf:
-            - acc
-            - gene
+  - name: gets disorder annotations for P04637 (TP53)
+    params:
+      acc: P04637
+    assert:
+    - {}
+    - anyOf:
+      - acc
+      - gene

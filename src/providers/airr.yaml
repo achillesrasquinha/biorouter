@@ -2,86 +2,90 @@ name: airr
 displayName: AIRR Data Commons
 description: AIRR Data Commons — adaptive immune receptor repertoire sequencing data
 tags:
-  - immunology
-  - repertoire
-  - adaptive-immunity
-  - airr
-  - tcr
-  - bcr
+- immunology
+- repertoire
+- adaptive-immunity
+- airr
+- tcr
+- bcr
 baseUrl: https://vdjserver.org/airr/v1
 tools:
   searchRepertoires:
     description: Search AIRR Data Commons for immune repertoire metadata using AIRR query format
     tags:
-      - repertoire-search
-      - immune-search
+    - repertoire-search
+    - immune-search
     method: POST
     path: /repertoire
     params:
       filters:
         type: object
         required: true
-        description: >
-          AIRR-compliant query filters (e.g. {"op":"contains","content":{"field":"study.study_title","value":"COVID"}})
+        description: 'AIRR-compliant query filters (e.g. {"op":"contains","content":{"field":"study.study_title","value":"COVID"}})
+
+          '
     response:
       format: json
       fields:
-        - Repertoire[].repertoire_id
-        - Repertoire[].repertoire_name
-        - Repertoire[].study.study_id
-        - Repertoire[].study.study_title
-        - Repertoire[].study.study_description
-        - Repertoire[].subject.subject_id
-        - Repertoire[].subject.species.label
-        - Repertoire[].subject.sex
-        - Repertoire[].subject.diagnosis[].study_group_description
-        - Repertoire[].sample[].sample_id
+      - Repertoire[].repertoire_id
+      - Repertoire[].repertoire_name
+      - Repertoire[].study.study_id
+      - Repertoire[].study.study_title
+      - Repertoire[].study.study_description
+      - Repertoire[].subject.subject_id
+      - Repertoire[].subject.species.label
+      - Repertoire[].subject.sex
+      - Repertoire[].subject.diagnosis[].study_group_description
+      - Repertoire[].sample[].sample_id
+    entity: sample
   searchRearrangements:
     description: Search AIRR Data Commons for rearrangement sequences using AIRR query format
     tags:
-      - rearrangement-search
-      - sequence-search
+    - rearrangement-search
+    - sequence-search
     method: POST
     path: /rearrangement
     params:
       filters:
         type: object
         required: true
-        description: >
-          AIRR-compliant query filters (e.g. {"op":"=","content":{"field":"junction_aa","value":"CASSLAPGATNEKLFF"}})
+        description: 'AIRR-compliant query filters (e.g. {"op":"=","content":{"field":"junction_aa","value":"CASSLAPGATNEKLFF"}})
+
+          '
     response:
       format: json
       fields:
-        - Rearrangement[].sequence_id
-        - Rearrangement[].sequence
-        - Rearrangement[].productive
-        - Rearrangement[].v_call
-        - Rearrangement[].d_call
-        - Rearrangement[].j_call
-        - Rearrangement[].junction_aa
-        - Rearrangement[].locus
-        - Rearrangement[].cdr3_aa
-        - Rearrangement[].repertoire_id
+      - Rearrangement[].sequence_id
+      - Rearrangement[].sequence
+      - Rearrangement[].productive
+      - Rearrangement[].v_call
+      - Rearrangement[].d_call
+      - Rearrangement[].j_call
+      - Rearrangement[].junction_aa
+      - Rearrangement[].locus
+      - Rearrangement[].cdr3_aa
+      - Rearrangement[].repertoire_id
+    entity: sequence
 tests:
   searchRepertoires:
-    - name: searches for repertoires
-      params:
-        filters:
-          op: contains
-          content:
-            field: study.study_title
-            value: COVID
-      assert:
-        - {}
-      allowError: true
+  - name: searches for repertoires
+    params:
+      filters:
+        op: contains
+        content:
+          field: study.study_title
+          value: COVID
+    assert:
+    - {}
+    allowError: true
   searchRearrangements:
-    - name: searches for rearrangements
-      params:
-        filters:
-          op: "="
-          content:
-            field: junction_aa
-            value: CASSLAPGATNEKLFF
-      assert:
-        - {}
-      allowError: true
+  - name: searches for rearrangements
+    params:
+      filters:
+        op: '='
+        content:
+          field: junction_aa
+          value: CASSLAPGATNEKLFF
+    assert:
+    - {}
+    allowError: true

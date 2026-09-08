@@ -2,38 +2,39 @@ name: expression-atlas
 displayName: Expression Atlas
 description: Gene expression patterns across species and biological conditions (EBI)
 tags:
-  - gene-expression
-  - transcriptomics
-  - atlas
-  - ebi
+- gene-expression
+- transcriptomics
+- atlas
+- ebi
 baseUrl: https://www.ebi.ac.uk/gxa/json
 tools:
   listExperiments:
     description: List Expression Atlas experiments, optionally filtered by species
     tags:
-      - experiment-list
-      - expression-search
+    - experiment-list
+    - expression-search
     method: GET
     path: /experiments
     params:
       species:
         type: string
-        default: ""
+        default: ''
         description: Species filter (e.g. "Homo sapiens", "Mus musculus")
     response:
       format: json
       fields:
-        - "experiments[].experimentAccession"
-        - "experiments[].experimentDescription"
-        - "experiments[].species"
-        - "experiments[].experimentType"
-        - "experiments[].numberOfAssays"
-        - "experiments[].experimentalFactors"
+      - experiments[].experimentAccession
+      - experiments[].experimentDescription
+      - experiments[].species
+      - experiments[].experimentType
+      - experiments[].numberOfAssays
+      - experiments[].experimentalFactors
+    entity: assay
   getExperiment:
     description: Get detailed expression data for a specific experiment
     tags:
-      - experiment-info
-      - expression-data
+    - experiment-info
+    - expression-data
     method: GET
     path: /experiments/{experimentId}
     params:
@@ -44,27 +45,28 @@ tools:
     response:
       format: json
       fields:
-        - "experiment.accession"
-        - "experiment.description"
-        - "experiment.species"
-        - "experiment.type"
-        - "profiles.rows[].id"
-        - "profiles.rows[].name"
-        - "profiles.rows[].expressions"
-        - "profiles.searchResultTotal"
+      - experiment.accession
+      - experiment.description
+      - experiment.species
+      - experiment.type
+      - profiles.rows[].id
+      - profiles.rows[].name
+      - profiles.rows[].expressions
+      - profiles.searchResultTotal
+    entity: assay
 tests:
   listExperiments:
-    - name: lists available experiments
-      params: {}
-      assert:
-        - path: experiments
-          minLength: 1
-        - path: experiments.0.experimentAccession
+  - name: lists available experiments
+    params: {}
+    assert:
+    - path: experiments
+      minLength: 1
+    - path: experiments.0.experimentAccession
   getExperiment:
-    - name: gets experiment E-MTAB-513 details
-      params:
-        experimentId: E-MTAB-513
-      assert:
-        - anyOf:
-            - columnHeaders
-            - profiles
+  - name: gets experiment E-MTAB-513 details
+    params:
+      experimentId: E-MTAB-513
+    assert:
+    - anyOf:
+      - columnHeaders
+      - profiles

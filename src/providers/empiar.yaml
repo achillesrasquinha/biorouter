@@ -2,59 +2,39 @@ name: empiar
 displayName: EMPIAR
 description: Electron Microscopy Public Image Archive for raw EM data
 tags:
-  - electron-microscopy
-  - imaging
-  - empiar
-  - ebi
-  - structure
+- electron-microscopy
+- imaging
+- empiar
+- ebi
+- structure
 baseUrl: https://www.ebi.ac.uk/empiar/api
 tools:
-  getEntries:
-    description: List EMPIAR entries
-    tags:
-      - em-entries
-      - em-list
-    method: GET
-    path: /entry/list
-    params:
-      page:
-        type: integer
-        default: 1
-      page_size:
-        type: integer
-        default: 10
-    response:
-      format: json
   getEntry:
-    description: Get EMPIAR entry details by ID
+    description: Get EMPIAR entry details by numeric ID
     tags:
-      - em-entry
-      - em-detail
+    - em-entry
+    - em-detail
     method: GET
-    path: /entry/{empiarId}
+    path: /entry/{empiarId}/
     params:
       empiarId:
         type: string
         required: true
-        description: EMPIAR ID e.g. 'EMPIAR-10028'
+        description: EMPIAR entry ID e.g. 'EMPIAR-10028' or '10028'
     response:
       format: json
       fields:
-        - "*.title"
-        - "*.imagesets[].name"
-        - "*.imagesets[].category"
-        - "*.imagesets[].data_format"
-        - "*.imagesets[].num_images_or_tilt_series"
-        - "*.imagesets[].pixel_width"
+      - '*.title'
+      - '*.imagesets[].name'
+      - '*.imagesets[].category'
+      - '*.imagesets[].data_format'
+      - '*.imagesets[].num_images_or_tilt_series'
+      - '*.imagesets[].pixel_width'
+    entity: dataset
 tests:
-  getEntries:
-    - name: lists EMPIAR entries
-      params: {}
-      assert:
-        - {}
   getEntry:
-    - name: gets a specific EMPIAR entry
-      params:
-        empiarId: EMPIAR-10028
-      assert:
-        - {}
+  - name: gets a specific EMPIAR entry
+    params:
+      empiarId: EMPIAR-10028
+    assert:
+    - {}

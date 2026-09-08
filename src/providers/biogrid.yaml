@@ -2,31 +2,29 @@ name: biogrid
 displayName: BioGRID
 description: BioGRID database of protein and genetic interactions
 tags:
-  - protein-interaction
-  - genetic-interaction
-  - interactome
-  - biogrid
-  - ppi
+- protein-interaction
+- genetic-interaction
+- interactome
+- biogrid
+- ppi
 baseUrl: https://webservice.thebiogrid.org
-
 auth:
   type: apiKey
   param: accessKey
   env: LS_BIOGRID_API_KEY
-
 tools:
   searchInteractions:
     description: Search BioGRID for protein and genetic interactions by gene name
     tags:
-      - interaction-search
-      - ppi-search
+    - interaction-search
+    - ppi-search
     method: GET
     path: /interactions
     params:
       searchNames:
         type: string
         required: true
-        description: "Gene name(s) to search (pipe-delimited for multiple, e.g. TP53|MDM2)"
+        description: Gene name(s) to search (pipe-delimited for multiple, e.g. TP53|MDM2)
       format:
         type: string
         default: json
@@ -41,11 +39,12 @@ tools:
         description: NCBI taxonomy ID to filter by organism (9606 = human)
     response:
       format: json
+    entity: interaction
   getInteraction:
     description: Get details of a specific BioGRID interaction by ID
     tags:
-      - interaction-detail
-      - ppi-detail
+    - interaction-detail
+    - ppi-detail
     method: GET
     path: /interactions/{id}
     params:
@@ -59,20 +58,20 @@ tools:
         description: Response format (json, tab2, extab)
     response:
       format: json
-
+    entity: interaction
 tests:
   searchInteractions:
-    - name: searches for TP53 interactions
-      params:
-        searchNames: TP53
-        searchLimit: 5
-      assert:
-        - minLength: 1
-      allowError: true
+  - name: searches for TP53 interactions
+    params:
+      searchNames: TP53
+      searchLimit: 5
+    assert:
+    - minLength: 1
+    allowError: true
   getInteraction:
-    - name: gets a specific interaction by ID
-      params:
-        id: "103"
-      assert:
-        - minLength: 1
-      allowError: true
+  - name: gets a specific interaction by ID
+    params:
+      id: '103'
+    assert:
+    - minLength: 1
+    allowError: true

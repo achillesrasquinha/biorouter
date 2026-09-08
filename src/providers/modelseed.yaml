@@ -2,18 +2,18 @@ name: modelseed
 displayName: ModelSEED
 description: ModelSEED — automated metabolic model reconstruction and biochemistry database
 tags:
-  - metabolic-models
-  - biochemistry
-  - compounds
-  - reactions
-  - flux-balance
+- metabolic-models
+- biochemistry
+- compounds
+- reactions
+- flux-balance
 baseUrl: https://modelseed.org/api/v2
 tools:
   getModel:
     description: Get a metabolic model by ID
     tags:
-      - model-info
-      - metabolic-model
+    - model-info
+    - metabolic-model
     method: GET
     path: /models/{id}
     params:
@@ -23,11 +23,12 @@ tools:
         description: ModelSEED model identifier
     response:
       format: json
+    entity: structure
   searchCompounds:
     description: Search the ModelSEED biochemistry compound database
     tags:
-      - compound-search
-      - metabolite-search
+    - compound-search
+    - metabolite-search
     method: GET
     path: /biochemistry/compounds
     params:
@@ -37,11 +38,12 @@ tools:
         description: Compound name or partial name (e.g. "glucose", "ATP", "pyruvate")
     response:
       format: json
+    entity: compound
   searchReactions:
     description: Search the ModelSEED biochemistry reaction database
     tags:
-      - reaction-search
-      - enzyme-search
+    - reaction-search
+    - enzyme-search
     method: GET
     path: /biochemistry/reactions
     params:
@@ -51,25 +53,26 @@ tools:
         description: Reaction name or identifier (e.g. "glycolysis", "rxn00001")
     response:
       format: json
+    entity: reaction
 tests:
   getModel:
-    - name: gets a metabolic model by ID
-      params:
-        id: "1"
-      assert:
-        - minLength: 1
-      allowError: true
+  - name: gets a metabolic model by ID
+    params:
+      id: '1'
+    assert:
+    - minLength: 1
+    allowError: true
   searchCompounds:
-    - name: searches compounds for glucose
-      params:
-        query: glucose
-      assert:
-        - minLength: 1
-      allowError: true
+  - name: searches compounds for glucose
+    params:
+      query: glucose
+    assert:
+    - minLength: 1
+    allowError: true
   searchReactions:
-    - name: searches reactions for glycolysis
-      params:
-        query: glycolysis
-      assert:
-        - minLength: 1
-      allowError: true
+  - name: searches reactions for glycolysis
+    params:
+      query: glycolysis
+    assert:
+    - minLength: 1
+    allowError: true

@@ -1,0 +1,408 @@
+description: Search life-science data repositories — genomics, single-cell, proteomics, metabolomics, and imaging archives
+tags:
+- data
+- search
+- datasets
+- repositories
+- genomics
+- biorouter
+input:
+  query:
+    type: string
+    required: true
+    description: Dataset topic, accession, organism, technique, or reagent name (e.g. "BRCA1 RNA-seq breast cancer", "single
+      cell liver atlas", "proteomics melanoma")
+phases:
+- name: resolve
+  parallel: false
+  calls: []
+- name: fetch
+  parallel: true
+  calls:
+  - source: zenodo
+    tool: searchRecords
+    params:
+      q: '{input.query}'
+      size: 10
+    provides:
+    - datasets
+  - source: datacite
+    tool: searchDois
+    params:
+      query: '{input.query}'
+      page[size]: 10
+    provides:
+    - datasets
+  - source: biostudies
+    tool: search
+    params:
+      query: '{input.query}'
+      pageSize: 10
+    provides:
+    - datasets
+  - source: ebi-search
+    tool: search
+    params:
+      domain: allebi
+      query: '{input.query}'
+      size: 10
+      format: json
+    provides:
+    - crossDatabaseSearch
+  - source: geo
+    tool: search
+    params:
+      query: '{input.query}'
+      maxResults: 10
+    provides:
+    - genomicsData
+  - source: arrayexpress
+    tool: search
+    params:
+      query: '{input.query}'
+      pageSize: 10
+    provides:
+    - genomicsData
+  - source: ncbi-sra
+    tool: search
+    params:
+      term: '{input.query}'
+      retmax: 10
+    provides:
+    - genomicsData
+  - source: ena-portal
+    tool: search
+    params:
+      query: '{input.query}'
+      result: study
+      format: json
+      limit: 10
+    provides:
+    - genomicsData
+  - source: cellxgene
+    tool: getCollections
+    params: {}
+    provides:
+    - singleCell
+  - source: single-cell-portal
+    tool: searchStudies
+    params:
+      terms: '{input.query}'
+    provides:
+    - singleCell
+  - source: human-cell-atlas
+    tool: searchProjects
+    params:
+      size: 10
+      catalog: dcp60
+    provides:
+    - singleCell
+  - source: metabolomics-workbench
+    tool: searchStudies
+    params:
+      query: '{input.query}'
+    provides:
+    - metabolomics
+  - source: dandi
+    tool: listDandisets
+    params:
+      search: '{input.query}'
+      page_size: 10
+    provides:
+    - specialized
+  - source: hubmap
+    tool: search
+    params:
+      size: 10
+      query:
+        multi_match:
+          query: '{input.query}'
+          fields:
+          - description
+          - entity_type
+          - hubmap_id
+          - group_name
+          - data_types
+          - origin_samples.organ
+    provides:
+    - specialized
+  - source: immport
+    tool: searchStudies
+    params:
+      term: '{input.query}'
+    provides:
+    - specialized
+  - source: pride
+    tool: searchProjects
+    params:
+      query: '{input.query}'
+    provides:
+    - proteomics
+  - source: metabolights
+    tool: listStudies
+    params: {}
+    provides:
+    - metabolomics
+  - source: emdb
+    tool: search
+    params:
+      query: '{input.query}'
+    provides:
+    - structuralData
+  - source: dbgap
+    tool: search
+    params:
+      term: '{input.query}'
+    provides:
+    - genotypePhenotype
+  - source: ega
+    tool: searchDatasets
+    params:
+      limit: 10
+    provides:
+    - controlledAccess
+  - source: ega
+    tool: searchStudies
+    params:
+      limit: 10
+    provides:
+    - controlledAccess
+  - source: encode
+    tool: search
+    params:
+      searchTerm: '{input.query}'
+    provides:
+    - functionalGenomics
+  - source: biotools
+    tool: searchTools
+    params:
+      q: '{input.query}'
+      size: 10
+      format: json
+    provides:
+    - tools
+  - source: encode
+    tool: searchAnnotations
+    params:
+      searchTerm: '{input.query}'
+      limit: 10
+    provides:
+    - functionalGenomics
+  - source: metabolomics-workbench
+    tool: getMetabolite
+    params:
+      name: '{input.query}'
+    provides:
+    - metabolomics
+output:
+  datasets:
+    zenodoResults:
+      sources:
+      - source: zenodo
+        call: searchRecords
+        path: hits.hits
+        rank: 1
+      reason: Zenodo — CERN-hosted open research data repository for datasets, software, and publications
+    dataciteResults:
+      sources:
+      - source: datacite
+        call: searchDois
+        path: data
+        rank: 1
+      reason: DataCite — DOI-registered research datasets with rich bibliographic metadata
+    biostudiesResults:
+      sources:
+      - source: biostudies
+        call: search
+        path: hits
+        rank: 1
+      reason: BioStudies — EBI archive linking publications to biological study data
+  genomicsData:
+    geoDatasets:
+      sources:
+      - source: geo
+        call: search
+        path: esearchresult.idlist
+        rank: 1
+      reason: GEO — NCBI repository of gene expression and genomics datasets (microarray, RNA-seq)
+    arrayexpressExperiments:
+      sources:
+      - source: arrayexpress
+        call: search
+        path: hits
+        rank: 1
+      reason: ArrayExpress — EBI archive of functional genomics experiments
+    ncbiSraRuns:
+      sources:
+      - source: ncbi-sra
+        call: search
+        path: esearchresult.idlist
+        rank: 1
+      reason: NCBI SRA — raw sequencing data archive (RNA-seq, WGS, ChIP-seq, etc.)
+    enaStudies:
+      sources:
+      - source: ena-portal
+        call: search
+        path: $passthrough
+        rank: 1
+      reason: ENA Portal — European Nucleotide Archive studies, samples, and assemblies
+  singleCell:
+    cellxgeneCollections:
+      sources:
+      - source: cellxgene
+        call: getCollections
+        path: $passthrough
+        rank: 1
+      reason: CELLxGENE Discover — curated single-cell datasets with cell type annotations
+    singleCellPortal:
+      sources:
+      - source: single-cell-portal
+        call: searchStudies
+        path: $passthrough
+        rank: 1
+      reason: Broad Single Cell Portal — shareable single-cell genomics studies
+    humanCellAtlas:
+      sources:
+      - source: human-cell-atlas
+        call: searchProjects
+        path: hits
+        rank: 1
+      reason: Human Cell Atlas — comprehensive single-cell reference maps of all human cells
+  metabolomics:
+    metabolomicsWorkbenchStudies:
+      sources:
+      - source: metabolomics-workbench
+        call: searchStudies
+        path: $passthrough
+        rank: 1
+      reason: Metabolomics Workbench — metabolomics experiments with mass-spec and NMR data
+    metabolightsStudies:
+      sources:
+      - source: metabolights
+        call: listStudies
+        path: content
+        rank: 2
+      reason: MetaboLights — EMBL-EBI metabolomics repository for studies, metabolite data, and protocols
+    metabolomicsWorkbenchMetabolite:
+      sources:
+      - source: metabolomics-workbench
+        call: getMetabolite
+        path: $passthrough
+        rank: 3
+      reason: Metabolomics Workbench RefMet metabolite — formula, mass, classification, and identifiers for a named metabolite
+  specialized:
+    dandiDatasets:
+      sources:
+      - source: dandi
+        call: listDandisets
+        path: results
+        rank: 1
+      reason: DANDI Archive — neurophysiology datasets (electrophysiology, brain imaging)
+    hubmapDatasets:
+      sources:
+      - source: hubmap
+        call: search
+        path: hits.hits
+        rank: 1
+      reason: HuBMAP — human body atlas at single-cell and spatial resolution
+    immportStudies:
+      sources:
+      - source: immport
+        call: searchStudies
+        path: $passthrough
+        rank: 1
+      reason: ImmPort — shared immunology data from NIH-funded studies
+  tools:
+    biotoolsRegistry:
+      sources:
+      - source: biotools
+        call: searchTools
+        path: list
+        rank: 1
+      reason: bio.tools — ELIXIR registry of bioinformatics tools and databases
+  proteomics:
+    prideProjects:
+      sources:
+      - source: pride
+        call: searchProjects
+        path: $passthrough
+        rank: 1
+      reason: PRIDE — EBI proteomics data repository for mass spectrometry experiments
+  structuralData:
+    emdbEntries:
+      sources:
+      - source: emdb
+        call: search
+        path: $passthrough
+        rank: 1
+      reason: EMDB — Electron Microscopy Data Bank 3D cryo-EM density maps and tomograms
+  genotypePhenotype:
+    dbgapStudies:
+      sources:
+      - source: dbgap
+        call: search
+        path: $passthrough
+        rank: 1
+      reason: dbGaP — NCBI database of Genotypes and Phenotypes for genetic association studies
+  controlledAccess:
+    egaDatasets:
+      sources:
+      - source: ega
+        call: searchDatasets
+        path: $passthrough
+        rank: 1
+      reason: EGA — European Genome-phenome Archive controlled-access genomic datasets
+    egaStudies:
+      sources:
+      - source: ega
+        call: searchStudies
+        path: $passthrough
+        rank: 1
+      reason: EGA — European Genome-phenome Archive controlled-access genomic studies
+  functionalGenomics:
+    encodeExperiments:
+      sources:
+      - source: encode
+        call: search
+        path: '@graph'
+        rank: 1
+      reason: ENCODE — Encyclopedia of DNA Elements functional genome annotations (ChIP-seq, DNase, RNA-seq)
+    encodeAnnotations:
+      sources:
+      - source: encode
+        call: searchAnnotations
+        path: '@graph'
+        rank: 2
+      reason: ENCODE annotations — regulatory element and annotation tracks matching the query
+  crossDatabaseSearch:
+    ebiResults:
+      sources:
+      - source: ebi-search
+        call: search
+        path: entries
+        rank: 1
+      reason: EBI Search — unified cross-database search across 400+ EBI resources
+  metadata:
+    totalResults:
+      sources:
+      - source: zenodo
+        call: searchRecords
+        path: hits.total
+        rank: 1
+      - source: datacite
+        call: searchDois
+        path: meta.total
+        rank: 2
+      - source: biostudies
+        call: search
+        path: totalHits
+        rank: 3
+      - source: geo
+        call: search
+        path: esearchresult.count
+        rank: 4
+      - source: ebi-search
+        call: search
+        path: hitCount
+        rank: 5
+      reason: Total matching records across major dataset repositories

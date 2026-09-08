@@ -1,18 +1,24 @@
 name: omim
 displayName: OMIM
 description: Online Mendelian Inheritance in Man — catalog of human genes and genetic disorders
-tags: [mendelian-disease, genetics, gene-phenotype, clinical-genetics, omim]
+tags:
+- mendelian-disease
+- genetics
+- gene-phenotype
+- clinical-genetics
+- omim
 baseUrl: https://api.omim.org/api
-
 auth:
   type: apiKey
   param: apiKey
   env: LS_OMIM_API_KEY
-
 tools:
   search:
     description: Search OMIM entries by keyword (genes, diseases, phenotypes)
-    tags: [gene-search, disease-search, phenotype-search]
+    tags:
+    - gene-search
+    - disease-search
+    - phenotype-search
     method: GET
     path: /entry/search
     params:
@@ -39,17 +45,20 @@ tools:
     response:
       format: json
       fields:
-        - omim.searchResponse.totalResults
-        - omim.searchResponse.startIndex
-        - omim.searchResponse.endIndex
-        - omim.searchResponse.searchResultList[].preferredTitle
-        - omim.searchResponse.searchResultList[].mimNumber
-        - omim.searchResponse.searchResultList[].geneSymbols
-        - omim.searchResponse.searchResultList[].status
-
+      - omim.searchResponse.totalResults
+      - omim.searchResponse.startIndex
+      - omim.searchResponse.endIndex
+      - omim.searchResponse.searchResultList[].preferredTitle
+      - omim.searchResponse.searchResultList[].mimNumber
+      - omim.searchResponse.searchResultList[].geneSymbols
+      - omim.searchResponse.searchResultList[].status
+    entity: gene
   getEntry:
     description: Get an OMIM entry by MIM number
-    tags: [gene-info, disease-info, entry-details]
+    tags:
+    - gene-info
+    - disease-info
+    - entry-details
     method: GET
     path: /entry
     params:
@@ -67,18 +76,20 @@ tools:
     response:
       format: json
       fields:
-        - omim.entryList[].entry.mimNumber
-        - omim.entryList[].entry.prefix
-        - omim.entryList[].entry.status
-        - omim.entryList[].entry.titles.preferredTitle
-        - omim.entryList[].entry.titles.alternativeTitles
-        - omim.entryList[].entry.geneMap.geneSymbols
-        - omim.entryList[].entry.geneMap.geneName
-        - omim.entryList[].entry.geneMap.chromosomeSymbol
-
+      - omim.entryList[].entry.mimNumber
+      - omim.entryList[].entry.prefix
+      - omim.entryList[].entry.status
+      - omim.entryList[].entry.titles.preferredTitle
+      - omim.entryList[].entry.titles.alternativeTitles
+      - omim.entryList[].entry.geneMap.geneSymbols
+      - omim.entryList[].entry.geneMap.geneName
+      - omim.entryList[].entry.geneMap.chromosomeSymbol
+    entity: gene
   getClinicalSynopsis:
     description: Get clinical synopsis for an OMIM phenotype entry
-    tags: [clinical-features, phenotype-details]
+    tags:
+    - clinical-features
+    - phenotype-details
     method: GET
     path: /clinicalSynopsis
     params:
@@ -95,26 +106,26 @@ tools:
     response:
       format: json
       fields:
-        - omim.clinicalSynopsisList[].clinicalSynopsis.mimNumber
-        - omim.clinicalSynopsisList[].clinicalSynopsis.preferredTitle
-        - omim.clinicalSynopsisList[].clinicalSynopsis.inheritanceExists
-        - omim.clinicalSynopsisList[].clinicalSynopsis.headAndNeckExists
-        - omim.clinicalSynopsisList[].clinicalSynopsis.neurologicExists
-
+      - omim.clinicalSynopsisList[].clinicalSynopsis.mimNumber
+      - omim.clinicalSynopsisList[].clinicalSynopsis.preferredTitle
+      - omim.clinicalSynopsisList[].clinicalSynopsis.inheritanceExists
+      - omim.clinicalSynopsisList[].clinicalSynopsis.headAndNeckExists
+      - omim.clinicalSynopsisList[].clinicalSynopsis.neurologicExists
+    entity: disease
 tests:
   search:
-    - name: searches for Marfan syndrome
-      params:
-        query: Marfan syndrome
-      assert:
-        - path: omim.searchResponse.totalResults
-          gt: 0
-      allowError: true
+  - name: searches for Marfan syndrome
+    params:
+      query: Marfan syndrome
+    assert:
+    - path: omim.searchResponse.totalResults
+      gt: 0
+    allowError: true
   getEntry:
-    - name: gets BRCA1 entry
-      params:
-        mimNumber: "113705"
-      assert:
-        - path: omim.entryList
-          minLength: 1
-      allowError: true
+  - name: gets BRCA1 entry
+    params:
+      mimNumber: '113705'
+    assert:
+    - path: omim.entryList
+      minLength: 1
+    allowError: true

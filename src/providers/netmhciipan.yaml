@@ -2,20 +2,19 @@ name: netmhciipan
 displayName: NetMHCIIpan
 description: NetMHCIIpan 4.3 — MHC class II binding prediction for peptides across HLA-DR/DP/DQ alleles
 tags:
-  - mhc
-  - mhc-ii
-  - binding-prediction
-  - immunology
-  - hla
-  - peptide
+- mhc
+- mhc-ii
+- binding-prediction
+- immunology
+- hla
+- peptide
 baseUrl: https://services.healthtech.dtu.dk/api
-
 tools:
   predict:
     description: Submit a peptide sequence for MHC class II binding prediction
     tags:
-      - mhc-ii-prediction
-      - binding-affinity
+    - mhc-ii-prediction
+    - binding-affinity
     method: POST
     path: /NetMHCIIpan-4.3/submit
     params:
@@ -29,13 +28,13 @@ tools:
         description: HLA class II allele (e.g. "DRB1_0101")
     response:
       format: json
-
+    entity: structure
 tests:
   predict:
-    - name: predicts MHC-II binding for a peptide
-      params:
-        sequence: PKYVKQNTLKLAT
-        allele: DRB1_0101
-      assert:
-        - {}
-      allowError: true
+  - name: predicts MHC-II binding for a peptide
+    params:
+      sequence: PKYVKQNTLKLAT
+      allele: DRB1_0101
+    assert:
+    - {}
+    allowError: true

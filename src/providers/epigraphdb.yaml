@@ -2,17 +2,17 @@ name: epigraphdb
 displayName: EpiGraphDB
 description: EpiGraphDB — epidemiological graph database for Mendelian randomization and causal inference
 tags:
-  - epidemiology
-  - mendelian-randomization
-  - causal-inference
-  - gwas
+- epidemiology
+- mendelian-randomization
+- causal-inference
+- gwas
 baseUrl: https://api.epigraphdb.org
 tools:
   mendelianRandomization:
     description: Query Mendelian randomization results between exposure and outcome traits
     tags:
-      - mr
-      - causal-inference
+    - mr
+    - causal-inference
     method: GET
     path: /mr
     params:
@@ -31,26 +31,28 @@ tools:
     response:
       format: json
       fields:
-        - results[].exposure.trait
-        - results[].outcome.trait
-        - results[].mr.b
-        - results[].mr.pval
-        - results[].mr.method
+      - results[].exposure.trait
+      - results[].outcome.trait
+      - results[].mr.b
+      - results[].mr.pval
+      - results[].mr.method
+    entity: variant
   getSchema:
     description: Get the EpiGraphDB database schema (node and relationship types)
     tags:
-      - schema
-      - metadata
+    - schema
+    - metadata
     method: GET
     path: /meta/schema
     params: {}
     response:
       format: json
+    entity: dataset
   topicSearch:
     description: Search for GWAS traits and literature evidence
     tags:
-      - trait-search
-      - gwas
+    - trait-search
+    - gwas
     method: GET
     path: /literature/gwas
     params:
@@ -64,15 +66,16 @@ tools:
     response:
       format: json
       fields:
-        - results[].gwas.trait
-        - results[].literature.title
+      - results[].gwas.trait
+      - results[].literature.title
+    entity: publication
 tests:
   mendelianRandomization:
-    - name: queries MR for BMI and CHD
-      params:
-        exposure_trait: Body mass index
-        outcome_trait: Coronary heart disease
-        pval_threshold: 1e-5
-      assert:
-        - path: results
-          minLength: 1
+  - name: queries MR for BMI and CHD
+    params:
+      exposure_trait: Body mass index
+      outcome_trait: Coronary heart disease
+      pval_threshold: 1e-5
+    assert:
+    - path: results
+      minLength: 1

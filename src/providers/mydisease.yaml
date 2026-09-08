@@ -2,17 +2,17 @@ name: mydisease
 displayName: MyDisease.info
 description: Disease annotation query service — aggregates disease data from multiple sources
 tags:
-  - disease
-  - phenotype
-  - biothings
-  - clinical
+- disease
+- phenotype
+- biothings
+- clinical
 baseUrl: https://mydisease.info/v1
 tools:
   search:
     description: Search for diseases by keyword or query
     tags:
-      - disease-search
-      - phenotype-search
+    - disease-search
+    - phenotype-search
     method: GET
     path: /query
     params:
@@ -28,17 +28,18 @@ tools:
     response:
       format: json
       fields:
-        - total
-        - hits[]._id
-        - hits[]._score
-        - hits[].mondo
-        - hits[].disease_ontology
-        - hits[].hpo
+      - total
+      - hits[]._id
+      - hits[]._score
+      - hits[].mondo
+      - hits[].disease_ontology
+      - hits[].hpo
+    entity: disease
   getDisease:
     description: Get disease annotation by ID
     tags:
-      - disease-info
-      - disease-annotation
+    - disease-info
+    - disease-annotation
     method: GET
     path: /disease/{diseaseId}
     params:
@@ -49,24 +50,25 @@ tools:
     response:
       format: json
       fields:
-        - _id
-        - mondo
-        - disease_ontology
-        - hpo
-        - umls
+      - _id
+      - mondo
+      - disease_ontology
+      - hpo
+      - umls
+    entity: disease
 tests:
   search:
-    - name: searches for alzheimer disease
-      params:
-        query: alzheimer
-      assert:
-        - path: hits
-          minLength: 1
+  - name: searches for alzheimer disease
+    params:
+      query: alzheimer
+    assert:
+    - path: hits
+      minLength: 1
   getDisease:
-    - name: gets disease annotation by MONDO ID
-      params:
-        diseaseId: MONDO:0004975
-      assert:
-        - anyOf:
-            - _id
-            - mondo
+  - name: gets disease annotation by MONDO ID
+    params:
+      diseaseId: MONDO:0004975
+    assert:
+    - anyOf:
+      - _id
+      - mondo

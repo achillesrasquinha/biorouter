@@ -2,17 +2,17 @@ name: dali
 displayName: DALI
 description: DALI server — protein structure comparison by 3D alignment
 tags:
-  - protein-structure
-  - structure-comparison
-  - alignment
-  - dali
+- protein-structure
+- structure-comparison
+- alignment
+- dali
 baseUrl: http://ekhidna2.biocenter.helsinki.fi/dali
 tools:
   search:
     description: Submit a PDB structure for DALI structural similarity search (async job)
     tags:
-      - structure-search
-      - structure-comparison
+    - structure-search
+    - structure-comparison
     method: POST
     path: /search
     params:
@@ -26,11 +26,12 @@ tools:
         description: Chain identifier (e.g. A)
     response:
       format: json
-  getResults:
+    entity: structure
+  getStructureResults:
     description: Get results of a DALI structure comparison job
     tags:
-      - comparison-results
-      - job-results
+    - comparison-results
+    - job-results
     method: GET
     path: /results/{jobId}
     params:
@@ -40,19 +41,20 @@ tools:
         description: Job ID returned from the search endpoint
     response:
       format: json
+    entity: structure
 tests:
   search:
-    - name: submits a PDB structure for comparison
-      params:
-        pdbId: 1CRN
-        chain: A
-      assert:
-        - path: jobId
-      allowError: true
-  getResults:
-    - name: gets results for a comparison job
-      params:
-        jobId: test123
-      assert:
-        - path: status
-      allowError: true
+  - name: submits a PDB structure for comparison
+    params:
+      pdbId: 1CRN
+      chain: A
+    assert:
+    - path: jobId
+    allowError: true
+  getStructureResults:
+  - name: gets results for a comparison job
+    params:
+      jobId: test123
+    assert:
+    - path: status
+    allowError: true

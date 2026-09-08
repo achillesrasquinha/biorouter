@@ -2,19 +2,18 @@ name: single-cell-portal
 displayName: Single Cell Portal
 description: Broad Institute Single Cell Portal — explore and share single-cell genomics studies
 tags:
-  - single-cell
-  - rna-seq
-  - genomics
-  - broad-institute
-  - transcriptomics
+- single-cell
+- rna-seq
+- genomics
+- broad-institute
+- transcriptomics
 baseUrl: https://singlecell.broadinstitute.org/single_cell/api/v1
-
 tools:
   searchStudies:
     description: Search for single-cell studies by keyword
     tags:
-      - study-search
-      - single-cell-search
+    - study-search
+    - single-cell-search
     method: GET
     path: /studies
     params:
@@ -24,12 +23,12 @@ tools:
         description: Search terms (e.g. "brain", "COVID-19", "T cell")
     response:
       format: json
-
+    entity: dataset
   getStudy:
     description: Get details of a specific single-cell study by accession
     tags:
-      - study-detail
-      - study-lookup
+    - study-detail
+    - study-lookup
     method: GET
     path: /studies/{accession}
     params:
@@ -39,19 +38,19 @@ tools:
         description: Study accession identifier (e.g. "SCP1234")
     response:
       format: json
-
+    entity: dataset
 tests:
   searchStudies:
-    - name: searches for brain studies
-      params:
-        terms: brain
-      assert:
-        - {}
-      allowError: true
+  - name: searches for brain studies
+    params:
+      terms: brain
+    assert:
+    - {}
+    allowError: true
   getStudy:
-    - name: gets a specific study by accession
-      params:
-        accession: SCP1
-      assert:
-        - {}
-      allowError: true
+  - name: gets a specific study by accession
+    params:
+      accession: SCP1
+    assert:
+    - {}
+    allowError: true

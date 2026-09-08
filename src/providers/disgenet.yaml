@@ -1,18 +1,25 @@
 name: disgenet
 displayName: DisGeNET
 description: Gene-disease association database
-tags: [gene-disease, disease-associations, variants, genetics]
-baseUrl: https://www.disgenet.org/api
-
+tags:
+- gene-disease
+- disease-associations
+- variants
+- genetics
+# NOTE: DisGeNET requires an API key for all endpoints. Without one,
+# the API returns an HTML page instead of JSON data.
+# Register at https://disgenet.com/ to get an API key and set LS_DISGENET_API_KEY.
+baseUrl: https://disgenet.com/api
 auth:
   type: header
   header: Authorization
   env: LS_DISGENET_API_KEY
-
 tools:
   getGeneAssociations:
     description: Get diseases associated with a gene by NCBI gene ID
-    tags: [gene-disease, disease-lookup]
+    tags:
+    - gene-disease
+    - disease-lookup
     method: GET
     path: /gda/gene/{geneId}
     params:
@@ -29,9 +36,12 @@ tools:
         default: json
     response:
       format: json
+    entity: gene
   searchDisease:
     description: Search diseases by name
-    tags: [disease-search, disease-info]
+    tags:
+    - disease-search
+    - disease-info
     method: GET
     path: /disease/search/{query}
     params:
@@ -45,14 +55,16 @@ tools:
     response:
       format: json
       fields:
-        - payload[].diseaseid
-        - payload[].disease_name
-        - payload[].disease_type
-        - payload[].disease_class_name
-
+      - payload[].diseaseid
+      - payload[].disease_name
+      - payload[].disease_type
+      - payload[].disease_class_name
+    entity: disease
   getVariantDisease:
     description: Search variant-disease associations
-    tags: [variant-disease, variant-associations]
+    tags:
+    - variant-disease
+    - variant-associations
     method: GET
     path: /vda/variant/{variant}
     params:
@@ -69,9 +81,12 @@ tools:
         default: json
     response:
       format: json
+    entity: disease
   getDiseaseGenes:
     description: Search disease-gene associations by disease
-    tags: [disease-gene, disease-associations]
+    tags:
+    - disease-gene
+    - disease-associations
     method: GET
     path: /gda/disease/{disease}
     params:
@@ -88,33 +103,33 @@ tools:
         default: json
     response:
       format: json
-
+    entity: gene
 tests:
   getGeneAssociations:
-    - name: gets disease associations for CDK2
-      params:
-        geneId: "1017"
-      assert:
-        - minLength: 1
-      allowError: true
+  - name: gets disease associations for CDK2
+    params:
+      geneId: '1017'
+    assert:
+    - {}
+    allowError: true
   searchDisease:
-    - name: searches for asthma
-      params:
-        query: asthma
-      assert:
-        - minLength: 1
-      allowError: true
+  - name: searches for asthma
+    params:
+      query: asthma
+    assert:
+    - {}
+    allowError: true
   getVariantDisease:
-    - name: gets disease associations for rs7412
-      params:
-        variant: rs7412
-      assert:
-        - minLength: 1
-      allowError: true
+  - name: gets disease associations for rs7412
+    params:
+      variant: rs7412
+    assert:
+    - {}
+    allowError: true
   getDiseaseGenes:
-    - name: gets gene associations for Alzheimer disease
-      params:
-        disease: C0002395
-      assert:
-        - minLength: 1
-      allowError: true
+  - name: gets gene associations for Alzheimer disease
+    params:
+      disease: C0002395
+    assert:
+    - {}
+    allowError: true

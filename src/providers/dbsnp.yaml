@@ -2,18 +2,18 @@ name: dbsnp
 displayName: dbSNP
 description: Database of single nucleotide polymorphisms and other genetic variation
 tags:
-  - snp
-  - variants
-  - polymorphisms
-  - ncbi
-  - genetic-variation
+- snp
+- variants
+- polymorphisms
+- ncbi
+- genetic-variation
 baseUrl: https://eutils.ncbi.nlm.nih.gov/entrez/eutils
 tools:
   search:
     description: Search dbSNP for genetic variants by rsID or keyword
     tags:
-      - snp-search
-      - variant-search
+    - snp-search
+    - variant-search
     method: GET
     path: /esearch.fcgi
     params:
@@ -35,14 +35,15 @@ tools:
     response:
       format: json
       fields:
-        - "esearchresult.count"
-        - "esearchresult.idlist"
-        - "esearchresult.querytranslation"
+      - esearchresult.count
+      - esearchresult.idlist
+      - esearchresult.querytranslation
+    entity: gene
   getSummary:
     description: Get SNP summary information by dbSNP ID
     tags:
-      - snp-info
-      - variant-info
+    - snp-info
+    - variant-info
     method: GET
     path: /esummary.fcgi
     params:
@@ -58,26 +59,18 @@ tools:
         default: json
     response:
       format: json
-      fields:
-        - "result.*.snp_id"
-        - "result.*.genes"
-        - "result.*.chr"
-        - "result.*.chrpos"
-        - "result.*.snp_class"
-        - "result.*.clinical_significance"
-        - "result.*.global_mafs"
-        - "result.*.docsum"
+    entity: gene
 tests:
   search:
-    - name: searches for rs7412 variant
-      params:
-        query: rs7412
-      assert:
-        - path: esearchresult.idlist
-          minLength: 1
+  - name: searches for rs7412 variant
+    params:
+      query: rs7412
+    assert:
+    - path: esearchresult.idlist
+      minLength: 1
   getSummary:
-    - name: gets SNP summary for rs7412
-      params:
-        id: "7412"
-      assert:
-        - path: result.7412
+  - name: gets SNP summary for rs7412
+    params:
+      id: '7412'
+    assert:
+    - path: result.7412

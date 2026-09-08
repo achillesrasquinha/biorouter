@@ -2,17 +2,17 @@ name: ucsc-api
 displayName: UCSC Genome Browser API
 description: UCSC Genome Browser API — programmatic access to genome tracks, sequences, and search
 tags:
-  - genome-browser
-  - tracks
-  - sequence
-  - ucsc
+- genome-browser
+- tracks
+- sequence
+- ucsc
 baseUrl: https://api.genome.ucsc.edu
 tools:
   search:
     description: Search the UCSC genome browser for genes and positions
     tags:
-      - genome-search
-      - gene-search
+    - genome-search
+    - gene-search
     method: GET
     path: /search
     params:
@@ -27,13 +27,14 @@ tools:
     response:
       format: json
       fields:
-        - positionMatches[].matches[].position
-        - positionMatches[].matches[].posName
+      - positionMatches[].matches[].position
+      - positionMatches[].matches[].posName
+    entity: gene
   getSequence:
     description: Get DNA sequence for a genomic region
     tags:
-      - sequence
-      - dna
+    - sequence
+    - dna
     method: GET
     path: /getData/sequence
     params:
@@ -56,16 +57,17 @@ tools:
     response:
       format: json
       fields:
-        - dna
-        - genome
-        - chrom
-        - start
-        - end
+      - dna
+      - genome
+      - chrom
+      - start
+      - end
+    entity: sequence
   getTrackData:
     description: Get track data for a specific genomic region
     tags:
-      - track-data
-      - annotation
+    - track-data
+    - annotation
     method: GET
     path: /getData/track
     params:
@@ -91,11 +93,12 @@ tools:
         description: End position
     response:
       format: json
+    entity: gene
   listTracks:
     description: List available tracks for a genome assembly
     tags:
-      - track-list
-      - metadata
+    - track-list
+    - metadata
     method: GET
     path: /list/tracks
     params:
@@ -105,21 +108,22 @@ tools:
         description: Genome assembly (e.g. hg38, mm39)
     response:
       format: json
+    entity: dataset
 tests:
   search:
-    - name: searches for BRCA1 in hg38
-      params:
-        genome: hg38
-        search: BRCA1
-      assert:
-        - path: positionMatches
-          minLength: 1
+  - name: searches for BRCA1 in hg38
+    params:
+      genome: hg38
+      search: BRCA1
+    assert:
+    - path: positionMatches
+      minLength: 1
   getSequence:
-    - name: gets DNA sequence
-      params:
-        genome: hg38
-        chrom: chr17
-        start: 43044295
-        end: 43044395
-      assert:
-        - path: dna
+  - name: gets DNA sequence
+    params:
+      genome: hg38
+      chrom: chr17
+      start: 43044295
+      end: 43044395
+    assert:
+    - path: dna

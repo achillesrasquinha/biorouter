@@ -2,30 +2,31 @@ name: tcia
 displayName: TCIA
 description: The Cancer Imaging Archive — public access to cancer medical imaging data and collections
 tags:
-  - medical-imaging
-  - cancer
-  - radiology
-  - tcia
-  - dicom
+- medical-imaging
+- cancer
+- radiology
+- tcia
+- dicom
 baseUrl: https://services.cancerimagingarchive.net/nbia-api/services/v1
 tools:
   getCollections:
     description: List all available imaging collections in TCIA
     tags:
-      - collection-list
-      - imaging-collections
+    - collection-list
+    - imaging-collections
     method: GET
     path: /getCollectionValues
     params: {}
     response:
       format: json
       fields:
-        - "[].Collection"
+      - '[].Collection'
+    entity: dataset
   getPatients:
     description: Get patient study data for a specific TCIA collection
     tags:
-      - patient-data
-      - study-data
+    - patient-data
+    - study-data
     method: GET
     path: /getPatientStudy
     params:
@@ -37,23 +38,24 @@ tools:
     response:
       format: json
       fields:
-        - "[].PatientID"
-        - "[].PatientSex"
-        - "[].PatientAge"
-        - "[].Collection"
-        - "[].StudyDate"
-        - "[].SeriesCount"
+      - '[].PatientID'
+      - '[].PatientSex'
+      - '[].PatientAge'
+      - '[].Collection'
+      - '[].StudyDate'
+      - '[].SeriesCount'
+    entity: dataset
 tests:
   getCollections:
-    - name: lists available collections
-      params: {}
-      assert:
-        - isArray: true
-        - path: 0.Collection
+  - name: lists available collections
+    params: {}
+    assert:
+    - isArray: true
+    - path: 0.Collection
   getPatients:
-    - name: gets patient data for TCGA-LUAD
-      params:
-        collection: TCGA-LUAD
-      assert:
-        - isArray: true
-        - path: 0.PatientID
+  - name: gets patient data for TCGA-LUAD
+    params:
+      collection: TCGA-LUAD
+    assert:
+    - isArray: true
+    - path: 0.PatientID

@@ -2,19 +2,19 @@ name: vdjdb
 displayName: VDJdb
 description: VDJdb — curated database of T-cell receptor sequences and specificities
 tags:
-  - tcr
-  - immunology
-  - t-cell
-  - receptor
-  - vdjdb
-  - adaptive-immunity
+- tcr
+- immunology
+- t-cell
+- receptor
+- vdjdb
+- adaptive-immunity
 baseUrl: https://vdjdb.cdr3.net/api
 tools:
   search:
     description: Search TCR sequences by CDR3
     tags:
-      - tcr-search
-      - cdr3-search
+    - tcr-search
+    - cdr3-search
     method: POST
     path: /search
     params:
@@ -25,34 +25,36 @@ tools:
       species:
         type: string
         default: HomoSapiens
-        description: "Species: HomoSapiens or MusMusculus"
+        description: 'Species: HomoSapiens or MusMusculus'
     response:
       format: json
       fields:
-        - "[].cdr3"
-        - "[].gene"
-        - "[].species"
-        - "[].antigen.epitope"
-        - "[].antigen.gene"
-        - "[].antigen.species"
-        - "[].score"
+      - '[].cdr3'
+      - '[].gene'
+      - '[].species'
+      - '[].antigen.epitope'
+      - '[].antigen.gene'
+      - '[].antigen.species'
+      - '[].score'
+    entity: sequence
   getSummary:
     description: Get database summary statistics
     tags:
-      - database-summary
-      - statistics
+    - database-summary
+    - statistics
     method: GET
     path: /summary
     params: {}
     response:
       format: json
       fields:
-        - recordCount
-        - speciesCount
-        - epitopeCount
-        - geneCount
+      - recordCount
+      - speciesCount
+      - epitopeCount
+      - geneCount
+    entity: dataset
 tests:
   getSummary:
-    - name: gets database summary statistics
-      params: {}
-      assert: []
+  - name: gets database summary statistics
+    params: {}
+    assert: []

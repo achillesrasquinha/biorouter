@@ -2,18 +2,18 @@ name: bern2
 displayName: BERN2
 description: BERN2 biomedical named entity recognition — extract genes, diseases, drugs, and other entities from text
 tags:
-  - ner
-  - text-mining
-  - annotation
-  - bern2
-  - entity-recognition
+- ner
+- text-mining
+- annotation
+- bern2
+- entity-recognition
 baseUrl: https://bern2.korea.ac.kr
 tools:
   annotateText:
     description: Annotate free text to extract biomedical named entities
     tags:
-      - ner-annotation
-      - text-annotation
+    - ner-annotation
+    - text-annotation
     method: POST
     path: /plain
     params:
@@ -23,11 +23,12 @@ tools:
         description: Text to annotate (e.g. "Aspirin inhibits COX-2 and treats pain")
     response:
       format: json
+    entity: annotation
   annotatePmid:
     description: Get biomedical entity annotations for a PubMed article by PMID
     tags:
-      - pubmed-annotation
-      - entity-extraction
+    - pubmed-annotation
+    - entity-extraction
     method: GET
     path: /pubmed/{pmid}
     params:
@@ -37,18 +38,19 @@ tools:
         description: PubMed ID (e.g. "35153516")
     response:
       format: json
+    entity: annotation
 tests:
   annotateText:
-    - name: annotates free text for biomedical entities
-      params:
-        text: Aspirin inhibits COX-2 and treats pain
-      assert:
-        - path: annotations
-          minLength: 1
+  - name: annotates free text for biomedical entities
+    params:
+      text: Aspirin inhibits COX-2 and treats pain
+    assert:
+    - path: annotations
+      minLength: 1
   annotatePmid:
-    - name: annotates a PubMed article by PMID
-      params:
-        pmid: "35153516"
-      assert:
-        - path: annotations
-          minLength: 1
+  - name: annotates a PubMed article by PMID
+    params:
+      pmid: '35153516'
+    assert:
+    - path: annotations
+      minLength: 1

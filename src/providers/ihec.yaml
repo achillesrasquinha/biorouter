@@ -2,18 +2,18 @@ name: ihec
 displayName: IHEC
 description: International Human Epigenome Consortium — reference epigenome datasets and metadata
 tags:
-  - epigenomics
-  - epigenetics
-  - chromatin
-  - histone
-  - ihec
+- epigenomics
+- epigenetics
+- chromatin
+- histone
+- ihec
 baseUrl: https://epigenomesportal.ca/ihec/api/v2
 tools:
   searchDatasets:
     description: Search IHEC epigenome datasets by genome assembly
     tags:
-      - dataset-search
-      - epigenome-search
+    - dataset-search
+    - epigenome-search
     method: GET
     path: /datasets
     params:
@@ -27,11 +27,12 @@ tools:
         description: Maximum number of results
     response:
       format: json
+    entity: dataset
   getDataset:
     description: Get details of a specific IHEC dataset by ID
     tags:
-      - dataset-info
-      - epigenome-info
+    - dataset-info
+    - epigenome-info
     method: GET
     path: /datasets/{id}
     params:
@@ -41,18 +42,19 @@ tools:
         description: IHEC dataset identifier
     response:
       format: json
+    entity: dataset
 tests:
   searchDatasets:
-    - name: searches for hg38 epigenome datasets
-      params:
-        assembly: hg38
-      assert:
-        - path: datasets
-      allowError: true
+  - name: searches for hg38 epigenome datasets
+    params:
+      assembly: hg38
+    assert:
+    - path: datasets
+    allowError: true
   getDataset:
-    - name: gets a specific IHEC dataset
-      params:
-        id: IHECRE00000001
-      assert:
-        - path: id
-      allowError: true
+  - name: gets a specific IHEC dataset
+    params:
+      id: IHECRE00000001
+    assert:
+    - path: id
+    allowError: true

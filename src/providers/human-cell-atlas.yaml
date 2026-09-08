@@ -2,18 +2,18 @@ name: human-cell-atlas
 displayName: Human Cell Atlas
 description: Human Cell Atlas data portal — single-cell genomics projects and datasets
 tags:
-  - single-cell
-  - genomics
-  - cell-atlas
-  - transcriptomics
-  - hca
+- single-cell
+- genomics
+- cell-atlas
+- transcriptomics
+- hca
 baseUrl: https://service.azul.data.humancellatlas.org
 tools:
   searchProjects:
     description: Search Human Cell Atlas projects with optional filters
     tags:
-      - project-search
-      - single-cell-search
+    - project-search
+    - single-cell-search
     method: GET
     path: /index/projects
     params:
@@ -32,20 +32,21 @@ tools:
     response:
       format: json
       fields:
-        - hits[].entryId
-        - hits[].projects[].projectId
-        - hits[].projects[].projectTitle
-        - hits[].projects[].projectShortname
-        - hits[].projects[].projectDescription
-        - hits[].projects[].laboratory
-        - hits[].projects[].estimatedCellCount
-        - hits[].protocols[].libraryConstructionApproach
-        - hits[].protocols[].instrumentManufacturerModel
+      - hits[].entryId
+      - hits[].projects[].projectId
+      - hits[].projects[].projectTitle
+      - hits[].projects[].projectShortname
+      - hits[].projects[].projectDescription
+      - hits[].projects[].laboratory
+      - hits[].projects[].estimatedCellCount
+      - hits[].protocols[].libraryConstructionApproach
+      - hits[].protocols[].instrumentManufacturerModel
+    entity: dataset
   getProject:
     description: Get details for a specific Human Cell Atlas project by ID
     tags:
-      - project-info
-      - dataset-info
+    - project-info
+    - dataset-info
     method: GET
     path: /index/projects/{id}
     params:
@@ -60,29 +61,30 @@ tools:
     response:
       format: json
       fields:
-        - projects[].projectId
-        - projects[].projectTitle
-        - projects[].projectShortname
-        - projects[].projectDescription
-        - projects[].laboratory
-        - projects[].estimatedCellCount
-        - projects[].contributors[].contactName
-        - projects[].contributors[].institution
+      - projects[].projectId
+      - projects[].projectTitle
+      - projects[].projectShortname
+      - projects[].projectDescription
+      - projects[].laboratory
+      - projects[].estimatedCellCount
+      - projects[].contributors[].contactName
+      - projects[].contributors[].institution
+    entity: dataset
 tests:
   searchProjects:
-    - name: searches for HCA projects
-      params:
-        size: 5
-        catalog: dcp60
-      assert:
-        - path: hits
-          minLength: 1
-      allowError: true
+  - name: searches for HCA projects
+    params:
+      size: 5
+      catalog: dcp60
+    assert:
+    - path: hits
+      minLength: 1
+    allowError: true
   getProject:
-    - name: gets a specific HCA project
-      params:
-        id: 4a95101c-9ffc-4f30-a809-f04518a23803
-        catalog: dcp60
-      assert:
-        - path: projects
-      allowError: true
+  - name: gets a specific HCA project
+    params:
+      id: 4a95101c-9ffc-4f30-a809-f04518a23803
+      catalog: dcp60
+    assert:
+    - path: projects
+    allowError: true

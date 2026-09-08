@@ -2,18 +2,18 @@ name: cog
 displayName: COG
 description: Clusters of Orthologous Genes — ortholog classification and functional annotation
 tags:
-  - orthology
-  - clusters
-  - cog
-  - functional-annotation
-  - microbial-genomics
+- orthology
+- clusters
+- cog
+- functional-annotation
+- microbial-genomics
 baseUrl: https://www.ncbi.nlm.nih.gov/research/cog/api
 tools:
   searchCOG:
     description: Search COG clusters by COG ID or organism
     tags:
-      - cog-search
-      - ortholog-search
+    - cog-search
+    - ortholog-search
     method: GET
     path: /cog/
     params:
@@ -34,51 +34,58 @@ tools:
     response:
       format: json
       fields:
-        - count
-        - results[].cog.cog_id
-        - results[].cog.cog_name
-        - results[].cog.cog_category
-        - results[].gene_tag
-        - results[].organism.name
+      - count
+      - results[].cog.cogid
+      - results[].cog.name
+      - results[].gene_tag
+      - results[].organism.name
+    entity: gene
   getCOG:
     description: Get a specific COG by ID
     tags:
-      - cog-info
-      - ortholog-info
+    - cog-info
+    - ortholog-info
     method: GET
-    path: /cog/?cog={cogId}&per_page=5
+    path: /cog/
     params:
       cogId:
         type: string
         required: true
         mapsTo: cog
         description: COG identifier (e.g. COG0001)
+      per_page:
+        type: integer
+        default: 5
+        description: Number of results per page
     response:
       format: json
       fields:
-        - count
-        - results[].gene_tag
-        - results[].organism.name
-        - results[].bitscore
+      - count
+      - results[].cog.cogid
+      - results[].cog.name
+      - results[].gene_tag
+      - results[].organism.name
+      - results[].bitscore
+    entity: gene
 tests:
   searchCOG:
-    - name: searches for COG0001
-      params:
-        cog: COG0001
-      assert:
-        - path: count
-          gt: 0
-        - path: results
-          minLength: 1
-        - path: results.0.cog.cog_id
-          equals: COG0001
+  - name: searches for COG0001
+    params:
+      cog: COG0001
+    assert:
+    - path: count
+      gt: 0
+    - path: results
+      minLength: 1
+    - path: results.0.cog.cogid
+      equals: COG0001
   getCOG:
-    - name: gets COG0001 details
-      params:
-        cogId: COG0001
-      assert:
-        - path: count
-          gt: 0
-        - path: results
-          minLength: 1
-        - path: results.0.gene_tag
+  - name: gets COG0001 details
+    params:
+      cogId: COG0001
+    assert:
+    - path: count
+      gt: 0
+    - path: results
+      minLength: 1
+    - path: results.0.gene_tag

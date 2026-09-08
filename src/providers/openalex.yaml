@@ -2,19 +2,19 @@ name: openalex
 displayName: OpenAlex
 description: OpenAlex — open catalog of scholarly works, authors, institutions, and concepts
 tags:
-  - literature
-  - scholarly
-  - citations
-  - openalex
-  - publications
-  - open-access
+- literature
+- scholarly
+- citations
+- openalex
+- publications
+- open-access
 baseUrl: https://api.openalex.org
 tools:
   searchWorks:
     description: Search scholarly works by keyword
     tags:
-      - work-search
-      - publication-search
+    - work-search
+    - publication-search
     method: GET
     path: /works
     params:
@@ -31,21 +31,22 @@ tools:
     response:
       format: json
       fields:
-        - meta.count
-        - results[].id
-        - results[].doi
-        - results[].title
-        - results[].publication_year
-        - results[].type
-        - results[].authorships[].author.display_name
-        - results[].primary_location.source.display_name
-        - results[].cited_by_count
-        - results[].open_access.is_oa
+      - meta.count
+      - results[].id
+      - results[].doi
+      - results[].title
+      - results[].publication_year
+      - results[].type
+      - results[].authorships[].author.display_name
+      - results[].primary_location.source.display_name
+      - results[].cited_by_count
+      - results[].open_access.is_oa
+    entity: publication
   getWork:
     description: Get a specific scholarly work by OpenAlex ID
     tags:
-      - work-info
-      - publication-detail
+    - work-info
+    - publication-detail
     method: GET
     path: /works/{id}
     params:
@@ -56,21 +57,22 @@ tools:
     response:
       format: json
       fields:
-        - id
-        - doi
-        - title
-        - publication_year
-        - type
-        - authorships[].author.display_name
-        - primary_location.source.display_name
-        - cited_by_count
-        - open_access.is_oa
-        - abstract_inverted_index
+      - id
+      - doi
+      - title
+      - publication_year
+      - type
+      - authorships[].author.display_name
+      - primary_location.source.display_name
+      - cited_by_count
+      - open_access.is_oa
+      - abstract_inverted_index
+    entity: publication
   searchAuthors:
     description: Search authors by name
     tags:
-      - author-search
-      - researcher-search
+    - author-search
+    - researcher-search
     method: GET
     path: /authors
     params:
@@ -84,19 +86,20 @@ tools:
     response:
       format: json
       fields:
-        - meta.count
-        - results[].id
-        - results[].display_name
-        - results[].orcid
-        - results[].works_count
-        - results[].cited_by_count
-        - results[].summary_stats.h_index
-        - results[].last_known_institutions[].display_name
+      - meta.count
+      - results[].id
+      - results[].display_name
+      - results[].orcid
+      - results[].works_count
+      - results[].cited_by_count
+      - results[].summary_stats.h_index
+      - results[].last_known_institutions[].display_name
+    entity: publication
   getAuthor:
     description: Get an author profile by OpenAlex author ID
     tags:
-      - author-info
-      - researcher-detail
+    - author-info
+    - researcher-detail
     method: GET
     path: /authors/{id}
     params:
@@ -107,16 +110,17 @@ tools:
     response:
       format: json
       fields:
-        - id
-        - display_name
-        - works_count
-        - cited_by_count
-        - last_known_institutions[].display_name
+      - id
+      - display_name
+      - works_count
+      - cited_by_count
+      - last_known_institutions[].display_name
+    entity: publication
   getInstitution:
     description: Get institution details by OpenAlex institution ID
     tags:
-      - institution-info
-      - organization-detail
+    - institution-info
+    - organization-detail
     method: GET
     path: /institutions/{id}
     params:
@@ -127,59 +131,63 @@ tools:
     response:
       format: json
       fields:
-        - id
-        - display_name
-        - country_code
-        - type
-        - works_count
-  getConcept:
-    description: Get concept/topic details by OpenAlex concept ID
+      - id
+      - display_name
+      - country_code
+      - type
+      - works_count
+    entity: dataset
+  getTopic:
+    description: Get topic details by OpenAlex topic ID
     tags:
-      - concept-info
-      - topic-detail
+    - topic-info
+    - topic-detail
     method: GET
-    path: /concepts/{id}
+    path: /topics/{id}
     params:
       id:
         type: string
         required: true
-        description: OpenAlex concept ID e.g. 'C86803240'
+        description: OpenAlex topic ID e.g. 'T10113'
     response:
       format: json
       fields:
-        - id
-        - display_name
-        - description
-        - works_count
-        - level
+      - id
+      - display_name
+      - description
+      - works_count
+      - subfield.display_name
+      - field.display_name
+      - domain.display_name
+    entity: ontology-term
 tests:
   searchWorks:
-    - name: searches works for CRISPR
-      params:
-        search: CRISPR
-      assert:
-        - path: meta.count
-          gt: 0
-        - path: results
-          minLength: 1
+  - name: searches works for CRISPR
+    params:
+      search: CRISPR
+    assert:
+    - path: meta.count
+      gt: 0
+    - path: results
+      minLength: 1
   getAuthor:
-    - name: gets author by OpenAlex ID
-      params:
-        id: A5023888391
-      assert:
-        - path: display_name
-        - path: id
+  - name: gets author by OpenAlex ID
+    params:
+      id: A5023888391
+    assert:
+    - path: display_name
+    - path: id
   getInstitution:
-    - name: gets institution by OpenAlex ID
-      params:
-        id: I136199984
-      assert:
-        - path: display_name
-        - path: id
-  getConcept:
-    - name: gets concept by OpenAlex ID
-      params:
-        id: C86803240
-      assert:
-        - path: display_name
-        - path: id
+  - name: gets institution by OpenAlex ID
+    params:
+      id: I136199984
+    assert:
+    - path: display_name
+    - path: id
+  getTopic:
+  - name: gets topic by OpenAlex ID
+    params:
+      id: T10113
+    assert:
+    - path: display_name
+    - path: id

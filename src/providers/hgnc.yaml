@@ -2,11 +2,11 @@ name: hgnc
 displayName: HGNC
 description: HUGO Gene Nomenclature Committee — approved human gene symbols and names
 tags:
-  - gene
-  - nomenclature
-  - symbol
-  - human
-  - hgnc
+- gene
+- nomenclature
+- symbol
+- human
+- hgnc
 baseUrl: https://rest.genenames.org
 headers:
   Accept: application/json
@@ -14,8 +14,8 @@ tools:
   search:
     description: Search HGNC for gene symbols and names
     tags:
-      - gene-search
-      - symbol-search
+    - gene-search
+    - symbol-search
     method: GET
     path: /search/{query}
     params:
@@ -26,14 +26,15 @@ tools:
     response:
       format: json
       fields:
-        - response.docs[].symbol
-        - response.docs[].hgnc_id
-        - response.docs[].score
+      - response.docs[].symbol
+      - response.docs[].hgnc_id
+      - response.docs[].score
+    entity: gene
   getGene:
     description: Get gene record by approved gene symbol
     tags:
-      - gene-info
-      - symbol-lookup
+    - gene-info
+    - symbol-lookup
     method: GET
     path: /fetch/symbol/{symbol}
     params:
@@ -44,19 +45,20 @@ tools:
     response:
       format: json
       fields:
-        - response.docs[].hgnc_id
-        - response.docs[].symbol
-        - response.docs[].name
-        - response.docs[].locus_group
-        - response.docs[].locus_type
-        - response.docs[].location
-        - response.docs[].alias_symbol
-        - response.docs[].entrez_id
+      - response.docs[].hgnc_id
+      - response.docs[].symbol
+      - response.docs[].name
+      - response.docs[].locus_group
+      - response.docs[].locus_type
+      - response.docs[].location
+      - response.docs[].alias_symbol
+      - response.docs[].entrez_id
+    entity: gene
   getGeneById:
     description: Get gene record by HGNC ID
     tags:
-      - gene-info
-      - hgnc-id-lookup
+    - gene-info
+    - hgnc-id-lookup
     method: GET
     path: /fetch/hgnc_id/{hgncId}
     params:
@@ -67,35 +69,94 @@ tools:
     response:
       format: json
       fields:
-        - response.docs[].hgnc_id
-        - response.docs[].symbol
-        - response.docs[].name
-        - response.docs[].alias_symbol
-        - response.docs[].locus_type
-        - response.docs[].gene_group
+      - response.docs[].hgnc_id
+      - response.docs[].symbol
+      - response.docs[].name
+      - response.docs[].alias_symbol
+      - response.docs[].locus_type
+      - response.docs[].gene_group
+    entity: gene
+  getGeneByEntrezId:
+    description: Fetch gene record by Entrez/NCBI gene ID
+    tags:
+    - gene-info
+    - entrez-lookup
+    method: GET
+    path: /fetch/entrez_id/{entrezId}
+    params:
+      entrezId:
+        type: string
+        required: true
+        description: Entrez gene ID (e.g. 672 for BRCA1)
+    response:
+      format: json
+      fields:
+      - response.docs[].hgnc_id
+      - response.docs[].symbol
+      - response.docs[].name
+      - response.docs[].entrez_id
+    entity: gene
+  getGeneByEnsemblId:
+    description: Fetch gene record by Ensembl gene ID
+    tags:
+    - gene-info
+    - ensembl-lookup
+    method: GET
+    path: /fetch/ensembl_gene_id/{ensemblId}
+    params:
+      ensemblId:
+        type: string
+        required: true
+        description: Ensembl gene ID (e.g. ENSG00000012048)
+    response:
+      format: json
+      fields:
+      - response.docs[].hgnc_id
+      - response.docs[].symbol
+      - response.docs[].name
+      - response.docs[].ensembl_gene_id
+    entity: gene
 tests:
   search:
-    - name: searches for BRCA1 gene
-      params:
-        query: BRCA1
-      assert:
-        - path: response.docs
-          minLength: 1
+  - name: searches for BRCA1 gene
+    params:
+      query: BRCA1
+    assert:
+    - path: response.docs
+      minLength: 1
   getGene:
-    - name: gets gene record for BRCA1 symbol
-      params:
-        symbol: BRCA1
-      assert:
-        - path: response.docs
-          minLength: 1
-        - path: response.docs.0.symbol
-          equals: BRCA1
+  - name: gets gene record for BRCA1 symbol
+    params:
+      symbol: BRCA1
+    assert:
+    - path: response.docs
+      minLength: 1
+    - path: response.docs.0.symbol
+      equals: BRCA1
   getGeneById:
-    - name: gets gene record by HGNC ID for TP53
-      params:
-        hgncId: "HGNC:11998"
-      assert:
-        - path: response.docs
-          minLength: 1
-        - path: response.docs.0.symbol
-          equals: TP53
+  - name: gets gene record by HGNC ID for TP53
+    params:
+      hgncId: HGNC:11998
+    assert:
+    - path: response.docs
+      minLength: 1
+    - path: response.docs.0.symbol
+      equals: TP53
+  getGeneByEntrezId:
+  - name: gets gene by Entrez ID for BRCA1
+    params:
+      entrezId: '672'
+    assert:
+    - path: response.docs
+      minLength: 1
+    - path: response.docs.0.symbol
+      equals: BRCA1
+  getGeneByEnsemblId:
+  - name: gets gene by Ensembl ID for BRCA1
+    params:
+      ensemblId: ENSG00000012048
+    assert:
+    - path: response.docs
+      minLength: 1
+    - path: response.docs.0.symbol
+      equals: BRCA1

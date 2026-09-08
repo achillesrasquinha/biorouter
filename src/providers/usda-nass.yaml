@@ -1,18 +1,25 @@
 name: usda-nass
 displayName: USDA NASS
 description: USDA National Agricultural Statistics Service — US crop, livestock, and agricultural census data
-tags: [agriculture, usda, statistics, crops, livestock, census]
+tags:
+- agriculture
+- usda
+- statistics
+- crops
+- livestock
+- census
 baseUrl: https://quickstats.nass.usda.gov/api
-
 auth:
   type: apiKey
   param: key
   env: LS_USDA_NASS_API_KEY
-
 tools:
-  query:
+  queryStatistics:
     description: Query USDA NASS agricultural statistics by commodity and year
-    tags: [ag-statistics, crop-data, livestock-data]
+    tags:
+    - ag-statistics
+    - crop-data
+    - livestock-data
     method: GET
     path: /api_GET
     params:
@@ -31,10 +38,12 @@ tools:
         description: Statistic category (e.g. "PRODUCTION", "YIELD", "AREA PLANTED")
     response:
       format: json
-
+    entity: dataset
   getParams:
     description: Get allowed values for a NASS query parameter
-    tags: [parameter-values, data-dictionary]
+    tags:
+    - parameter-values
+    - data-dictionary
     method: GET
     path: /get_param_values
     params:
@@ -44,20 +53,20 @@ tools:
         description: Parameter name to get values for (e.g. "commodity_desc", "state_name", "year")
     response:
       format: json
-
+    entity: dataset
 tests:
-  query:
-    - name: queries corn production statistics
-      params:
-        commodity_desc: CORN
-        year: "2023"
-      assert:
-        - minLength: 1
-      allowError: true
+  queryStatistics:
+  - name: queries corn production statistics
+    params:
+      commodity_desc: CORN
+      year: '2023'
+    assert:
+    - minLength: 1
+    allowError: true
   getParams:
-    - name: gets list of commodity values
-      params:
-        param: commodity_desc
-      assert:
-        - minLength: 1
-      allowError: true
+  - name: gets list of commodity values
+    params:
+      param: commodity_desc
+    assert:
+    - minLength: 1
+    allowError: true

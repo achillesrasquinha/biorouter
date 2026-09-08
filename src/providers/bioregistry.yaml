@@ -2,18 +2,18 @@ name: bioregistry
 displayName: Bioregistry
 description: Bioregistry — registry of 1000+ biological databases with identifier patterns and metadata
 tags:
-  - registry
-  - identifiers
-  - databases
-  - metadata
-  - prefixes
+- registry
+- identifiers
+- databases
+- metadata
+- prefixes
 baseUrl: https://bioregistry.io/api
 tools:
   getResource:
     description: Get metadata for a biological database by prefix
     tags:
-      - database-info
-      - registry-lookup
+    - database-info
+    - registry-lookup
     method: GET
     path: /registry/{prefix}
     params:
@@ -24,16 +24,17 @@ tools:
     response:
       format: json
       fields:
-        - prefix
-        - name
-        - description
-        - pattern
-        - uri_format
+      - prefix
+      - name
+      - description
+      - pattern
+      - uri_format
+    entity: identifier
   resolveIdentifier:
     description: Resolve a CURIE to provider URLs across databases
     tags:
-      - identifier-resolution
-      - curie-lookup
+    - identifier-resolution
+    - curie-lookup
     method: GET
     path: /reference/{curie}
     params:
@@ -44,20 +45,21 @@ tools:
     response:
       format: json
       fields:
-        - query.prefix
-        - query.identifier
-        - providers
+      - query.prefix
+      - query.identifier
+      - providers
+    entity: identifier
 tests:
   getResource:
-    - name: gets UniProt metadata
-      params:
-        prefix: uniprot
-      assert:
-        - path: prefix
-        - path: name
+  - name: gets UniProt metadata
+    params:
+      prefix: uniprot
+    assert:
+    - path: prefix
+    - path: name
   resolveIdentifier:
-    - name: resolves a UniProt CURIE
-      params:
-        curie: uniprot:P00734
-      assert:
-        - path: providers
+  - name: resolves a UniProt CURIE
+    params:
+      curie: uniprot:P00734
+    assert:
+    - path: providers

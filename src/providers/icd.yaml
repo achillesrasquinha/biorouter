@@ -2,24 +2,22 @@ name: icd
 displayName: WHO ICD-11
 description: WHO ICD-11 International Classification of Diseases — search and retrieve disease classifications
 tags:
-  - disease-classification
-  - icd
-  - who
-  - diagnosis
-  - medical-coding
+- disease-classification
+- icd
+- who
+- diagnosis
+- medical-coding
 baseUrl: https://id.who.int/icd
-
 auth:
   type: header
   header: Authorization
   env: LS_ICD_API_KEY
-
 tools:
   search:
     description: Search ICD-11 for diseases and health conditions
     tags:
-      - disease-search
-      - classification-search
+    - disease-search
+    - classification-search
     method: GET
     path: /entity/search
     params:
@@ -46,12 +44,12 @@ tools:
         description: Return flat result list
     response:
       format: json
-
+    entity: disease
   getEntity:
     description: Get details of a specific ICD-11 entity by ID
     tags:
-      - entity-detail
-      - classification-lookup
+    - entity-detail
+    - classification-lookup
     method: GET
     path: /entity/{id}
     params:
@@ -61,19 +59,19 @@ tools:
         description: ICD-11 entity ID (e.g. "455013390" for diabetes mellitus)
     response:
       format: json
-
+    entity: disease
 tests:
   search:
-    - name: searches for diabetes
-      params:
-        query: diabetes
-      assert:
-        - {}
-      allowError: true
+  - name: searches for diabetes
+    params:
+      query: diabetes
+    assert:
+    - {}
+    allowError: true
   getEntity:
-    - name: gets entity by ID
-      params:
-        id: "455013390"
-      assert:
-        - {}
-      allowError: true
+  - name: gets entity by ID
+    params:
+      id: '455013390'
+    assert:
+    - {}
+    allowError: true

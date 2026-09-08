@@ -1,0 +1,106 @@
+name: merops
+displayName: MEROPS
+description: MEROPS peptidase/protease families accessed via the InterPro API
+tags:
+- protease
+- peptidase
+- enzyme
+- merops
+baseUrl: https://www.ebi.ac.uk/interpro/api
+tools:
+  searchMeropsFamilies:
+    description: Search MEROPS peptidase/protease families by keyword via InterPro
+    tags:
+    - protease-search
+    - peptidase-search
+    method: GET
+    path: /entry/merops
+    params:
+      query:
+        type: string
+        required: true
+        mapsTo: search
+        description: Search keyword (e.g. "trypsin", "cysteine protease", "metallopeptidase")
+      pageSize:
+        type: integer
+        default: 10
+        mapsTo: page_size
+        description: Number of results per page
+    response:
+      format: json
+      fields:
+      - count
+      - results[].metadata.accession
+      - results[].metadata.name
+      - results[].metadata.source_database
+      - results[].metadata.type
+      - results[].metadata.integrated
+    entity: protein
+  getMeropsEntry:
+    description: Get detailed information for a specific MEROPS family by accession
+    tags:
+    - protease-info
+    - peptidase-info
+    method: GET
+    path: /entry/merops/{accession}
+    params:
+      accession:
+        type: string
+        required: true
+        description: MEROPS accession (e.g. M12.001 or a MEROPS clan/family identifier)
+    response:
+      format: json
+      fields:
+      - metadata.accession
+      - metadata.name
+      - metadata.source_database
+      - metadata.type
+      - metadata.integrated
+      - metadata.counters.proteins
+      - metadata.counters.structures
+      - metadata.counters.taxa
+    entity: protein
+  getProteinsInFamily:
+    description: Get UniProt proteins associated with a MEROPS family
+    tags:
+    - protease-proteins
+    - family-members
+    method: GET
+    path: /protein/entry/merops/{accession}
+    params:
+      accession:
+        type: string
+        required: true
+        description: MEROPS accession (e.g. M12.001)
+      pageSize:
+        type: integer
+        default: 10
+        mapsTo: page_size
+        description: Number of results per page
+    response:
+      format: json
+      fields:
+      - count
+      - results[].metadata.accession
+      - results[].metadata.name
+      - results[].metadata.source_organism.scientificName
+      - results[].metadata.length
+      - results[].metadata.gene
+    entity: protein
+tests:
+  searchMeropsFamilies:
+  - name: searches for trypsin peptidase families
+    params:
+      query: trypsin
+    assert:
+    - path: results
+      minLength: 1
+    allowError: true
+  getMeropsEntry:
+  - name: gets MEROPS entry M12.001
+    params:
+      accession: M12.001
+    assert:
+    - path: metadata.accession
+      equals: M12.001
+    allowError: true
