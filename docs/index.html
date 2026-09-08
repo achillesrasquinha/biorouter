@@ -42,6 +42,18 @@ section .sec-desc{color:#666;font-size:14px;margin-bottom:28px}
 .ep-desc{font-size:13px;color:#666;margin-top:4px;line-height:1.5}
 .ep-meta{margin-top:8px;font-size:11px;color:var(--teal-600);opacity:.7}
 
+.examples-tabs{display:flex;gap:8px;margin-bottom:20px}
+.etab{padding:6px 18px;border-radius:20px;font-size:13px;font-weight:600;background:#f8fafb;border:1px solid #e8e8e8;color:#888;cursor:pointer;transition:all .15s}
+.etab:hover,.etab.active{border-color:var(--teal);color:var(--teal-700);background:var(--teal-50)}
+.eq-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:1px;background:#e2e8f0;border:1px solid #e2e8f0;border-radius:10px;overflow:hidden}
+.eq-card{background:#fff;padding:16px 20px;transition:background .15s}
+.eq-card:hover{background:var(--teal-50)}
+.eq-query{font-size:13px;color:#333;line-height:1.6;font-style:italic}
+.eq-tags{margin-top:8px;display:flex;gap:4px;flex-wrap:wrap}
+.eq-tag{font-size:10px;padding:2px 7px;border-radius:4px;font-weight:600}
+.eq-domain{color:var(--teal-700);background:var(--teal-50);border:1px solid var(--teal-200)}
+.eq-role{color:#6d28d9;background:#f5f3ff;border:1px solid #ddd6fe}
+
 .search-bar{margin-bottom:16px}
 .search-bar input{width:100%;max-width:400px;background:#f8fafb;color:#1a1a1a;border:1px solid #e0e0e0;padding:10px 16px;border-radius:8px;font-size:14px;font-family:inherit}
 .search-bar input:focus{outline:none;border-color:var(--teal)}
@@ -81,6 +93,7 @@ footer a{color:var(--teal-600)}
   <div class="logo">biorouter</div>
   <div class="nav-links">
     <a href="#endpoints">Endpoints</a>
+    <a href="#examples">Examples</a>
     <a href="#providers">Providers</a>
     <a href="https://github.com/achillesrasquinha/biorouter">GitHub</a>
   </div>
@@ -106,6 +119,15 @@ footer a{color:var(--teal-600)}
   <h2>Endpoints</h2>
   <div class="sec-desc">Orchestrated queries that fan out to multiple APIs in parallel and return a single merged result.</div>
   <div class="ep-grid" id="epGrid"></div>
+</section>
+
+<hr class="sep">
+
+<section id="examples">
+  <h2>Example Queries</h2>
+  <div class="sec-desc">From simple lookups to multi-database research workflows — 39 curated queries across clinical, ecology, molecular, and translational domains.</div>
+  <div class="examples-tabs" id="exTabs"></div>
+  <div class="eq-grid" id="eqGrid"></div>
 </section>
 
 <hr class="sep">
@@ -177,6 +199,80 @@ function renderProviders() {
 
 searchInput.addEventListener('input', renderProviders);
 renderProviders();
+
+const EXAMPLES = [
+  {level:"Beginner",domain:"Clinical Genetics",role:"Medical Resident",q:"I have a patient with a novel LDLR variant (c.2054C>T) — what does ClinVar say about its pathogenicity, and what’s the population allele frequency in gnomAD?"},
+  {level:"Beginner",domain:"Pharmacogenomics",role:"Clinical Pharmacist",q:"A patient is a CYP2D6 poor metabolizer — should I adjust the dose for vortioxetine? Check PharmGKB for CPIC guidelines and DailyMed for label language."},
+  {level:"Beginner",domain:"Rare Disease",role:"Genetic Counselor",q:"A family reports a diagnosis of Stargardt disease — what’s the inheritance pattern and causative genes? Look in Orphanet and GARD."},
+  {level:"Beginner",domain:"Drug Safety",role:"Public Health Analyst",q:"Are there emerging safety signals for semaglutide related to thyroid neoplasms? Check openFDA FAERS data and Europe PMC for recent publications."},
+  {level:"Beginner",domain:"Conservation",role:"Conservation Volunteer",q:"Show me the distribution of American pika (Ochotona princeps) observations from iNaturalist and their current IUCN Red List status."},
+  {level:"Beginner",domain:"Ecology",role:"Birdwatcher",q:"Where has the Arctic tern (Sterna paradisaea) been reported in eBird during the last migration season?"},
+  {level:"Beginner",domain:"Structural Biology",role:"Graduate Student",q:"What is the experimentally determined structure of FUS protein in PDB, and does AlphaFold predict any low-confidence disordered regions?"},
+  {level:"Beginner",domain:"Metabolomics",role:"Research Technician",q:"What are the known biological roles and pathway associations of sphingosine-1-phosphate in HMDB and LIPID MAPS?"},
+  {level:"Beginner",domain:"Cancer Genomics",role:"Clinical Research Coordinator",q:"What are the most common EGFR mutations in lung adenocarcinoma in cBioPortal, and which ones are clinically actionable in OncoKB?"},
+  {level:"Beginner",domain:"Synthetic Biology",role:"Synthetic Biology Engineer",q:"Find commonly used promoter parts in the iGEM Registry for E. coli protein expression systems."},
+  {level:"Beginner",domain:"Transcriptomics",role:"Bioinformatics Analyst",q:"What is the tissue-specific expression pattern of the CLOCK gene across human organs in GTEx and Human Protein Atlas?"},
+  {level:"Beginner",domain:"Agriculture",role:"Agricultural Extension Officer",q:"What are the global rice production trends over the last 20 years from FAOSTAT, and how do they correlate with USDA NASS data for US production?"},
+  {level:"Intermediate",domain:"Clinical Genetics",role:"Clinical Geneticist",q:"I found a VUS in SCN5A (p.Arg1632His) in a patient with suspected long QT syndrome — cross-reference ClinVar, ClinGen gene-disease validity, gnomAD constraint metrics, and Ensembl VEP functional predictions. Is this likely pathogenic?"},
+  {level:"Intermediate",domain:"Pharmacogenomics",role:"Oncology Pharmacist",q:"Patient with metastatic colorectal cancer is DPYD heterozygous (c.1905+1G>A) — what fluoropyrimidine dose adjustments does CPIC recommend via PharmGKB, and are there alternative regimens listed in ClinicalTrials.gov?"},
+  {level:"Intermediate",domain:"Rare Disease",role:"Rare Disease Specialist",q:"A 3-year-old with developmental delay, hypotonia, and abnormal eye movements — query HPO for matching phenotypes, then cross-reference candidate genes in Monarch Initiative, OMIM, and check if GTR lists available clinical testing panels."},
+  {level:"Intermediate",domain:"Public Health",role:"Cardiologist",q:"A patient’s direct-to-consumer test shows elevated polygenic risk score for coronary artery disease — validate the PRS model in PGS Catalog, check if DisGeNET has updated gene-CAD associations, and review ClinicalTrials.gov for prevention trials enrolling based on genetic risk."},
+  {level:"Intermediate",domain:"Ecology",role:"Invasion Ecologist",q:"Compare historical and current distribution of spotted lanternfly (Lycorma delicatula) using GBIF and iNaturalist, and identify potential agricultural impacts from USDA NASS crop regions."},
+  {level:"Intermediate",domain:"Conservation",role:"Pollinator Biologist",q:"Analyze citizen-science trends for rusty patched bumble bee (Bombus affinis) from GBIF and iNaturalist, cross-reference with IUCN Red List status changes and US corn production areas from USDA NASS."},
+  {level:"Intermediate",domain:"Marine Biology",role:"Fisheries Analyst",q:"Compare Atlantic cod (Gadus morhua) occurrence data from OBIS and FishBase life-history traits with IUCN threat assessments and recent genomic diversity from NCBI SRA."},
+  {level:"Intermediate",domain:"Wildlife Management",role:"Wildlife Corridor Planner",q:"Map jaguar (Panthera onca) observations from VertNet and GBIF, overlay with Movebank GPS tracking data, and assess genetic connectivity using BOLD barcode clusters."},
+  {level:"Intermediate",domain:"Structural Biology",role:"Structural Biologist",q:"For the nuclear pore complex protein NUP98, compare its experimentally determined structures in PDB with AlphaFold predictions and identify intrinsically disordered regions using DisProt and MobiDB."},
+  {level:"Intermediate",domain:"Systems Biology",role:"Systems Biologist",q:"What are the protein-protein interaction partners of GPX4 in STRING and IntAct, and which metabolic pathways from KEGG and Reactome are enriched among these interactors relevant to ferroptosis?"},
+  {level:"Intermediate",domain:"Single Cell",role:"Single-Cell Analyst",q:"Using CELLxGENE and Human Cell Atlas, identify marker genes for oligodendrocyte precursor cells in human brain, then validate their expression specificity across tissues in GTEx and Bgee."},
+  {level:"Intermediate",domain:"Cancer Genomics",role:"Translational Oncologist",q:"Identify actionable BRCA1/BRCA2 alterations across ovarian cancer cohorts in GDC and cBioPortal, then cross-reference with FDA-approved PARP inhibitors in DGIdb and clinical trial outcomes in ClinicalTrials.gov."},
+  {level:"Intermediate",domain:"Drug Discovery",role:"Medicinal Chemist",q:"For the SMARCA4 target, retrieve binding ligands from ChEMBL, predict ADME properties using SwissADME and pkCSM, and identify E3 ligase recruiters from BindingDB to design a PROTAC degrader."},
+  {level:"Intermediate",domain:"Immunology",role:"CAR-T Therapy Developer",q:"Identify tumor-associated antigens overexpressed in glioblastoma from cBioPortal and DepMap, check for normal tissue expression in Pharos, and retrieve published CAR-T trials from ClinicalTrials.gov and Europe PMC."},
+  {level:"Intermediate",domain:"Natural Products",role:"Natural Products Chemist",q:"Search COCONUT and LOTUS for natural products with quinone scaffolds, classify their chemical ontology using ClassyFire, and identify analogs with known bioactivity in ChEMBL and PubChem."},
+  {level:"Advanced",domain:"Clinical Genetics",role:"Precision Medicine Fellow",q:"Patient with suspected mitochondrial disorder carries compound heterozygous POLG variants (c.2243G>C and c.2542G>A). Chain: ClinVar and ClinGen for pathogenicity, gnomAD for allele frequency and constraint, GTEx for POLG tissue expression, MyVariant.info for aggregated annotations, HPO for genotype-phenotype correlation with the patient’s seizures and ataxia, and PubMed and Europe PMC for case reports of these specific variants."},
+  {level:"Advanced",domain:"Drug Safety",role:"Pharmacovigilance Scientist",q:"Investigating post-marketing immune-mediated adverse events with tofacitinib — openFDA FAERS for disproportionality analysis, DailyMed for current label warnings, FDA Orange Book for formulation differences, ClinicalTrials.gov for ongoing safety studies, PharmGKB for pharmacogenomic associations with JAK inhibitor toxicity, EpiGraphDB for causal inference, and SNOMED CT and ICD-11 for standardized adverse event coding."},
+  {level:"Advanced",domain:"Rare Disease",role:"Rare Disease Diagnostician",q:"Adult patient with progressive ataxia, peripheral neuropathy, and hypogonadism — HPO phenotype matching for candidate genes, filter by ClinGen gene-disease validity, cross-reference OMIM for overlap syndromes, check GTR for available testing, review MalaCards comorbidity patterns, query DisGeNET gene-phenotype networks, search Europe PMC for atypical presentations, and verify ICD-11 coding for research cohort identification."},
+  {level:"Advanced",domain:"Ecology",role:"Climate Change Ecologist",q:"Identify northward range shifts in American beech (Fagus grandifolia) by comparing GBIF occurrence records over 50 years, integrate Planteome trait data, correlate with USDA NASS forest health surveys, and assess evolutionary capacity using TimeTree divergence and NCBI SRA population genomics."},
+  {level:"Advanced",domain:"Marine Biology",role:"Marine Conservation Geneticist",q:"Characterize genetic diversity of newly discovered hydrothermal vent species by integrating OBIS occurrence records, WoRMS taxonomic validation, AquaMaps habitat models, BOLD DNA barcodes, NCBI SRA metagenomic surveys, and phylogenetic placement using Open Tree of Life."},
+  {level:"Advanced",domain:"Agriculture",role:"Agricultural Genomics Researcher",q:"Investigate fall armyworm (Spodoptera frugiperda) resistance evolution by combining GBIF invasion pathways, NCBI Taxonomy strain classification, NCBI SRA Bt-resistance genomics, BOLD haplotype networks, FAOSTAT maize loss data, and MaizeGDB resistance gene orthologs."},
+  {level:"Advanced",domain:"Structural Biology",role:"Principal Investigator",q:"For TDP-43, integrate PDB structures, AlphaFold predictions, and DisProt disorder annotations to map its prion-like domain. Then use RNAcentral and ENCODE to identify its RNA targets, cross-reference with Rfam for structured RNA elements, and analyze enriched RNA-binding motifs from JASPAR to understand its role in stress granule formation."},
+  {level:"Advanced",domain:"Proteomics",role:"Mitochondrial Biologist",q:"Compile the human mitochondrial proteome using UniProt with DeepLoc and SignalP predictions for targeting sequences. Cross-reference with PRIDE for experimentally detected proteins, map interaction networks in Complex Portal and STRING, identify metabolic enzymes and reactions in SABIO-RK and BiGG Models, then analyze pathway enrichment using Reactome and g:Profiler."},
+  {level:"Advanced",domain:"Cancer Genomics",role:"Precision Oncology Scientist",q:"Identify synthetic lethal interactions for IDH1-mutant gliomas using DepMap CRISPR screens, cross-reference with genomic co-occurrence patterns in GDC and Progenetix, validate targets with existing small molecules in ChEMBL and BindingDB, assess druggability via Pharos, and retrieve preclinical evidence from Europe PMC and bioRxiv."},
+  {level:"Advanced",domain:"Drug Discovery",role:"ADC Scientist",q:"For Trop-2 positive triple-negative breast cancer — retrieve tumor expression from cBioPortal and GDC, identify payload candidates from ChEMBL and ZINC with cytotoxic mechanisms in DGIdb, assess linker chemistry using ClassyFire and pkCSM, validate internalization via Open Targets and Pharos, and compile ADC clinical trials from ClinicalTrials.gov."},
+  {level:"Advanced",domain:"Immunology",role:"Immunotherapy Researcher",q:"Build a neoantigen prioritization pipeline for microsatellite-stable colorectal cancer — extract somatic mutations from GDC, predict MHC-I and MHC-II binding using NetMHCpan and NetMHCIIpan, cross-reference patient HLA types with IPD-IMGT/HLA, validate immunogenicity with IEDB, check TCR repertoire coverage in VDJdb and AIRR Data Commons, and review vaccine trial outcomes in ClinicalTrials.gov."},
+  {level:"Advanced",domain:"Cheminformatics",role:"AI-Driven Drug Designer",q:"Validate AI-generated molecules targeting BTK for autoimmune disease — check structural novelty against PubChem, ZINC, and SureChEMBL patents, predict binding affinity using ChEMBL SAR data, assess ADMET with SwissADME and pkCSM, identify off-target risks via Pharos and BindingDB, retrieve BTK pathway biology from Open Targets and KEGG, and survey the competitive landscape in FDA Orange Book and ClinicalTrials.gov."}
+];
+
+const levels = ['Beginner','Intermediate','Advanced'];
+const exTabs = document.getElementById('exTabs');
+const eqGrid = document.getElementById('eqGrid');
+let activeLevel = 'Beginner';
+
+levels.forEach(lv => {
+  const tab = document.createElement('span');
+  tab.className = 'etab' + (lv===activeLevel?' active':'');
+  tab.textContent = lv + ' (' + EXAMPLES.filter(e=>e.level===lv).length + ')';
+  tab.onclick = () => {
+    activeLevel = lv;
+    document.querySelectorAll('.etab').forEach(t=>t.classList.remove('active'));
+    tab.classList.add('active');
+    renderExamples();
+  };
+  exTabs.appendChild(tab);
+});
+
+function renderExamples() {
+  const filtered = EXAMPLES.filter(e => e.level === activeLevel);
+  eqGrid.innerHTML = filtered.map(e =>
+    '<div class="eq-card">' +
+      '<div class="eq-query">' + esc(e.q) + '</div>' +
+      '<div class="eq-tags">' +
+        '<span class="eq-tag eq-domain">' + esc(e.domain) + '</span>' +
+        '<span class="eq-tag eq-role">' + esc(e.role) + '</span>' +
+      '</div>' +
+    '</div>'
+  ).join('');
+}
+renderExamples();
 
 function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
